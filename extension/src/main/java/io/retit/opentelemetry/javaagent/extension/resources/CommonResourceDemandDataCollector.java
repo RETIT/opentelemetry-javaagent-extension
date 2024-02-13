@@ -1,0 +1,160 @@
+package io.retit.opentelemetry.javaagent.extension.resources;
+
+import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
+import java.util.Locale;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ * General-purpose implementation of an {@link IResourceDemandDataCollector}.
+ * <p>
+ * This class uses both JVM methods (via a <code>jvmCollector</code>) as well as
+ * native methods (<code>osCollector</code>) in order to provide the methods
+ * necessary for collecting resource demands on a system. These resource demands
+ * are generally measured twice for a specific method invocation. This is done
+ * by the {@link TelemetryUtils}.
+ *
+
+ */
+public abstract class CommonResourceDemandDataCollector implements IResourceDemandDataCollector {
+
+    private static final String WINDOWS_NAME = "windows";
+    private static final String LINUX_NAME = "linux";
+    private static final String HOTSPOT_NAME = "HotSpot";
+    private static final String IBM_JVM_NAME = "IBM";
+
+    private static final String OS_NAME_PROPERTY = "os.name";
+
+    private static final String IBM_VENDOR = "ibm";
+
+    private static final String JVM_NAME_PROPERTY = "java.vm.name";
+
+    private static final Logger LOGGER = Logger.getLogger(CommonResourceDemandDataCollector.class.getName());
+
+    private static ThreadMXBean threadmxBean;
+
+    private IResourceDemandDataCollector jvmCollector;
+
+    /**
+     * Gets an instance of {@link IResourceDemandDataCollector} which is
+     * applicable for this system.
+     * <p>
+     * The returned instance will be a collector for the current OS which also
+     * has a reference to a JVM-specific collector.
+     *
+     * @return
+     */
+    public static IResourceDemandDataCollector getResourceDemandDataCollector() {
+
+        String osName = System.getProperty(OS_NAME_PROPERTY);
+
+        CommonResourceDemandDataCollector osCollector;
+        if (osName.trim().toLowerCase().contains(WINDOWS_NAME)) {
+            osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(WINDOWS_NAME);
+        } else if (osName.trim().toLowerCase().contains(LINUX_NAME)) {
+            osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(LINUX_NAME);
+        } else {
+            throw new UnsupportedOperationException("Cannot collect Resource Demands for current OS: " + osName);
+        }
+
+        IResourceDemandDataCollector jvmCollector;
+
+        // FIXME: Workaround for OpenJDK
+        if (isHotspotJVM() || isOpenJDK()) {
+            jvmCollector = getDataCollectorFromJVM(HOTSPOT_NAME);
+        } else if (isIBMJVM()) {
+            jvmCollector = getDataCollectorFromJVM(IBM_JVM_NAME);
+        } else {
+            throw new UnsupportedOperationException(
+                "Cannot collect Resource Demands for current JVM: " + System.getProperty(JVM_NAME_PROPERTY));
+        }
+
+        osCollector.setJvmCollector(jvmCollector);
+        return osCollector;
+    }
+
+    /**
+     * get the ResourceDemandDataCollector to be used from a string containing
+     * the OS's name
+     *
+     * @param osName the name of the OS to use
+     * @return the JVMDataCollector for the selected JVM
+     */
+    protected static IResourceDemandDataCollector getDataCollectorFromOS(final String osName) {
+        if (osName.equals(WINDOWS_NAME)) {
+            return new WindowsDataCollector();
+        }
+        if (osName.equals(LINUX_NAME)) {
+            return new LinuxDataCollector();
+        }
+        throw new UnsupportedOperationException("Unsupported OS: " + osName);
+    }
+
+    /**
+     * get the ResourceDemandDataCollector to be used from a string containing
+     * the JVM's name
+     *
+     * @param jvmName the name of the JVM to use
+     * @return the JVMDataCollector for the selected JVM
+     */
+    protected static IResourceDemandDataCollector getDataCollectorFromJVM(final String jvmName) {
+        return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources." + jvmName + "DataCollector");
+    }
+
+    private static Object loadInstance(String className) {
+        Class<?> collectorClass;
+        Object collector = null;
+        try {
+            collectorClass = Class.forName(className);
+            collector = collectorClass.newInstance();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Could not initialize instance: " + className, e);
+        }
+        return collector;
+    }
+
+    protected static ThreadMXBean getThreadMXBean() {
+        if (threadmxBean == null) {
+            threadmxBean = ManagementFactory.getThreadMXBean();
+        }
+        return threadmxBean;
+    }
+
+    @Override
+    public long getCurrentThreadCpuTime() {
+        return getThreadMXBean().getCurrentThreadCpuTime();
+    }
+
+    @Override
+    public long getCurrentThreadAllocatedBytes() {
+        return jvmCollector.getCurrentThreadAllocatedBytes();
+    }
+
+    /**
+     * Sets the JVM collector to the specified one.
+     */
+    public void setJvmCollector(IResourceDemandDataCollector jvmCollector) {
+        this.jvmCollector = jvmCollector;
+    }
+
+    private static boolean isIBMJVM() {
+        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains(IBM_VENDOR);
+    }
+
+    private static boolean isJRockitJVM() {
+        return System.getProperty("jrockit.version") != null
+            || System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).indexOf("jrockit") >= 0;
+    }
+
+    private static boolean isHotspotJVM() {
+        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("hotspot");
+    }
+
+    private static boolean isOpenJDK() {
+        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("openjdk");
+    }
+
+}
