@@ -40,6 +40,11 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logDiskDemand,
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readWriteSpan);
+        if (readWriteSpan.toSpanData() != null) {
+            System.out.println("Start attributes: " + readWriteSpan.toSpanData().getAttributes());
+        } else {
+            System.out.println("SpanData is null");
+        }
     }
 
     @Override
@@ -70,6 +75,7 @@ public class RETITSpanProcessor implements SpanProcessor {
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
+        boolean logCPuTimeUsed = TelemetryUtils.isLogCpuTimeUsedDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
@@ -82,18 +88,16 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logDiskDemand,
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readableSpan);
-        System.out.println("End attributes: " + mergedAttributes);
+
         Long startCpuTime = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
         Long endCpuTime = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
-        long cpuTimeUsed = 0;
 
         if (startCpuTime != null && endCpuTime != null) {
-            cpuTimeUsed = startCpuTime - endCpuTime;
+            TelemetryUtils.addCPUTimeUsedToSpanAttributes(attributesBuilder, logCPuTimeUsed, endCpuTime - startCpuTime, readableSpan);
         }
+        Attributes finalAttributes = attributesBuilder.build();
 
-        System.out.println("CPU time used: " + cpuTimeUsed);
-
-        return TelemetryUtils.createReadableSpan(readableSpan, mergedAttributes);
+        return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }
 
     @Override

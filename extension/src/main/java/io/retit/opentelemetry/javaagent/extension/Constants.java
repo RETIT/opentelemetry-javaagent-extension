@@ -21,6 +21,7 @@ public class Constants {
     public static final int RETIT_APM_CASSANDRA_MAXIMUM_SHARD_QUERY = 72;
     public static final String RETIT_APM_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.response.time";
     public static final String RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.cpu.demand";
+    public static final String RETIT_APM_CPU_TIMES_USED_LOGGING_ENABLED = "de.retit.apm.log.cpu.time.used";
     public static final String RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.heap.demand";
     public static final String RETIT_APM_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.network.demand";
     public static final String RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.disk.demand";
@@ -33,6 +34,7 @@ public class Constants {
 
     public static final String STARTCPUTIME_FIELD = "startcputime";
     public static final String ENDCPUTIME_FIELD = "endcputime";
+    public static final String CPUTIME_USED = "cputimeused";
 
     public static final String STARTSYSTEMTIME_FIELD = "startsystemtime";
     public static final String ENDSYSTEMTIME_FIELD = "endsystemtime";
@@ -86,6 +88,7 @@ public class Constants {
     public static final String SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTDISKWRITEDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_START_CPU_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTCPUTIME_FIELD);
     public static final String SPAN_ATTRIBUTE_END_CPU_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDCPUTIME_FIELD);
+    public static final String SPAN_ATTRIBUTE_CPU_TIME_USED = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, CPUTIME_USED);
     public static final String SPAN_ATTRIBUTE_END_DISK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDDISKREADDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDDISKWRITEDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDHEAPBYTEALLOCATION_FIELD);

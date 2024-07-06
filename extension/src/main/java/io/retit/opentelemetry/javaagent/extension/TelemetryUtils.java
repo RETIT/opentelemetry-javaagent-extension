@@ -40,6 +40,10 @@ public class TelemetryUtils {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
+    public static boolean isLogCpuTimeUsedDefaultTrue() {
+        return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_CPU_TIMES_USED_LOGGING_ENABLED, true);
+    }
+
     public static SpanData createSpanData(SpanData spanData, Attributes attributes) {
         return new SpanData() {
             @Override
@@ -234,6 +238,14 @@ public class TelemetryUtils {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION,
                         RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
             }
+        }
+        return attributesBuilder.build();
+    }
+
+    public static Attributes addCPUTimeUsedToSpanAttributes(AttributesBuilder attributesBuilder, boolean logCPUTimeUsed, long cpuTimeUsed, ReadableSpan readableSpan) {
+        if (!isExternalDatabaseCall(readableSpan) && logCPUTimeUsed) {
+            attributesBuilder.put(Constants.SPAN_ATTRIBUTE_CPU_TIME_USED, cpuTimeUsed);
+            return attributesBuilder.build();
         }
         return attributesBuilder.build();
     }
