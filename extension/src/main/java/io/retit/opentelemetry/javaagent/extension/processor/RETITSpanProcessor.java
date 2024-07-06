@@ -1,5 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
+import io.opentelemetry.api.common.AttributeKey;
+import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.opentelemetry.api.common.Attributes;
@@ -24,6 +26,7 @@ public class RETITSpanProcessor implements SpanProcessor {
 
     @Override
     public void onStart(Context parentContext, ReadWriteSpan readWriteSpan) {
+        System.out.println("onStart called");
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
@@ -31,16 +34,17 @@ public class RETITSpanProcessor implements SpanProcessor {
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
         TelemetryUtils.addStartResourceDemandValuesToSpanAttributes(
-            logCPUDemand,
-            logResponseTime,
-            logHeapDemand,
-            logDiskDemand,
-            logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
-            readWriteSpan);
+                logCPUDemand,
+                logResponseTime,
+                logHeapDemand,
+                logDiskDemand,
+                logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
+                readWriteSpan);
     }
 
     @Override
     public boolean isStartRequired() {
+        System.out.println("isStartRequired called");
         return true;
     }
 
@@ -59,6 +63,7 @@ public class RETITSpanProcessor implements SpanProcessor {
      * @return {@link ReadableSpan} containing preexisting and our custom attributes
      */
     private ReadableSpan beforeEnd(ReadableSpan readableSpan) {
+        System.out.println("onStart called");
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
@@ -77,11 +82,23 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logDiskDemand,
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readableSpan);
+        System.out.println("End attributes: " + mergedAttributes);
+        Long startCpuTime = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
+        Long endCpuTime = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
+        long cpuTimeUsed = 0;
+
+        if (startCpuTime != null && endCpuTime != null) {
+            cpuTimeUsed = startCpuTime - endCpuTime;
+        }
+
+        System.out.println("CPU time used: " + cpuTimeUsed);
+
         return TelemetryUtils.createReadableSpan(readableSpan, mergedAttributes);
     }
 
     @Override
     public boolean isEndRequired() {
+        System.out.println("isEndRequired called");
         return delegateBatchSpanProcessor.isEndRequired();
     }
 

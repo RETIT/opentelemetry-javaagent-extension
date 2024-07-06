@@ -183,6 +183,10 @@ public class TelemetryUtils {
         };
     }
 
+    public static void addCostumDataToSpanAttributes(double value, ReadWriteSpan readWriteSpan) {
+        readWriteSpan.setAttribute("randomNumberOnStart", value);
+    }
+
     public static void addStartResourceDemandValuesToSpanAttributes(boolean logCPUTime, boolean logSystemTime, boolean logHeapConsumption,
                                                                     boolean logDiskDemand, boolean logThreadName, ReadWriteSpan readWriteSpan) {
         if (logSystemTime) {
