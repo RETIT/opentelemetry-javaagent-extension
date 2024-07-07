@@ -32,7 +32,7 @@ public class TelemetryUtils {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
-    public static boolean isLogCpuTimeUsedDefaultTrue() {
+    public static boolean isLogTotalCpuTimeUsedDefaultTrue() {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_TOTAL_CPU_TIMES_USED_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
@@ -47,7 +47,6 @@ public class TelemetryUtils {
     public static boolean isLogGCEventDefaultTrue() {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY, true);
     }
-
 
     public static SpanData createSpanData(SpanData spanData, Attributes attributes) {
         return new SpanData() {
@@ -248,29 +247,29 @@ public class TelemetryUtils {
     }
 
     public static Attributes addResourceDemandMetricsToSpanAttributes(AttributesBuilder attributesBuilder,
-                                                                      boolean logCPUTimeUsed, long cpuTimeUsed,
-                                                                      boolean logDiskReadDemand, long diskReadDemand,
-                                                                      boolean logDiskWriteDemand, long diskWriteDemand,
+                                                                      boolean logTotalCPUTimeUsed, long totalCPUTimeUsed,
+                                                                      boolean logTotalDiskReadDemand, long totalDiskReadDemand,
+                                                                      boolean logTotalDiskWriteDemand, long totalDiskWriteDemand,
                                                                       boolean logTotalDiskDemand, long totalDiskDemand,
-                                                                      boolean logTotalHeapByteAllocation, long heapDemand,
+                                                                      boolean logTotalHeapDemand, long totalHeapDemand,
                                                                       ReadableSpan readableSpan) {
         if (!isExternalDatabaseCall(readableSpan)) {
-            if (logCPUTimeUsed) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_CPU_TIME_USED, cpuTimeUsed);
+            if (logTotalCPUTimeUsed) {
+                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_CPU_TIME_USED, totalCPUTimeUsed);
             }
-            if (logDiskReadDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_READ_DEMAND, diskReadDemand);
+            if (logTotalDiskReadDemand) {
+                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_READ_DEMAND, totalDiskReadDemand);
             }
-            if (logDiskWriteDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_WRITE_DEMAND, diskWriteDemand);
+            if (logTotalDiskWriteDemand) {
+                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_WRITE_DEMAND, totalDiskWriteDemand);
             }
 
             if (logTotalDiskDemand) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_DEMAND, totalDiskDemand);
             }
 
-            if (logTotalHeapByteAllocation) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_HEAP_DEMAND, heapDemand);
+            if (logTotalHeapDemand) {
+                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_HEAP_DEMAND, totalHeapDemand);
             }
 
             return attributesBuilder.build();

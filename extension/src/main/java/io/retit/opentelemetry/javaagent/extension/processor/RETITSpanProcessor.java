@@ -73,7 +73,7 @@ public class RETITSpanProcessor implements SpanProcessor {
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
-        boolean logTotalCPUTimeUsed = TelemetryUtils.isLogCpuTimeUsedDefaultTrue();
+        boolean logTotalCPUTimeUsed = TelemetryUtils.isLogTotalCpuTimeUsedDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logTotalHeapDemand = TelemetryUtils.isLogTotalHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
@@ -112,10 +112,8 @@ public class RETITSpanProcessor implements SpanProcessor {
         long totalDiskDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
         Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logTotalCPUTimeUsed, totalCPUTimeUsed,
-                logTotalHeapDemand, totalHeapDemand, logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand,
-                totalDiskWriteDemand, logTotalDiskDemand, totalDiskDemand,  readableSpan);
-
-        attributesBuilder.build();
+                logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalDiskDemand,
+                totalDiskDemand, logTotalHeapDemand, totalHeapDemand,  readableSpan);
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }

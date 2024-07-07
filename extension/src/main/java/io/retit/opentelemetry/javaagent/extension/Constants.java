@@ -52,7 +52,6 @@ public class Constants {
     public static final String TOTALDISKREADDEMAND_FIELD = "totaldiskreaddemand";
     public static final String TOTALDISKDEMAND_FIELD = "totaldiskdemand";
 
-
     public static final String STARTDISKWRITEDEMAND_FIELD = "startdiskwritedemand";
     public static final String ENDDISKWRITEDEMAND_FIELD = "enddiskwritedemand";
     public static final String TOTALDISKWRITEDEMAND_FIELD = "totaldiskwritedemand";
