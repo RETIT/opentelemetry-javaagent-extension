@@ -45,7 +45,7 @@ public class Constants {
 
     public static final String STARTHEAPBYTEALLOCATION_FIELD = "startheapbyteallocation";
     public static final String ENDHEAPBYTEALLOCATION_FIELD = "endheapbyteallocation";
-    public static final String TOTALHEAPDEMAND_FIELD = "totalheapbyteallocation";
+    public static final String TOTALHEAPDEMAND_FIELD = "totalheapdemand";
 
     public static final String STARTDISKREADDEMAND_FIELD = "startdiskreaddemand";
     public static final String ENDDISKREADDEMAND_FIELD = "enddiskreaddemand";
