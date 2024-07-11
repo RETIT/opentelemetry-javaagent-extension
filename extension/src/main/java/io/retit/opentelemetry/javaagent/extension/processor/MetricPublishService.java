@@ -7,8 +7,8 @@ import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.Meter;
 import io.retit.opentelemetry.javaagent.extension.config.EnvVariables;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.CpuEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageType;
 
 public class MetricPublishService {
 
@@ -50,6 +50,14 @@ public class MetricPublishService {
     public void publishCpuEmissions(EnvVariables envVariables, double totalCpuDemand, Attributes attributes) {
         double totalEmissions = CpuEmissions.calculateCpuEmissions(envVariables.getInstance(), totalCpuDemand);
         System.out.println("total cpu emissions: " + totalEmissions);
+    }
+
+    public void publishEmbeddedEmissions(EnvVariables envVariables, long totalCPUTimeUsedInHours, Attributes attributes) {
+        //ignoring serverless software
+        if (envVariables.getInstance() != null) {
+            double totalEmbodiedEmissions = EmbodiedEmissions.calculateEmbodiedEmissionsInGramm(envVariables.getInstance(), totalCPUTimeUsedInHours);
+            System.out.println("total embodied emissions: " + totalEmbodiedEmissions);
+        }
     }
 }
 

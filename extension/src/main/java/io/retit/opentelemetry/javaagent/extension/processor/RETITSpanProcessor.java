@@ -124,6 +124,7 @@ public class RETITSpanProcessor implements SpanProcessor {
 
         MetricPublishService.getInstance().publishStorageEmissions(envVariables, totalStorageDemand, Attributes.of(AttributeKey.stringKey("label_for_storage_demand"), "value"));
         MetricPublishService.getInstance().publishCpuEmissions(envVariables, totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("label_for_cpu_demand"), "value"));
+        MetricPublishService.getInstance().publishEmbeddedEmissions(envVariables, 1, Attributes.of(AttributeKey.stringKey("label_for_embedded_demand"), "value"));
         // metricPublishService.publishCpuEnergy(totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("cputime"), "cycles"));
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
