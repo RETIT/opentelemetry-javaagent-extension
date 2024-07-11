@@ -240,7 +240,9 @@ public class TelemetryUtils {
             }
             if (logHeapConsumption) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION,
-                        RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
+                        100000000);
+                //attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION,
+                  //      RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
             }
         }
         return attributesBuilder.build();
@@ -250,26 +252,31 @@ public class TelemetryUtils {
                                                                       boolean logTotalCPUTimeUsed, long totalCPUTimeUsed,
                                                                       boolean logTotalDiskReadDemand, long totalDiskReadDemand,
                                                                       boolean logTotalDiskWriteDemand, long totalDiskWriteDemand,
-                                                                      boolean logTotalDiskDemand, long totalDiskDemand,
                                                                       boolean logTotalHeapDemand, long totalHeapDemand,
+                                                                      boolean logTotalStorageDemand, long totalStorageDemand,
                                                                       ReadableSpan readableSpan) {
         if (!isExternalDatabaseCall(readableSpan)) {
             if (logTotalCPUTimeUsed) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_CPU_TIME_USED, totalCPUTimeUsed);
+                System.out.println("Total CPU Time Logged: " + totalCPUTimeUsed);
             }
             if (logTotalDiskReadDemand) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_READ_DEMAND, totalDiskReadDemand);
+                System.out.println("Total Disk Read Demand Logged: " + totalDiskReadDemand);
             }
             if (logTotalDiskWriteDemand) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_WRITE_DEMAND, totalDiskWriteDemand);
+                System.out.println("Total Disk Write Demand Logged: " + totalDiskWriteDemand);
             }
 
-            if (logTotalDiskDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_DEMAND, totalDiskDemand);
+            if (logTotalStorageDemand) {
+                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_STORAGE_DEMAND, totalStorageDemand);
+                System.out.println("Total Storage Demand Logged: " + totalStorageDemand);
             }
 
             if (logTotalHeapDemand) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_HEAP_DEMAND, totalHeapDemand);
+                System.out.println("Total Heap Demand Logged: " + totalHeapDemand);
             }
 
             return attributesBuilder.build();

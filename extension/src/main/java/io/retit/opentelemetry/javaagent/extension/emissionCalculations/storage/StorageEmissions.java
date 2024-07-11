@@ -33,7 +33,9 @@ public class StorageEmissions {
     }
 
     public static double calculateStorageEmissions(StorageType storageType, String region, double amountInBytes) {
-        double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024;
+        //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024;
+        double storageSize = amountInBytes;
+        System.out.println(storageSize);
         if (storageType == StorageType.SSD) {
             System.out.println("SSD storage set");
             storageSize *= STORAGE_EMISSIONS_HDD_PER_TB_HOUR;
@@ -42,6 +44,7 @@ public class StorageEmissions {
             storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR;
         }
         storageSize *= getRegionMultiplierFromCSVFile(region);
+        System.out.println("total emissions: " + storageSize);
         return storageSize;
     }
 

@@ -28,7 +28,7 @@ public class Constants {
     public static final String RETIT_APM_TOTAL_DISK_READ_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.disk.read.demand";
     public static final String RETIT_APM_TOTAL_DISK_WRITE_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.disk.write.demand";
     public static final String RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.disk.demand";
-    public static final String RETIT_APM_TOTAL_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.disk.demand";
+    public static final String RETIT_APM_TOTAL_STORAGE_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.storage.demand";
     public static final String RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.gc.event";
     public static final String RETIT_APM_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.thread.name";
     public static final String RETIT_APM_NEWRELIC_ENABLED = "de.retit.apm.newrelic.enabled";
@@ -50,7 +50,7 @@ public class Constants {
     public static final String STARTDISKREADDEMAND_FIELD = "startdiskreaddemand";
     public static final String ENDDISKREADDEMAND_FIELD = "enddiskreaddemand";
     public static final String TOTALDISKREADDEMAND_FIELD = "totaldiskreaddemand";
-    public static final String TOTALDISKDEMAND_FIELD = "totaldiskdemand";
+    public static final String TOTALSTORAGEDEMAND_FIELD = "totalstoragedemand";
 
     public static final String STARTDISKWRITEDEMAND_FIELD = "startdiskwritedemand";
     public static final String ENDDISKWRITEDEMAND_FIELD = "enddiskwritedemand";
@@ -103,7 +103,7 @@ public class Constants {
     public static final String SPAN_ATTRIBUTE_TOTAL_CPU_TIME_USED = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALCPUTIMEUSED_FIELD);
     public static final String SPAN_ATTRIBUTE_TOTAL_DISK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALDISKREADDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_TOTAL_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALDISKWRITEDEMAND_FIELD);
-    public static final String SPAN_ATTRIBUTE_TOTAL_DISK_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALDISKDEMAND_FIELD);
+    public static final String SPAN_ATTRIBUTE_TOTAL_STORAGE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALSTORAGEDEMAND_FIELD);
 
     public static final String SPAN_ATTRIBUTE_TOTAL_HEAP_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALHEAPDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_LOG_SYSTEM_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, LOG_SYSTEM_TIME_FIELD);

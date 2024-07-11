@@ -26,7 +26,7 @@ public class SampleApplication {
     }
 
     public static void main(String[] args) {
-        for (int i = 0; i < 3; i++) { // Simulate 10 requests
+        for (int i = 0; i < 1; i++) { // Simulate 10 requests
             Span span = Span.current();
             span.setAttribute("test", "some value");
             method1();

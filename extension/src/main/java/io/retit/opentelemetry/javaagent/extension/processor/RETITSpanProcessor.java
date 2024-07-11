@@ -73,7 +73,6 @@ public class RETITSpanProcessor implements SpanProcessor {
      * @return {@link ReadableSpan} containing preexisting and our custom attributes
      */
     private ReadableSpan beforeEnd(ReadableSpan readableSpan) {
-        System.out.println("onStart called");
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
@@ -86,7 +85,7 @@ public class RETITSpanProcessor implements SpanProcessor {
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logTotalDiskReadDemand = InstanceConfiguration.isLogTotalDiskReadDemand();
         boolean logTotalDiskWriteDemand = InstanceConfiguration.isLogTotalDiskWriteDemand();
-        boolean logTotalDiskDemand = InstanceConfiguration.isLogTotalDiskDemand();
+        boolean logTotalStorageDemand = InstanceConfiguration.isLogTotalStorageDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
         final Attributes mergedAttributes =
                 TelemetryUtils.addEndResourceDemandValuesToSpanAttributes(
@@ -117,18 +116,13 @@ public class RETITSpanProcessor implements SpanProcessor {
         long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand + totalHeapDemand;
 
         Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logTotalCPUTimeUsed, totalCPUTimeUsed,
-                logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalDiskDemand,
-                totalStorageDemand, logTotalHeapDemand, totalHeapDemand, readableSpan);
-
-        System.out.println("End CPU time: " + mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME)));
-        System.out.println("Total CPU time used: " + totalCPUTimeUsed);
+                logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalHeapDemand,
+                totalHeapDemand, logTotalStorageDemand, totalStorageDemand, readableSpan);
 
         //System.out.println("Counter ist " + serviceCallCounter++);
         //metricPublishService.publishMetrics(finalAttributes);
         //MetricPublishService.getInstance().incrementServiceCallCounter(Attributes.of(AttributeKey.stringKey("fixed_label"), "fixed_value"));
 
-        System.out.println("Total storage demand: " + totalStorageDemand);
-        System.out.println("envVariables: " + envVariables.getStorageType() + " " + envVariables.getRegion());
         MetricPublishService.getInstance().publishStorageEmissions(envVariables, totalStorageDemand, Attributes.of(AttributeKey.stringKey("label_for_storage_demand"), "value"));
         // metricPublishService.publishCpuEnergy(totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("cputime"), "cycles"));
 

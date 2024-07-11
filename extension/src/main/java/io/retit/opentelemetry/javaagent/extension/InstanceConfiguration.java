@@ -67,8 +67,8 @@ public class InstanceConfiguration {
         return getBooleanProperty(Constants.RETIT_APM_TOTAL_DISK_WRITE_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
     }
 
-    public static boolean isLogTotalDiskDemand() {
-        return getBooleanProperty(Constants.RETIT_APM_TOTAL_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
+    public static boolean isLogTotalStorageDemand() {
+        return getBooleanProperty(Constants.RETIT_APM_TOTAL_STORAGE_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
     }
 
     public static boolean isLogNetworkDemand() {
