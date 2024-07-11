@@ -6,6 +6,7 @@ import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.Meter;
 import io.retit.opentelemetry.javaagent.extension.config.EnvVariables;
+import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageType;
 
@@ -44,6 +45,11 @@ public class MetricPublishService {
     public void publishStorageEmissions(EnvVariables envVariables, double totalStorageDemand, Attributes attributes) {
         double totalEmissions = StorageEmissions.calculateStorageEmissions(envVariables.getStorageType(), envVariables.getRegion(), totalStorageDemand);
         storageEmissionMeter.record((long) totalEmissions, attributes);
+    }
+
+    public void publishCpuEmissions(EnvVariables envVariables, double totalCpuDemand, Attributes attributes) {
+        double totalEmissions = CpuEmissions.calculateCpuEmissions(envVariables.getInstance(), totalCpuDemand);
+        System.out.println("total cpu emissions: " + totalEmissions);
     }
 }
 

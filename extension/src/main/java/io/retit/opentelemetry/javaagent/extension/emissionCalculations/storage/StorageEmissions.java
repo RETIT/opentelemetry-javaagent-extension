@@ -34,7 +34,7 @@ public class StorageEmissions {
 
     public static double calculateStorageEmissions(StorageType storageType, String region, double amountInBytes) {
         //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024;
-        double storageSize = amountInBytes;
+        double storageSize = amountInBytes; //simplification to get easier numbers
         System.out.println(storageSize);
         if (storageType == StorageType.SSD) {
             System.out.println("SSD storage set");

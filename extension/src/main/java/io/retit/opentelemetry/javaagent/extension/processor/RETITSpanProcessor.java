@@ -1,6 +1,5 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
@@ -20,7 +19,7 @@ import io.retit.opentelemetry.javaagent.extension.config.EnvVariables;
 public class RETITSpanProcessor implements SpanProcessor {
 
    // private final MetricPublishService metricPublishService;
-    EnvVariables envVariables = EnvVariables.getInstance();
+    EnvVariables envVariables = EnvVariables.getEnvInstance();
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
 
@@ -124,6 +123,7 @@ public class RETITSpanProcessor implements SpanProcessor {
         //MetricPublishService.getInstance().incrementServiceCallCounter(Attributes.of(AttributeKey.stringKey("fixed_label"), "fixed_value"));
 
         MetricPublishService.getInstance().publishStorageEmissions(envVariables, totalStorageDemand, Attributes.of(AttributeKey.stringKey("label_for_storage_demand"), "value"));
+        MetricPublishService.getInstance().publishCpuEmissions(envVariables, totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("label_for_cpu_demand"), "value"));
         // metricPublishService.publishCpuEnergy(totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("cputime"), "cycles"));
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);

@@ -4,18 +4,20 @@ import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.S
 
 public class EnvVariables {
 
-    private static final EnvVariables instance = new EnvVariables();
+    private static final EnvVariables envInstance = new EnvVariables();
 
     private final StorageType storageType;
     private final String region;
+    private final String instance;
 
     private EnvVariables() {
         this.storageType = initializeStorageType();
         this.region = initializeRegion();
+        this.instance = initializeInstance();
     }
 
-    public static EnvVariables getInstance() {
-        return instance;
+    public static EnvVariables getEnvInstance() {
+        return envInstance;
     }
 
     public StorageType getStorageType() {
@@ -24,6 +26,10 @@ public class EnvVariables {
 
     public String getRegion() {
         return region;
+    }
+
+    public String getInstance() {
+        return instance;
     }
 
     private StorageType initializeStorageType() {
@@ -47,5 +53,14 @@ public class EnvVariables {
             throw new IllegalStateException("REGION environment variable is required but not set");
         }
         return region;
+    }
+
+    private String initializeInstance() {
+        String instance = System.getenv("INSTANCE");
+        instance = instance != null ? instance.trim() : null;
+        if (instance == null || instance.isEmpty()) {
+            throw new IllegalStateException("INSTANCE environment variable is required but not set");
+        }
+        return instance;
     }
 }
