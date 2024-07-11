@@ -1,5 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
@@ -14,14 +15,18 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
+import io.retit.opentelemetry.javaagent.extension.config.EnvVariables;
 
 public class RETITSpanProcessor implements SpanProcessor {
 
+   // private final MetricPublishService metricPublishService;
+    EnvVariables envVariables = EnvVariables.getInstance();
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
 
     public RETITSpanProcessor(BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder) {
         this.delegateBatchSpanProcessorBuilder = delegateBatchSpanProcessorBuilder;
+        //this.metricPublishService = new MetricPublishService();
     }
 
     @Override
@@ -41,9 +46,9 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readWriteSpan);
         if (readWriteSpan.toSpanData() != null) {
-            System.out.println("Start attributes: " + readWriteSpan.toSpanData().getAttributes());
+            System.out.println("Start CPU time: " + readWriteSpan.toSpanData().getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME)));
         } else {
-            System.out.println("SpanData is null");
+            System.out.println("Start CPU time  is null");
         }
     }
 
@@ -84,14 +89,14 @@ public class RETITSpanProcessor implements SpanProcessor {
         boolean logTotalDiskDemand = InstanceConfiguration.isLogTotalDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
         final Attributes mergedAttributes =
-            TelemetryUtils.addEndResourceDemandValuesToSpanAttributes(
-                attributesBuilder,
-                logCPUDemand,
-                logResponseTime,
-                logHeapDemand,
-                logDiskDemand,
-                logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
-                readableSpan);
+                TelemetryUtils.addEndResourceDemandValuesToSpanAttributes(
+                        attributesBuilder,
+                        logCPUDemand,
+                        logResponseTime,
+                        logHeapDemand,
+                        logDiskDemand,
+                        logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
+                        readableSpan);
 
         Long startCpuTime = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
         Long endCpuTime = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
@@ -109,11 +114,23 @@ public class RETITSpanProcessor implements SpanProcessor {
         Long endDiskWriteDemand = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
         long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? endDiskWriteDemand - startDiskWriteDemand : 0;
 
-        long totalDiskDemand = totalDiskReadDemand + totalDiskWriteDemand;
+        long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand + totalHeapDemand;
 
         Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logTotalCPUTimeUsed, totalCPUTimeUsed,
                 logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalDiskDemand,
-                totalDiskDemand, logTotalHeapDemand, totalHeapDemand,  readableSpan);
+                totalStorageDemand, logTotalHeapDemand, totalHeapDemand, readableSpan);
+
+        System.out.println("End CPU time: " + mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME)));
+        System.out.println("Total CPU time used: " + totalCPUTimeUsed);
+
+        //System.out.println("Counter ist " + serviceCallCounter++);
+        //metricPublishService.publishMetrics(finalAttributes);
+        //MetricPublishService.getInstance().incrementServiceCallCounter(Attributes.of(AttributeKey.stringKey("fixed_label"), "fixed_value"));
+
+        System.out.println("Total storage demand: " + totalStorageDemand);
+        System.out.println("envVariables: " + envVariables.getStorageType() + " " + envVariables.getRegion());
+        MetricPublishService.getInstance().publishStorageEmissions(envVariables, totalStorageDemand, Attributes.of(AttributeKey.stringKey("label_for_storage_demand"), "value"));
+        // metricPublishService.publishCpuEnergy(totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("cputime"), "cycles"));
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }
