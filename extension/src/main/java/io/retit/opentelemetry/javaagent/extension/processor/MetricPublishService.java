@@ -16,7 +16,6 @@ public class MetricPublishService {
     private final LongCounter serviceCallCounter;
     private final LongHistogram storageEmissionMeter;
 
-    // Private constructor prevents instantiation from other classes
     private MetricPublishService() {
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
         serviceCallCounter = meter.counterBuilder("testservice_call_count")
@@ -30,7 +29,6 @@ public class MetricPublishService {
                 .ofLongs().build();
     }
 
-    // Singleton instance getter
     public static synchronized MetricPublishService getInstance() {
         if (instance == null) {
             instance = new MetricPublishService();
@@ -48,14 +46,14 @@ public class MetricPublishService {
     }
 
     public void publishCpuEmissions(EnvVariables envVariables, double totalCpuDemand, Attributes attributes) {
-        double totalEmissions = CpuEmissions.calculateCpuEmissions(envVariables.getInstance(), totalCpuDemand);
+        double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissions(envVariables.getInstance(), totalCpuDemand);
         System.out.println("total cpu emissions: " + totalEmissions);
     }
 
     public void publishEmbeddedEmissions(EnvVariables envVariables, long totalCPUTimeUsedInHours, Attributes attributes) {
         //ignoring serverless software
         if (envVariables.getInstance() != null) {
-            double totalEmbodiedEmissions = EmbodiedEmissions.calculateEmbodiedEmissionsInGramm(envVariables.getInstance(), totalCPUTimeUsedInHours);
+            double totalEmbodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInGramm(envVariables.getInstance(), totalCPUTimeUsedInHours);
             System.out.println("total embodied emissions: " + totalEmbodiedEmissions);
         }
     }

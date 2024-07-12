@@ -11,6 +11,7 @@ import java.util.Objects;
 
 public class EmbodiedEmissions {
 
+    private static EmbodiedEmissions instance;
     private static Integer instanceVCpu;
     private static Integer platformTotalVcpu;
     private static Double totalEmbodiedEmissions;
@@ -18,7 +19,14 @@ public class EmbodiedEmissions {
     private EmbodiedEmissions() {
     }
 
-    private static synchronized void loadInstanceDetails(String instanceType) {
+    public static EmbodiedEmissions getInstance() {
+        if (instance == null) {
+            instance = new EmbodiedEmissions();
+        }
+        return instance;
+    }
+
+    private void loadInstanceDetails(String instanceType) {
         if (instanceVCpu != null && platformTotalVcpu != null && totalEmbodiedEmissions != null) {
             return;
         }
@@ -58,7 +66,7 @@ public class EmbodiedEmissions {
         }
     }
 
-    public static double calculateEmbodiedEmissionsInGramm(String instanceType, double cpuTimeUsedInHours) {
+    public double calculateEmbodiedEmissionsInGramm(String instanceType, double cpuTimeUsedInHours) {
         loadInstanceDetails(instanceType);
 
         if (totalEmbodiedEmissions == null) {
