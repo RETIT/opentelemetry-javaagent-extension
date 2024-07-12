@@ -112,7 +112,7 @@ public class RETITSpanProcessor implements SpanProcessor {
         Long endDiskWriteDemand = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
         long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? endDiskWriteDemand - startDiskWriteDemand : 0;
 
-        long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand + totalHeapDemand;
+        long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
         Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logTotalCPUTimeUsed, totalCPUTimeUsed,
                 logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalHeapDemand,
