@@ -1,5 +1,9 @@
 package io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,30 +13,41 @@ import java.util.Objects;
 
 public class StorageEmissions {
 
+    public static StorageEmissions instance;
     public static final double STORAGE_EMISSIONS_HDD_PER_TB_HOUR = 0.00065;
     public static final double STORAGE_EMISSIONS_SSD_PER_TB_HOUR = 0.0012;
+    public static Double gridEmissionsFactor;
 
-    private static final Map<String, Double> regionCo2Map = new HashMap<>();
+    private StorageEmissions() {
+    }
 
-    static {
+    public static StorageEmissions getInstance() {
+        if (instance == null) {
+            instance = new StorageEmissions();
+        }
+        return instance;
+    }
+
+    private void loadRegionCo2ValuesFromCSVFile(String region) {
+        if (gridEmissionsFactor != null) {
+            return;
+        }
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 Objects.requireNonNull(StorageEmissions.class.getResourceAsStream("/grid-emissions-factors-aws.csv"))))) {
-            String line;
-            reader.readLine(); // Skip header
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 4) {
-                    String region = parts[0].trim();
-                    double co2Value = Double.parseDouble(parts[3].trim());
-                    regionCo2Map.put(region, co2Value);
+            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
+            for (CSVRecord csvRecord : csvParser) {
+                if (csvRecord.get("Region").trim().equalsIgnoreCase(region.trim())) {
+                    gridEmissionsFactor = Double.parseDouble(csvRecord.get("CO2e (metric ton/kWh)").replace("\"", "").trim().replace(',', '.'));
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to load CO2 values from CSV file", e);
         }
+        System.out.println("Region: " + region + " CO2: " + gridEmissionsFactor);
     }
 
-    public static double calculateStorageEmissions(StorageType storageType, String region, double amountInBytes) {
+    public double calculateStorageEmissions(StorageType storageType, String region, double amountInBytes) {
+        loadRegionCo2ValuesFromCSVFile(region);
         //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024;
         double storageSize = amountInBytes; //simplification to get easier numbers
         System.out.println(storageSize);
@@ -43,14 +58,8 @@ public class StorageEmissions {
             System.out.println("HDD or nothing set");
             storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR;
         }
-        storageSize *= getRegionMultiplierFromCSVFile(region);
+        storageSize *= gridEmissionsFactor;
         System.out.println("total emissions: " + storageSize);
         return storageSize;
-    }
-
-    public static double getRegionMultiplierFromCSVFile(String region) {
-        System.out.println("Region: " + region);
-        System.out.println("Region CO2: " + regionCo2Map.getOrDefault(region, 0.0));
-        return regionCo2Map.getOrDefault(region, 0.0);
     }
 }

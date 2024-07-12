@@ -41,7 +41,7 @@ public class MetricPublishService {
     }
 
     public void publishStorageEmissions(EnvVariables envVariables, double totalStorageDemand, Attributes attributes) {
-        double totalEmissions = StorageEmissions.calculateStorageEmissions(envVariables.getStorageType(), envVariables.getRegion(), totalStorageDemand);
+        double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissions(envVariables.getStorageType(), envVariables.getRegion(), totalStorageDemand);
         storageEmissionMeter.record((long) totalEmissions, attributes);
     }
 
