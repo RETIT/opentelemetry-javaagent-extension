@@ -21,6 +21,6 @@ public class EmbodiedEmissions {
     public double calculateEmbodiedEmissionsInGramm(double cpuTimeUsedInHours) {
         cpuTimeUsedInHours = 1; //simplification for now
         return configLoader.getTotalEmbodiedEmissions() * 0.0289 * configLoader.getInstanceVCpu() / configLoader.getPlatformTotalVcpu()
-                * cpuTimeUsedInHours * configLoader.getPueValue();
+                * cpuTimeUsedInHours / 1000;
     }
 }

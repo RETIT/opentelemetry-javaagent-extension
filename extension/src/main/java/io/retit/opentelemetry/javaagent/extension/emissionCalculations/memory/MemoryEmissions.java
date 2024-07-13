@@ -17,10 +17,10 @@ public class MemoryEmissions {
         return instance;
     }
 
-    public double calculateMemoryEmissions(double amountInBytes) {
+    public double calculateMemoryEmissionsInGramm(double amountInBytes) {
        // double storageSize = amountInBytes / 1024 / 1024 / 1024;
         amountInBytes = 10000; //simplification to get easier numbers
-        amountInBytes *= 0.000392 * configLoader.getGridEmissionsFactor() * configLoader.getPueValue();//0.000392 is a fix coefficient
+        amountInBytes *= 0.000392 * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() / 1000;//0.000392 is a fix coefficient
         return amountInBytes;
     }
 }

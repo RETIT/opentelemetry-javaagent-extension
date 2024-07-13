@@ -40,24 +40,22 @@ public class MetricPublishingService {
     }
 
     private static void publishStorageEmissions(double totalStorageDemand) {
-        double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissions(totalStorageDemand);
+        double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInGramm(totalStorageDemand);
         System.out.println("total storage emissions: " + totalEmissions);
     }
 
     private static void publishCpuEmissions(double totalCpuDemand) {
-        double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissions(totalCpuDemand);
+        double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInGramm(totalCpuDemand);
         System.out.println("total cpu emissions: " + totalEmissions);
     }
 
     private static void publishEmbeddedEmissions(long totalCPUTimeUsedInHours) {
-        //ignoring serverless software
         double totalEmbodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInGramm(totalCPUTimeUsedInHours);
         System.out.println("total embodied emissions: " + totalEmbodiedEmissions);
     }
 
     private static void publishMemoryEmissions(double totalMemoryDemand) {
-        //ignoring serverless software
-        double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissions( totalMemoryDemand);
+        double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInGramm( totalMemoryDemand);
         System.out.println("total memory emissions: " + totalMemoryEmissions);
       //  memoryEmissionMeter.record((long) totalMemoryEmissions, Attributes.of(AttributeKey.stringKey("label_for_memory_demand"), "value"));
     }

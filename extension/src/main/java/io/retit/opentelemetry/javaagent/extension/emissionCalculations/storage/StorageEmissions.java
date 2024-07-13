@@ -20,7 +20,7 @@ public class StorageEmissions {
         return instance;
     }
 
-    public double calculateStorageEmissions(double amountInBytes) {
+    public double calculateStorageEmissionsInGramm(double amountInBytes) {
         //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024;
         double storageSize = 10000; //simplification for now
         System.out.println(storageSize);
@@ -29,7 +29,7 @@ public class StorageEmissions {
         } else {
             storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR;
         }
-        storageSize *= configLoader.getGridEmissionsFactor() * configLoader.getPueValue();
+        storageSize *= configLoader.getPueValue() * configLoader.getGridEmissionsFactor() / 1000;
         return storageSize;
     }
 }
