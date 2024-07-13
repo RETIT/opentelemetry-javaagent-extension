@@ -14,12 +14,11 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
-import io.retit.opentelemetry.javaagent.extension.config.EnvVariables;
+import lombok.Getter;
 
 public class RETITSpanProcessor implements SpanProcessor {
 
-   // private final MetricPublishService metricPublishService;
-    EnvVariables envVariables = EnvVariables.getEnvInstance();
+    @Getter
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
 
@@ -44,11 +43,6 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logDiskDemand,
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readWriteSpan);
-        if (readWriteSpan.toSpanData() != null) {
-            System.out.println("Start CPU time: " + readWriteSpan.toSpanData().getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME)));
-        } else {
-            System.out.println("Start CPU time  is null");
-        }
     }
 
     @Override
@@ -118,14 +112,7 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalHeapDemand,
                 totalHeapDemand, logTotalStorageDemand, totalStorageDemand, readableSpan);
 
-        //System.out.println("Counter ist " + serviceCallCounter++);
-        //metricPublishService.publishMetrics(finalAttributes);
-        //MetricPublishService.getInstance().incrementServiceCallCounter(Attributes.of(AttributeKey.stringKey("fixed_label"), "fixed_value"));
-
-        MetricPublishService.getInstance().publishStorageEmissions(envVariables, totalStorageDemand, Attributes.of(AttributeKey.stringKey("label_for_storage_demand"), "value"));
-        MetricPublishService.getInstance().publishCpuEmissions(envVariables, totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("label_for_cpu_demand"), "value"));
-        MetricPublishService.getInstance().publishEmbeddedEmissions(envVariables, 1, Attributes.of(AttributeKey.stringKey("label_for_embedded_demand"), "value"));
-        // metricPublishService.publishCpuEnergy(totalCPUTimeUsed, Attributes.of(AttributeKey.stringKey("cputime"), "cycles"));
+        MetricPublishingService.publishEmissions(totalStorageDemand, totalCPUTimeUsed, totalHeapDemand);
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }
@@ -149,10 +136,6 @@ public class RETITSpanProcessor implements SpanProcessor {
     @Override
     public void close() {
         delegateBatchSpanProcessor.close();
-    }
-
-    public BatchSpanProcessorBuilder getDelegateBatchSpanProcessorBuilder() {
-        return delegateBatchSpanProcessorBuilder;
     }
 
     public void buildBatchSpanProcessor() {

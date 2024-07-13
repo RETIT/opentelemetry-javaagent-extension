@@ -104,6 +104,12 @@
             <artifactId>commons-csv</artifactId>
             <version>1.11.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -116,6 +122,11 @@
                     <source>17</source>
                     <target>17</target>
                     <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.30</version>
+                        </path>
                         <path>
                             <groupId>com.google.auto.service</groupId>
                             <artifactId>auto-service</artifactId>
@@ -165,13 +176,6 @@
                             <outputDirectory>${project.build.directory}/classes</outputDirectory>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
                     <execution>
                         <id>copy-otel-agent</id>
                         <phase>package</phase>
@@ -200,7 +204,6 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
                         <phase>verify</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -233,7 +236,6 @@
                             <tag>${props.branch.dockertag}</tag>
                         </tags>
                     </to>
-                    <!-- Copies files from 'src/main/custom-extra-dir' and '/home/user/jib-extras' instead of 'src/main/jib' -->
                     <extraDirectories>
                         <paths>
                             <path>${project.build.directory}/jib</path>
