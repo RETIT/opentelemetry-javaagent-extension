@@ -3,6 +3,7 @@ package io.retit.opentelemetry.javaagent.extension.processor;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.Meter;
+import io.opentelemetry.api.common.Attributes;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.memory.MemoryEmissions;
@@ -10,54 +11,61 @@ import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.S
 
 public class MetricPublishingService {
 
-    private final LongHistogram storageEmissionMeter;
-    private final LongHistogram cpuEmissionMeter;
-    private final LongHistogram embeddedEmissionMeter;
-    private final LongHistogram memoryEmissionMeter;
+    private static final LongHistogram storageEmissionMeter;
+    private static final LongHistogram cpuEmissionMeter;
+    private static final LongHistogram embeddedEmissionMeter;
+    private static final LongHistogram memoryEmissionMeter;
 
-    private MetricPublishingService() {
+    static {
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
 
         storageEmissionMeter = meter.histogramBuilder("storage_emissions")
-                .setDescription("total emissions from storage")
-                .setUnit("kgCO2e")
-                .ofLongs().build();
+                .setDescription("Total emissions from storage")
+                .setUnit("gCO2e")
+                .ofLongs()
+                .build();
 
         cpuEmissionMeter = meter.histogramBuilder("cpu_emissions")
-                .setDescription("total emissions from cpu")
-                .setUnit("kgCO2e")
-                .ofLongs().build();
+                .setDescription("Total emissions from CPU")
+                .setUnit("gCO2e")
+                .ofLongs()
+                .build();
 
         embeddedEmissionMeter = meter.histogramBuilder("embedded_emissions")
-                .setDescription("total emissions from embedded")
-                .setUnit("kgCO2e")
-                .ofLongs().build();
+                .setDescription("Total emissions from embedded components")
+                .setUnit("gCO2e")
+                .ofLongs()
+                .build();
 
         memoryEmissionMeter = meter.histogramBuilder("memory_emissions")
-                .setDescription("total emissions from memory")
-                .setUnit("kgCO2e")
-                .ofLongs().build();
+                .setDescription("Total emissions from memory")
+                .setUnit("gCO2e")
+                .ofLongs()
+                .build();
     }
 
-    private static void publishStorageEmissions(double totalStorageDemand) {
+    public static void publishStorageEmissions(double totalStorageDemand) {
         double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInGramm(totalStorageDemand);
-        System.out.println("total storage emissions: " + totalEmissions);
+        storageEmissionMeter.record((long) totalEmissions, Attributes.empty());
+        System.out.println("Total storage emissions: " + totalEmissions);
     }
 
-    private static void publishCpuEmissions(double totalCpuDemand) {
+    public static void publishCpuEmissions(double totalCpuDemand) {
         double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInGramm(totalCpuDemand);
-        System.out.println("total cpu emissions: " + totalEmissions);
+        cpuEmissionMeter.record((long) totalEmissions, Attributes.empty());
+        System.out.println("Total CPU emissions: " + totalEmissions);
     }
 
-    private static void publishEmbeddedEmissions(long totalCPUTimeUsedInHours) {
+    public static void publishEmbeddedEmissions(long totalCPUTimeUsedInHours) {
         double totalEmbodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInGramm(totalCPUTimeUsedInHours);
-        System.out.println("total embodied emissions: " + totalEmbodiedEmissions);
+        embeddedEmissionMeter.record((long) totalEmbodiedEmissions, Attributes.empty());
+        System.out.println("Total embodied emissions: " + totalEmbodiedEmissions);
     }
 
-    private static void publishMemoryEmissions(double totalMemoryDemand) {
-        double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInGramm( totalMemoryDemand);
-        System.out.println("total memory emissions: " + totalMemoryEmissions);
-      //  memoryEmissionMeter.record((long) totalMemoryEmissions, Attributes.of(AttributeKey.stringKey("label_for_memory_demand"), "value"));
+    public static void publishMemoryEmissions(double totalMemoryDemand) {
+        double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInGramm(totalMemoryDemand);
+        memoryEmissionMeter.record((long) totalMemoryEmissions, Attributes.empty());
+        System.out.println("Total memory emissions: " + totalMemoryEmissions);
     }
 
     public static void publishEmissions(double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
@@ -67,4 +75,3 @@ public class MetricPublishingService {
         publishMemoryEmissions(totalHeapDemand);
     }
 }
-
