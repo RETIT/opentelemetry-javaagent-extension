@@ -38,7 +38,7 @@ public class ConfigLoader {
     private final Double totalEmbodiedEmissions;
     @Getter
     private final Double pueValue;
-    private final Double[] cloudInstanceDetails = new Double[4];
+    private final Double[] cloudInstanceDetails = new Double[5];
 
     private ConfigLoader() {
         this.storageType = initializeStorageType();
@@ -49,7 +49,7 @@ public class ConfigLoader {
         this.instanceEnergyUsageFull = cloudInstanceDetails[1];
         this.instanceVCpu = cloudInstanceDetails[2];
         this.platformTotalVcpu = cloudInstanceDetails[3];
-        this.totalEmbodiedEmissions = initializeTotalEmbodiedEmissionDetails(cloudInstanceName);
+        this.totalEmbodiedEmissions = cloudInstanceDetails[4];
         this.pueValue = initializePueValue();
     }
 
@@ -104,17 +104,18 @@ public class ConfigLoader {
 
     private Double[] initializeCloudInstanceDetails(String instanceType) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(CpuEmissions.class.getResourceAsStream("/aws-instances.csv"))))) {
+                Objects.requireNonNull(CpuEmissions.class.getResourceAsStream("/mergedValues.csv"))))) {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
             for (CSVRecord csvRecord : csvParser) {
-                if (csvRecord.get("Instance type").trim().equalsIgnoreCase(instanceType.trim())) {
-                    cloudInstanceDetails[0] = Double.parseDouble(csvRecord.get("Instance @ Idle").replace("\"", "").trim().replace(',', '.'));
-                    cloudInstanceDetails[1] = Double.parseDouble(csvRecord.get("Instance @ 100%").replace("\"", "").trim().replace(',', '.'));
+                if (csvRecord.get("Instance Type").trim().equalsIgnoreCase(instanceType.trim())) {
+                    cloudInstanceDetails[0] = Double.parseDouble(csvRecord.get("Instance @ Idle").trim());
+                    cloudInstanceDetails[1] = Double.parseDouble(csvRecord.get("Instance @ 100%").trim());
                     cloudInstanceDetails[2] = Double.parseDouble(csvRecord.get("Instance vCPU").trim());
                     cloudInstanceDetails[3] = Double.parseDouble(csvRecord.get("Platform Total Number of vCPU").trim());
+                    cloudInstanceDetails[4] = Double.parseDouble(csvRecord.get("Total Embodied Emissions").trim());
                     System.out.println("instance " + instanceType + "instanceEnergyUsageIdle: " + cloudInstanceDetails[0] + " instanceEnergyUsageFull: "
                             + cloudInstanceDetails[1] + " instanceVCpu: " + cloudInstanceDetails[2] + " platformTotalVcpu: "
-                            + cloudInstanceDetails[3]);
+                            + cloudInstanceDetails[3] + " totalEmbodiedEmissions: " + cloudInstanceDetails[4]);
                     break;
                 }
             }
@@ -122,24 +123,6 @@ public class ConfigLoader {
             throw new RuntimeException("Failed to load instance details from CSV file", e);
         }
         return cloudInstanceDetails;
-    }
-
-    private Double initializeTotalEmbodiedEmissionDetails(String instanceType) {
-        Double totalEmbodiedEmissions = null;
-        try (BufferedReader emissionsReader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(CpuEmissions.class.getResourceAsStream("/coefficients-aws-embodied.csv"))))) {
-            CSVParser emissionsParser = new CSVParser(emissionsReader, CSVFormat.DEFAULT.withHeader());
-            for (CSVRecord csvRecord : emissionsParser) {
-                if (csvRecord.get("type").trim().equals(instanceType)) {
-                    totalEmbodiedEmissions = Double.parseDouble(csvRecord.get("total").trim());
-                    System.out.println(instanceType + " has totalEmbodiedEmissions of: " + totalEmbodiedEmissions);
-                    break;
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load total embodied emissions from CSV file", e);
-        }
-        return totalEmbodiedEmissions;
     }
 
     private Double initializePueValue() {

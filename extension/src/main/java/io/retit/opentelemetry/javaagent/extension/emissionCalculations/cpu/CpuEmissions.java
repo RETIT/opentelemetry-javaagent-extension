@@ -25,7 +25,7 @@ public class CpuEmissions {
 
     public double calculateCpuEmissionsInGramm(double cpuTimeUsedinHours) {
         cpuTimeUsedinHours = 10000; //simplification for now
-        return  configLoader.getInstanceEnergyUsageIdle() * (configLoader.getInstanceEnergyUsageFull()
+        return  configLoader.getInstanceEnergyUsageIdle() + 0.5 * (configLoader.getInstanceEnergyUsageFull()
                 - configLoader.getInstanceEnergyUsageIdle()) / 1000 * cpuTimeUsedinHours * configLoader.getPueValue()
                 * configLoader.getGridEmissionsFactor() / 1000;
     }
