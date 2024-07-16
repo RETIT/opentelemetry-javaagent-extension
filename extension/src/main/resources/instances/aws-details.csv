@@ -1,5 +1,5 @@
 Instance Type,Instance @ Idle,Instance @ 100%,Total Embodied Emissions,Instance vCPU,Platform Total Number of vCPU
-a 1.large,2.4,8.5,0.0,2,16
+a1.large,2.4,8.5,1022.21,2,16
 a1.2xlarge,9.5,34.0,1022.21,8,16
 a1.4xlarge,19.0,67.9,1022.21,16,16
 a1.medium,1.2,4.2,1022.21,1,16

@@ -84,6 +84,21 @@ public class ConfigLoader {
         return instance;
     }
 
+    private CloudProvider initializeCloudProvider() {
+        String providerName = System.getenv("CLOUD_PROVIDER");
+        if (providerName == null || providerName.trim().isEmpty()) {
+            throw new IllegalStateException("CLOUD_PROVIDER environment variable is required but not set");
+        }
+
+        CloudProvider cloudProvider;
+        try {
+            cloudProvider = CloudProvider.valueOf(providerName.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalStateException("Invalid CLOUD_PROVIDER value: " + providerName);
+        }
+        return cloudProvider;
+    }
+
     private Double initializeGridEmissionFactor(String region) {
         Double returnValue = null;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -104,7 +119,7 @@ public class ConfigLoader {
 
     private Double[] initializeCloudInstanceDetails(String instanceType) {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(CpuEmissions.class.getResourceAsStream("/mergedValues.csv"))))) {
+                Objects.requireNonNull(CpuEmissions.class.getResourceAsStream("/instances/aws-details.csv"))))) {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
             for (CSVRecord csvRecord : csvParser) {
                 if (csvRecord.get("Instance Type").trim().equalsIgnoreCase(instanceType.trim())) {

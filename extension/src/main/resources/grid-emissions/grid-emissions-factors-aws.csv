@@ -1,0 +1,26 @@
+Region,CO2e (g/kWh)
+us-east-1,415.755
+us-east-2,440.187
+us-west-1,350.861
+us-west-2,350.861
+us-gov-east-1,415.755
+us-gov-west-1,350.861
+af-south-1,928
+ap-east-1,810
+ap-south-1,708
+ap-northeast-3,506
+ap-northeast-2,500
+ap-southeast-1,408.5
+ap-southeast-2,790
+ap-northeast-1,506
+ca-central-1,130
+cn-north-1,555
+cn-northwest-1,555
+eu-central-1,338
+eu-west-1,316
+eu-west-2,228
+eu-south-1,233
+eu-west-3,52
+eu-north-1,8
+me-south-1,732
+sa-east-1,74
