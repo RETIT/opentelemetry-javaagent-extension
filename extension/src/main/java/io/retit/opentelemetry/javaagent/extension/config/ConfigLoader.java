@@ -25,6 +25,8 @@ public class ConfigLoader {
     @Getter
     private final String cloudInstanceName;
     @Getter
+    private final CloudProvider cloudProvider;
+    @Getter
     private final Double gridEmissionsFactor;
     @Getter
     private final Double instanceEnergyUsageIdle;
@@ -51,6 +53,7 @@ public class ConfigLoader {
         this.platformTotalVcpu = cloudInstanceDetails[3];
         this.totalEmbodiedEmissions = cloudInstanceDetails[4];
         this.pueValue = initializePueValue();
+        this.cloudProvider = initializeCloudProvider();
     }
 
     private StorageType initializeStorageType() {
@@ -79,7 +82,8 @@ public class ConfigLoader {
         String instance = System.getenv("INSTANCE").trim();
         System.out.println("Instance: " + instance);
         if (instance.isEmpty()) {
-            throw new IllegalStateException("INSTANCE environment variable is required but not set");
+            throw new IllegalStateException("INSTANCE environment variable is required but not set. Set it to 'SERVERLESS' " +
+                    "in case of serverless deployment");
         }
         return instance;
     }
@@ -102,11 +106,11 @@ public class ConfigLoader {
     private Double initializeGridEmissionFactor(String region) {
         Double returnValue = null;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(StorageEmissions.class.getResourceAsStream("/grid-emissions-factors-aws.csv"))))) {
+                Objects.requireNonNull(StorageEmissions.class.getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
             CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
             for (CSVRecord csvRecord : csvParser) {
                 if (csvRecord.get("Region").trim().equalsIgnoreCase(region.trim())) {
-                    returnValue = Double.parseDouble(csvRecord.get("CO2e (metric ton/kWh)").replace("\"", "").trim().replace(',', '.'));
+                    returnValue = Double.parseDouble(csvRecord.get("CO2e (g/kWh)").replace("\"", "").trim().replace(',', '.'));
                     break;
                 }
             }

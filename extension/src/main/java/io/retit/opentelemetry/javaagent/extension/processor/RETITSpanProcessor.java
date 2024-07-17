@@ -29,7 +29,6 @@ public class RETITSpanProcessor implements SpanProcessor {
 
     @Override
     public void onStart(Context parentContext, ReadWriteSpan readWriteSpan) {
-        System.out.println("onStart called");
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
@@ -111,6 +110,8 @@ public class RETITSpanProcessor implements SpanProcessor {
         Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logTotalCPUTimeUsed, totalCPUTimeUsed,
                 logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalHeapDemand,
                 totalHeapDemand, logTotalStorageDemand, totalStorageDemand, readableSpan);
+
+        System.out.println("before end called");
 
         MetricPublishingService.publishEmissions(totalStorageDemand, totalCPUTimeUsed, totalHeapDemand);
 

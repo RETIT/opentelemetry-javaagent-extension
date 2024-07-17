@@ -29,7 +29,7 @@ public class StorageEmissions {
         } else {
             storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR;
         }
-        storageSize *= configLoader.getPueValue() * configLoader.getGridEmissionsFactor() / 1000;
+        storageSize *= configLoader.getPueValue() * configLoader.getGridEmissionsFactor();
         return storageSize;
     }
 }

@@ -240,9 +240,7 @@ public class TelemetryUtils {
             }
             if (logHeapConsumption) {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION,
-                        100000000); //simplification to get easier numbers
-                //attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION,
-                  //      RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
+                        RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
             }
         }
         return attributesBuilder.build();

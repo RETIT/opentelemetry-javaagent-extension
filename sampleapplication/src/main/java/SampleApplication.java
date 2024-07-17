@@ -10,7 +10,7 @@ public class SampleApplication {
 
     @WithSpan
     public static void method1() {
-        LOGGER.info("method1");
+        LOGGER.info("inside method1");
 
     }
 
@@ -26,13 +26,13 @@ public class SampleApplication {
     }
 
     public static void main(String[] args) {
-        for (int i = 0; i < 1; i++) { // Simulate 10 requests
+       // for (int i = 0; i < 1; i++) { // Simulate 10 requests
             Span span = Span.current();
             span.setAttribute("test", "some value");
             method1();
             //method2();
             span.end();
             System.out.println("just printing something");
-        }
+        //}
     }
 }
