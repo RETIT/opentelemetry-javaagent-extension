@@ -21,14 +21,9 @@ public class Constants {
     public static final int RETIT_APM_CASSANDRA_MAXIMUM_SHARD_QUERY = 72;
     public static final String RETIT_APM_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.response.time";
     public static final String RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.cpu.demand";
-    public static final String RETIT_APM_TOTAL_CPU_TIMES_USED_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.cpu.time.used";
     public static final String RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.heap.demand";
-    public static final String RETIT_APM_TOTAL_HEAP_DEMAND_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.heap.demand";
     public static final String RETIT_APM_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.network.demand";
-    public static final String RETIT_APM_TOTAL_DISK_READ_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.disk.read.demand";
-    public static final String RETIT_APM_TOTAL_DISK_WRITE_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.disk.write.demand";
     public static final String RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.disk.demand";
-    public static final String RETIT_APM_TOTAL_STORAGE_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.total.storage.demand";
     public static final String RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.gc.event";
     public static final String RETIT_APM_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.thread.name";
     public static final String RETIT_APM_NEWRELIC_ENABLED = "de.retit.apm.newrelic.enabled";
@@ -38,23 +33,18 @@ public class Constants {
 
     public static final String STARTCPUTIME_FIELD = "startcputime";
     public static final String ENDCPUTIME_FIELD = "endcputime";
-    public static final String TOTALCPUTIMEUSED_FIELD = "totalcputimeused";
 
     public static final String STARTSYSTEMTIME_FIELD = "startsystemtime";
     public static final String ENDSYSTEMTIME_FIELD = "endsystemtime";
 
     public static final String STARTHEAPBYTEALLOCATION_FIELD = "startheapbyteallocation";
     public static final String ENDHEAPBYTEALLOCATION_FIELD = "endheapbyteallocation";
-    public static final String TOTALHEAPDEMAND_FIELD = "totalheapdemand";
 
     public static final String STARTDISKREADDEMAND_FIELD = "startdiskreaddemand";
     public static final String ENDDISKREADDEMAND_FIELD = "enddiskreaddemand";
-    public static final String TOTALDISKREADDEMAND_FIELD = "totaldiskreaddemand";
-    public static final String TOTALSTORAGEDEMAND_FIELD = "totalstoragedemand";
 
     public static final String STARTDISKWRITEDEMAND_FIELD = "startdiskwritedemand";
     public static final String ENDDISKWRITEDEMAND_FIELD = "enddiskwritedemand";
-    public static final String TOTALDISKWRITEDEMAND_FIELD = "totaldiskwritedemand";
     public static final String TOTAL_HEAP_SIZE_FIELD = "totalheapsize";
     public static final String START_THREAD_FIELD = "startthread";
     public static final String END_THREAD_FIELD = "endthread";
@@ -100,12 +90,7 @@ public class Constants {
     public static final String SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDDISKWRITEDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDHEAPBYTEALLOCATION_FIELD);
     public static final String SPAN_ATTRIBUTE_END_SYSTEM_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDSYSTEMTIME_FIELD);
-    public static final String SPAN_ATTRIBUTE_TOTAL_CPU_TIME_USED = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALCPUTIMEUSED_FIELD);
-    public static final String SPAN_ATTRIBUTE_TOTAL_DISK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALDISKREADDEMAND_FIELD);
-    public static final String SPAN_ATTRIBUTE_TOTAL_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALDISKWRITEDEMAND_FIELD);
-    public static final String SPAN_ATTRIBUTE_TOTAL_STORAGE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALSTORAGEDEMAND_FIELD);
 
-    public static final String SPAN_ATTRIBUTE_TOTAL_HEAP_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTALHEAPDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_LOG_SYSTEM_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, LOG_SYSTEM_TIME_FIELD);
     public static final String SPAN_ATTRIBUTE_TOTAL_HEAP_SIZE = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, TOTAL_HEAP_SIZE_FIELD);
     public static final String SPAN_ATTRIBUTE_SPAN_START_THREAD = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, START_THREAD_FIELD);

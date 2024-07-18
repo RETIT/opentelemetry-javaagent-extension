@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu;
+package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 

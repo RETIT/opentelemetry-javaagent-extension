@@ -59,18 +59,6 @@ public class InstanceConfiguration {
         return getBooleanProperty(Constants.RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
     }
 
-    public static boolean isLogTotalDiskReadDemand() {
-        return getBooleanProperty(Constants.RETIT_APM_TOTAL_DISK_READ_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
-    }
-
-    public static boolean isLogTotalDiskWriteDemand() {
-        return getBooleanProperty(Constants.RETIT_APM_TOTAL_DISK_WRITE_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
-    }
-
-    public static boolean isLogTotalStorageDemand() {
-        return getBooleanProperty(Constants.RETIT_APM_TOTAL_STORAGE_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
-    }
-
     public static boolean isLogNetworkDemand() {
         return getBooleanProperty(Constants.RETIT_APM_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
     }

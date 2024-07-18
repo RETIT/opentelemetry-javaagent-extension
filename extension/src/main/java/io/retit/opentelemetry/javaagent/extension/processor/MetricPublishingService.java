@@ -4,11 +4,13 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.trace.SpanContext;
+import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.CpuEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.EmbodiedEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.memory.MemoryEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.cpu.EmbodiedEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.memory.MemoryEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
 
 public class MetricPublishingService {
 
@@ -76,10 +78,17 @@ public class MetricPublishingService {
         System.out.println("Total memory emissions: " + totalMemoryEmissions);
     }
 
-    public static void publishEmissions(double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
-        publishStorageEmissions(totalStorageDemand);
-        publishCpuEmissions(totalCpuTimeUsedInHours);
-        publishEmbeddedEmissions(totalCpuTimeUsedInHours);
-        publishMemoryEmissions(totalHeapDemand);
+    public static void publishEmissions(ReadableSpan readableSpan, double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
+        if (isTopLevelSpan(readableSpan)) {
+            publishStorageEmissions(totalStorageDemand);
+            publishCpuEmissions(totalCpuTimeUsedInHours);
+            publishEmbeddedEmissions(totalCpuTimeUsedInHours);
+            publishMemoryEmissions(totalHeapDemand);
+        }
+    }
+
+    private static boolean isTopLevelSpan(ReadableSpan span) {
+        SpanContext parentContext = span.getParentSpanContext();
+        return parentContext == null || !parentContext.isValid();
     }
 }

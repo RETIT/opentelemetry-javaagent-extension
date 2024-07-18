@@ -4,8 +4,7 @@ This is an extension for the OpenTelemetry Java agent to provide additional inst
 usage data for the application, such as the total disk demand, total CPU demand, total storage demand and the network demand of the application.
 This data is attached to the span of each request and can be viewed in the Jaeger UI.
 
-This data will later be used to find the SCI value of each API call. 
-## Usage
+This data will later be used to calculate the SCI value of each API call.
 
 To run the sample application with the OpenTelemetry Java agent attached, the OpenTelemetry Java agent has to be downloaded from the OpenTelemetry website. The OpenTelemetry Java agent can be downloaded from the following link:
 https://opentelemetry.io/docs/zero-code/java/agent/
@@ -16,8 +15,11 @@ To run the extension it has to be packaged into a jar file. This can be done by 
 mvn clean package
 ```
 
-The endpoints used in this extension, can be run with the docker-compose file in this repository. This will start Grafana, Prometheus, Jaeger and the Open Telemetry Collector.
-
+The data (traces and metrics) collected by this extension can be processed by all OpenTelemetry Protocol (OTLP) compatible 
+backends. However, in order to process the additional attributes added to the metrics and traces for SCI calculation you 
+need to use a compatible backend such as [https://www.retit.io](https://www.retit.io) or a custom setup using the 
+OpenTelemetry Collector, Prometheus and Grafana. You can start an example setup for development purposes using the provided 
+dockerc-ompose file in this repository.
 To do this, run:
 
 ```bash 

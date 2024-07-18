@@ -71,15 +71,10 @@ public class RETITSpanProcessor implements SpanProcessor {
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
-        boolean logTotalCPUTimeUsed = TelemetryUtils.isLogTotalCpuTimeUsedDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
-        boolean logTotalHeapDemand = TelemetryUtils.isLogTotalHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
-        boolean logTotalDiskReadDemand = InstanceConfiguration.isLogTotalDiskReadDemand();
-        boolean logTotalDiskWriteDemand = InstanceConfiguration.isLogTotalDiskWriteDemand();
-        boolean logTotalStorageDemand = InstanceConfiguration.isLogTotalStorageDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
         final Attributes mergedAttributes =
                 TelemetryUtils.addEndResourceDemandValuesToSpanAttributes(
@@ -109,13 +104,11 @@ public class RETITSpanProcessor implements SpanProcessor {
 
         long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
-        Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logTotalCPUTimeUsed, totalCPUTimeUsed,
-                logTotalDiskReadDemand, totalDiskReadDemand, logTotalDiskWriteDemand, totalDiskWriteDemand, logTotalHeapDemand,
-                totalHeapDemand, logTotalStorageDemand, totalStorageDemand, readableSpan);
+        Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logCPUDemand, totalCPUTimeUsed,
+                 logDiskDemand, totalStorageDemand,  logHeapDemand,
+                totalHeapDemand, readableSpan);
 
-        System.out.println("before end called");
-
-        MetricPublishingService.publishEmissions(totalStorageDemand, totalCPUTimeUsed, totalHeapDemand);
+        MetricPublishingService.publishEmissions(readableSpan, totalStorageDemand, totalCPUTimeUsed, totalHeapDemand);
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }

@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.javaagent.extension.emissionCalculations.memory;
+package io.retit.opentelemetry.javaagent.extension.emissions.memory;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 

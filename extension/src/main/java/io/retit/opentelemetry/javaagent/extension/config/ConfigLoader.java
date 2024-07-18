@@ -1,12 +1,9 @@
 package io.retit.opentelemetry.javaagent.extension.config;
 
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.CpuEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage.StorageType;
+import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageType;
 import lombok.Getter;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,18 +37,19 @@ public class ConfigLoader {
     private final Double totalEmbodiedEmissions;
     @Getter
     private final Double pueValue;
-    private final Double[] cloudInstanceDetails = new Double[5];
+    private final Double[] cloudInstanceDetails = new Double[4];
 
     private ConfigLoader() {
         this.storageType = initializeStorageType();
         this.region = initializeRegion();
         this.cloudInstanceName = initializeInstance();
         this.gridEmissionsFactor = initializeGridEmissionFactor(region);
-        this.instanceEnergyUsageIdle = initializeCloudInstanceDetails(cloudInstanceName)[0];
+        initializeCloudInstanceDetails(cloudInstanceName);
+        this.instanceEnergyUsageIdle = cloudInstanceDetails[0];
         this.instanceEnergyUsageFull = cloudInstanceDetails[1];
         this.instanceVCpu = cloudInstanceDetails[2];
         this.platformTotalVcpu = cloudInstanceDetails[3];
-        this.totalEmbodiedEmissions = cloudInstanceDetails[4];
+        this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
         this.pueValue = initializePueValue();
         this.cloudProvider = initializeCloudProvider();
     }
@@ -106,12 +104,18 @@ public class ConfigLoader {
     private Double initializeGridEmissionFactor(String region) {
         Double returnValue = null;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(StorageEmissions.class.getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
-            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
-            for (CSVRecord csvRecord : csvParser) {
-                if (csvRecord.get("Region").trim().equalsIgnoreCase(region.trim())) {
-                    returnValue = Double.parseDouble(csvRecord.get("CO2e (g/kWh)").replace("\"", "").trim().replace(',', '.'));
-                    break;
+                Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
+            String line;
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",", -1);
+                if (fields.length >= 4) {
+                    String csvRegion = fields[0].trim();
+                    if (csvRegion.equalsIgnoreCase(region.trim())) {
+                        String co2eValue = fields[3].replace("\"", "").trim().replace(',', '.'); //
+                        returnValue = Double.parseDouble(co2eValue);
+                        break;
+                    }
                 }
             }
         } catch (IOException e) {
@@ -121,31 +125,61 @@ public class ConfigLoader {
         return returnValue;
     }
 
-    private Double[] initializeCloudInstanceDetails(String instanceType) {
+    private void initializeCloudInstanceDetails(String instanceType) {
+        //Double[] cloudInstanceDetails = new Double[4];
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(CpuEmissions.class.getResourceAsStream("/instances/aws-details.csv"))))) {
-            CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withHeader());
-            for (CSVRecord csvRecord : csvParser) {
-                if (csvRecord.get("Instance Type").trim().equalsIgnoreCase(instanceType.trim())) {
-                    cloudInstanceDetails[0] = Double.parseDouble(csvRecord.get("Instance @ Idle").trim());
-                    cloudInstanceDetails[1] = Double.parseDouble(csvRecord.get("Instance @ 100%").trim());
-                    cloudInstanceDetails[2] = Double.parseDouble(csvRecord.get("Instance vCPU").trim());
-                    cloudInstanceDetails[3] = Double.parseDouble(csvRecord.get("Platform Total Number of vCPU").trim());
-                    cloudInstanceDetails[4] = Double.parseDouble(csvRecord.get("Total Embodied Emissions").trim());
-                    System.out.println("instance " + instanceType + "instanceEnergyUsageIdle: " + cloudInstanceDetails[0] + " instanceEnergyUsageFull: "
-                            + cloudInstanceDetails[1] + " instanceVCpu: " + cloudInstanceDetails[2] + " platformTotalVcpu: "
-                            + cloudInstanceDetails[3] + " totalEmbodiedEmissions: " + cloudInstanceDetails[4]);
-                    break;
+                Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
+            String line;
+            // Read the header line to skip it
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] fields = parseCSVLine(line);
+                if (fields.length >= 31) { // Ensure there are enough fields
+                    String csvInstanceType = fields[0].trim();
+                    if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
+                        cloudInstanceDetails[0] = Double.parseDouble(fields[27].replace("\"", "").trim().replace(',', '.')); // Instance @ Idle
+                        cloudInstanceDetails[1] = Double.parseDouble(fields[30].replace("\"", "").trim().replace(',', '.')); // Instance @ 100%
+                        cloudInstanceDetails[2] = Double.parseDouble(fields[2].trim()); // Instance vCPU
+                        cloudInstanceDetails[3] = Double.parseDouble(fields[3].trim()); // Platform Total Number of vCPU
+                        System.out.println("instance " + instanceType + " instanceEnergyUsageIdle: " + cloudInstanceDetails[0]
+                                + " instanceEnergyUsageFull: " + cloudInstanceDetails[1]
+                                + " instanceVCpu: " + cloudInstanceDetails[2]
+                                + " platformTotalVcpu: " + cloudInstanceDetails[3]);
+                        break;
+                    }
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("Failed to load instance details from CSV file", e);
         }
-        return cloudInstanceDetails;
+    }
+
+    public Double totalEmbodiedEmissions (String instanceType) {
+        Double totalValue = null;
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
+            String line;
+            // Read the header line to skip it
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] fields = parseCSVLine(line);
+                if (fields.length >= 6) { // Ensure there are enough fields
+                    String csvInstanceType = fields[1].trim(); // Assuming 'type' is the second field
+                    if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
+                        totalValue = Double.parseDouble(fields[6].trim()); // Assuming 'total' is the seventh field
+                        System.out.println("Instance: " + instanceType + " Total: " + totalValue);
+                        break;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load total value from CSV file", e);
+        }
+        return totalValue;
     }
 
     private Double initializePueValue() {
-        Double returnValue;
+        Double returnValue = null;
         String providerName = System.getenv("CLOUD_PROVIDER");
         if (providerName == null || providerName.trim().isEmpty()) {
             throw new IllegalStateException("CLOUD_PROVIDER environment variable is required but not set");
@@ -158,12 +192,33 @@ public class ConfigLoader {
             throw new IllegalStateException("Invalid CLOUD_PROVIDER value: " + providerName);
         }
 
-        returnValue = switch (cloudProvider) {
-            case AWS -> 1.135;
-            case AZURE -> 1.125;
-            case GCP -> 1.1;
-        };
+        if (cloudProvider == CloudProvider.AWS) {
+            returnValue = 1.135;
+        } else if (cloudProvider == CloudProvider.AZURE) {
+            returnValue = 1.125;
+        } else if (cloudProvider == CloudProvider.GCP) {
+            returnValue = 1.1;
+        }
+
         System.out.println("PUE value: " + returnValue);
         return returnValue;
+    }
+
+    private String[] parseCSVLine(String line) {
+        boolean inQuotes = false;
+        StringBuilder field = new StringBuilder();
+        java.util.List<String> fields = new java.util.ArrayList<>();
+        for (char c : line.toCharArray()) {
+            if (c == '\"') {
+                inQuotes = !inQuotes; // Toggle the state of inQuotes
+            } else if (c == ',' && !inQuotes) {
+                fields.add(field.toString());
+                field = new StringBuilder(); // Start a new field
+            } else {
+                field.append(c);
+            }
+        }
+        fields.add(field.toString()); // Add the last field
+        return fields.toArray(new String[0]);
     }
 }

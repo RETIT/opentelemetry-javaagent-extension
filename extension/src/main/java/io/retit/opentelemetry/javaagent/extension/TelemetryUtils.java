@@ -32,16 +32,8 @@ public class TelemetryUtils {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
-    public static boolean isLogTotalCpuTimeUsedDefaultTrue() {
-        return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_TOTAL_CPU_TIMES_USED_LOGGING_CONFIGURATION_PROPERTY, true);
-    }
-
     public static boolean isLogHeapDemandDefaultTrue() {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
-    }
-
-    public static boolean isLogTotalHeapDemandDefaultTrue() {
-        return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_TOTAL_HEAP_DEMAND_CONFIGURATION_PROPERTY, true);
     }
 
     public static boolean isLogGCEventDefaultTrue() {
@@ -247,33 +239,23 @@ public class TelemetryUtils {
     }
 
     public static Attributes addResourceDemandMetricsToSpanAttributes(AttributesBuilder attributesBuilder,
-                                                                      boolean logTotalCPUTimeUsed, long totalCPUTimeUsed,
-                                                                      boolean logTotalDiskReadDemand, long totalDiskReadDemand,
-                                                                      boolean logTotalDiskWriteDemand, long totalDiskWriteDemand,
-                                                                      boolean logTotalHeapDemand, long totalHeapDemand,
+                                                                      boolean logCpuDemand, long totalCPUTimeUsed,
                                                                       boolean logTotalStorageDemand, long totalStorageDemand,
+                                                                      boolean logHeapDemand, long totalHeapDemand,
                                                                       ReadableSpan readableSpan) {
         if (!isExternalDatabaseCall(readableSpan)) {
-            if (logTotalCPUTimeUsed) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_CPU_TIME_USED, totalCPUTimeUsed);
+            if (logCpuDemand) {
+                attributesBuilder.put("Total CPU-time used", totalCPUTimeUsed);
                 System.out.println("Total CPU Time Logged: " + totalCPUTimeUsed);
-            }
-            if (logTotalDiskReadDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_READ_DEMAND, totalDiskReadDemand);
-                System.out.println("Total Disk Read Demand Logged: " + totalDiskReadDemand);
-            }
-            if (logTotalDiskWriteDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_DISK_WRITE_DEMAND, totalDiskWriteDemand);
-                System.out.println("Total Disk Write Demand Logged: " + totalDiskWriteDemand);
             }
 
             if (logTotalStorageDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_STORAGE_DEMAND, totalStorageDemand);
+                attributesBuilder.put("Total Storage used", totalStorageDemand);
                 System.out.println("Total Storage Demand Logged: " + totalStorageDemand);
             }
 
-            if (logTotalHeapDemand) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_TOTAL_HEAP_DEMAND, totalHeapDemand);
+            if (logHeapDemand) {
+                attributesBuilder.put("Total Heap Demand", totalHeapDemand);
                 System.out.println("Total Heap Demand Logged: " + totalHeapDemand);
             }
 
