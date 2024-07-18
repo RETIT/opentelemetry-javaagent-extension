@@ -29,6 +29,7 @@ public class RETITSpanProcessor implements SpanProcessor {
 
     @Override
     public void onStart(Context parentContext, ReadWriteSpan readWriteSpan) {
+        System.out.println("onStart called");
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
@@ -65,6 +66,7 @@ public class RETITSpanProcessor implements SpanProcessor {
      * @return {@link ReadableSpan} containing preexisting and our custom attributes
      */
     private ReadableSpan beforeEnd(ReadableSpan readableSpan) {
+        System.out.println("before end called");
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);

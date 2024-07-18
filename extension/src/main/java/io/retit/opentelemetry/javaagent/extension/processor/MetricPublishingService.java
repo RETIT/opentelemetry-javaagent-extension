@@ -4,6 +4,7 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.metrics.LongHistogram;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.common.Attributes;
+import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissionCalculations.memory.MemoryEmissions;
@@ -16,7 +17,11 @@ public class MetricPublishingService {
     private static final LongHistogram embeddedEmissionMeter;
     private static final LongHistogram memoryEmissionMeter;
 
+    private static final ConfigLoader configLoader;
+
     static {
+        configLoader = ConfigLoader.getConfigInstance();
+
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
 
         storageEmissionMeter = meter.histogramBuilder("storage_emissions")
@@ -46,8 +51,11 @@ public class MetricPublishingService {
 
     public static void publishStorageEmissions(double totalStorageDemand) {
         double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInGramm(totalStorageDemand);
-        storageEmissionMeter.record((long) totalEmissions, Attributes.empty());
-        System.out.println("Total storage emissions: " + totalEmissions);
+        // Retrieve the cloud provider from the ConfigLoader
+        String cloudProvider = configLoader.getCloudProvider().toString();
+        // Record the emissions along with the cloud provider as an attribute
+        storageEmissionMeter.record((long) totalEmissions, Attributes.builder().put("cloudProvider", cloudProvider).build());
+        System.out.println("Total storage emissions: " + totalEmissions + " on " + cloudProvider);
     }
 
     public static void publishCpuEmissions(double totalCpuDemand) {

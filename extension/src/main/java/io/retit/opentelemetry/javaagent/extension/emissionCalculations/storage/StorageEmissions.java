@@ -2,17 +2,32 @@ package io.retit.opentelemetry.javaagent.extension.emissionCalculations.storage;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 
+/**
+ * The {@code StorageEmissions} class calculates the carbon emissions associated with storage device usage.
+ * It leverages configuration settings to estimate emissions based on the type of storage (HDD or SSD),
+ * the amount of data stored, and the specific energy consumption characteristics of the cloud provider.
+ */
 public class StorageEmissions {
 
     public static StorageEmissions instance;
     public static final double STORAGE_EMISSIONS_HDD_PER_TB_HOUR = 0.00065;
     public static final double STORAGE_EMISSIONS_SSD_PER_TB_HOUR = 0.0012;
-    ConfigLoader configLoader;
+    private ConfigLoader configLoader;
 
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes the {@link ConfigLoader} to load necessary configuration for emissions calculations.
+     */
     private StorageEmissions() {
         configLoader = ConfigLoader.getConfigInstance();
     }
 
+    /**
+     * Provides a global access point to the {@code StorageEmissions} instance, implementing a singleton pattern.
+     * This ensures that only one instance of the class is created and used throughout the application.
+     *
+     * @return The single instance of {@code StorageEmissions}.
+     */
     public static StorageEmissions getInstance() {
         if (instance == null) {
             instance = new StorageEmissions();
@@ -20,10 +35,17 @@ public class StorageEmissions {
         return instance;
     }
 
+    /**
+     * Calculates the carbon emissions in grams for a given amount of storage usage.
+     * This method estimates the emissions based on the storage type (HDD or SSD), the amount of data stored,
+     * and adjusts for the Power Usage Effectiveness (PUE) value and the grid emissions factor.
+     *
+     * @param amountInBytes The amount of storage used in bytes.
+     * @return The calculated carbon emissions in grams.
+     */
     public double calculateStorageEmissionsInGramm(double amountInBytes) {
-        //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024;
         double storageSize = 10000; //simplification for now
-        System.out.println(storageSize);
+        //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024; // Convert bytes to terabytes
         if (configLoader.getStorageType() == StorageType.HDD) {
             storageSize *= STORAGE_EMISSIONS_HDD_PER_TB_HOUR;
         } else {
