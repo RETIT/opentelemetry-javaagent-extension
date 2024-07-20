@@ -1,5 +1,8 @@
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Logger;
 
@@ -11,7 +14,7 @@ public class SampleApplication {
     @WithSpan
     public static void method1() {
         LOGGER.info("inside method1");
-
+        method2();
     }
 
     @WithSpan
@@ -23,16 +26,26 @@ public class SampleApplication {
             Thread.currentThread().interrupt();
             LOGGER.warning("Thread interrupted");
         }
+        method3();
     }
 
+    @WithSpan
+    public static void method3() {
+        LOGGER.info("method3");
+        try {
+            Thread.sleep(random.nextInt(2000)); // Random delay between 0 to 2000 milliseconds
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            LOGGER.warning("Thread interrupted");
+        }
+    }
+
+    @WithSpan
     public static void main(String[] args) {
-       // for (int i = 0; i < 1; i++) { // Simulate 10 requests
             Span span = Span.current();
             span.setAttribute("test", "some value");
             method1();
-            //method2();
             span.end();
-            System.out.println("just printing something");
-        //}
+        System.out.println("Hello, World!");
     }
 }

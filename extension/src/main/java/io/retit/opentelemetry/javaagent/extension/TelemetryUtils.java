@@ -14,6 +14,8 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
+import io.retit.opentelemetry.javaagent.extension.emissions.cpu.EmbodiedEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.memory.MemoryEmissions;
 import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
 
@@ -197,8 +199,9 @@ public class TelemetryUtils {
                 readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD, Thread.currentThread().getId());
             }
             if (logHeapConsumption) {
+                long heapDemand = RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes();
                 readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION,
-                        RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
+                        heapDemand);
             }
             if (logDiskDemand) {
                 long[] readAndWriteBytes = RESOURCE_DEMAND_DATA_COLLECTOR.getDiskBytesReadAndWritten();
@@ -246,17 +249,14 @@ public class TelemetryUtils {
         if (!isExternalDatabaseCall(readableSpan)) {
             if (logCpuDemand) {
                 attributesBuilder.put("Total CPU-time used", totalCPUTimeUsed);
-                System.out.println("Total CPU Time Logged: " + totalCPUTimeUsed);
             }
 
             if (logTotalStorageDemand) {
                 attributesBuilder.put("Total Storage used", totalStorageDemand);
-                System.out.println("Total Storage Demand Logged: " + totalStorageDemand);
             }
 
             if (logHeapDemand) {
                 attributesBuilder.put("Total Heap Demand", totalHeapDemand);
-                System.out.println("Total Heap Demand Logged: " + totalHeapDemand);
             }
 
             return attributesBuilder.build();

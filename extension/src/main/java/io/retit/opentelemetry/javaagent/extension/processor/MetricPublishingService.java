@@ -19,11 +19,7 @@ public class MetricPublishingService {
     private static final LongHistogram embeddedEmissionMeter;
     private static final LongHistogram memoryEmissionMeter;
 
-    private static final ConfigLoader configLoader;
-
     static {
-        configLoader = ConfigLoader.getConfigInstance();
-
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
 
         storageEmissionMeter = meter.histogramBuilder("storage_emissions")
@@ -54,10 +50,10 @@ public class MetricPublishingService {
     public static void publishStorageEmissions(double totalStorageDemand) {
         double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInGramm(totalStorageDemand);
         // Retrieve the cloud provider from the ConfigLoader
-        String cloudProvider = configLoader.getCloudProvider().toString();
+        //String cloudProvider = configLoader.getCloudProvider().toString();
         // Record the emissions along with the cloud provider as an attribute
-        storageEmissionMeter.record((long) totalEmissions, Attributes.builder().put("cloudProvider", cloudProvider).build());
-        System.out.println("Total storage emissions: " + totalEmissions + " on " + cloudProvider);
+        storageEmissionMeter.record((long) totalEmissions);
+        System.out.println("Total storage emissions: " + totalEmissions + " on ");
     }
 
     public static void publishCpuEmissions(double totalCpuDemand) {
@@ -79,12 +75,13 @@ public class MetricPublishingService {
     }
 
     public static void publishEmissions(ReadableSpan readableSpan, double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
-        if (isTopLevelSpan(readableSpan)) {
+        System.out.println("total storage demand: " + totalStorageDemand);
+        System.out.println("total cpu time used: " + totalCpuTimeUsedInHours);
+        System.out.println("total heap demand: " + totalHeapDemand);
             publishStorageEmissions(totalStorageDemand);
             publishCpuEmissions(totalCpuTimeUsedInHours);
             publishEmbeddedEmissions(totalCpuTimeUsedInHours);
             publishMemoryEmissions(totalHeapDemand);
-        }
     }
 
     private static boolean isTopLevelSpan(ReadableSpan span) {
