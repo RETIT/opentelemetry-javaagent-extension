@@ -68,6 +68,8 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logDiskDemand,
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readWriteSpan);
+        readWriteSpan.setAttribute("startJavaThreadId", startJavaThreadId);
+
     }
 
     @Override
@@ -91,6 +93,7 @@ public class RETITSpanProcessor implements SpanProcessor {
      * @return {@link ReadableSpan} containing preexisting and our custom attributes
      */
     private ReadableSpan beforeEnd(ReadableSpan readableSpan) {
+        System.out.println("beforeEnd called");
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
@@ -113,9 +116,9 @@ public class RETITSpanProcessor implements SpanProcessor {
 
         String traceId = readableSpan.getSpanContext().getTraceId();
         TraceInfo trace = getTrace(traceId);
-
         Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
         long endJavaThreadId = Thread.currentThread().getId();
+
         long totalHeapDemand = 0;
         long totalCpuTimeUsed = 0;
         long totalStorageDemand = 0;
