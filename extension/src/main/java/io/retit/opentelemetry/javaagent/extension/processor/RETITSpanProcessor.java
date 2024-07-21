@@ -147,7 +147,7 @@ public class RETITSpanProcessor implements SpanProcessor {
                 long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
                 totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
-                MetricPublishingService.publishEmissions(readableSpan, totalStorageDemand, totalCpuTimeUsed, totalHeapDemand);
+                MetricPublishingService.getInstance().publishEmissions(readableSpan, totalStorageDemand, totalCpuTimeUsed, totalHeapDemand);
 
             } else {
                 System.out.println("No top level span");

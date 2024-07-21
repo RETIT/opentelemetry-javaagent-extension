@@ -14,12 +14,25 @@ import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmiss
 
 public class MetricPublishingService {
 
-    private static final LongHistogram storageEmissionMeter;
-    private static final LongHistogram cpuEmissionMeter;
-    private static final LongHistogram embeddedEmissionMeter;
-    private static final LongHistogram memoryEmissionMeter;
+    public static MetricPublishingService instance;
 
-    static {
+    private final LongHistogram storageEmissionMeter;
+    private final LongHistogram cpuEmissionMeter;
+    private final LongHistogram embeddedEmissionMeter;
+    private final LongHistogram memoryEmissionMeter;
+
+    private final ConfigLoader configLoader;
+
+    public static MetricPublishingService getInstance() {
+        if (instance == null) {
+            instance = new MetricPublishingService();
+        }
+        return instance;
+    }
+
+    private MetricPublishingService() {
+        configLoader = ConfigLoader.getConfigInstance();
+
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
 
         storageEmissionMeter = meter.histogramBuilder("storage_emissions")
@@ -47,45 +60,37 @@ public class MetricPublishingService {
                 .build();
     }
 
-    public static void publishStorageEmissions(double totalStorageDemand) {
+    public void publishStorageEmissions(double totalStorageDemand) {
         double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInGramm(totalStorageDemand);
-        // Retrieve the cloud provider from the ConfigLoader
-        //String cloudProvider = configLoader.getCloudProvider().toString();
-        // Record the emissions along with the cloud provider as an attribute
         storageEmissionMeter.record((long) totalEmissions);
         System.out.println("Total storage emissions: " + totalEmissions + " on ");
     }
 
-    public static void publishCpuEmissions(double totalCpuDemand) {
+    public void publishCpuEmissions(double totalCpuDemand) {
         double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInGramm(totalCpuDemand);
         cpuEmissionMeter.record((long) totalEmissions, Attributes.empty());
         System.out.println("Total CPU emissions: " + totalEmissions);
     }
 
-    public static void publishEmbeddedEmissions(long totalCPUTimeUsedInHours) {
+    public void publishEmbeddedEmissions(long totalCPUTimeUsedInHours) {
         double totalEmbodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInGramm(totalCPUTimeUsedInHours);
         embeddedEmissionMeter.record((long) totalEmbodiedEmissions, Attributes.empty());
         System.out.println("Total embodied emissions: " + totalEmbodiedEmissions);
     }
 
-    public static void publishMemoryEmissions(double totalMemoryDemand) {
+    public void publishMemoryEmissions(double totalMemoryDemand) {
         double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInGramm(totalMemoryDemand);
         memoryEmissionMeter.record((long) totalMemoryEmissions, Attributes.empty());
         System.out.println("Total memory emissions: " + totalMemoryEmissions);
     }
 
-    public static void publishEmissions(ReadableSpan readableSpan, double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
+    public void publishEmissions(ReadableSpan readableSpan, double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
         System.out.println("total storage demand: " + totalStorageDemand);
         System.out.println("total cpu time used: " + totalCpuTimeUsedInHours);
         System.out.println("total heap demand: " + totalHeapDemand);
-            publishStorageEmissions(totalStorageDemand);
-            publishCpuEmissions(totalCpuTimeUsedInHours);
-            publishEmbeddedEmissions(totalCpuTimeUsedInHours);
-            publishMemoryEmissions(totalHeapDemand);
-    }
-
-    private static boolean isTopLevelSpan(ReadableSpan span) {
-        SpanContext parentContext = span.getParentSpanContext();
-        return parentContext == null || !parentContext.isValid();
+        publishStorageEmissions(totalStorageDemand);
+        publishCpuEmissions(totalCpuTimeUsedInHours);
+        publishEmbeddedEmissions(totalCpuTimeUsedInHours);
+        publishMemoryEmissions(totalHeapDemand);
     }
 }

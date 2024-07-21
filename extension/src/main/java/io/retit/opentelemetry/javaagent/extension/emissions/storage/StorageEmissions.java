@@ -12,7 +12,7 @@ public class StorageEmissions {
     public static StorageEmissions instance;
     public static final double STORAGE_EMISSIONS_HDD_PER_TB_HOUR = 0.00065;
     public static final double STORAGE_EMISSIONS_SSD_PER_TB_HOUR = 0.0012;
-    private ConfigLoader configLoader;
+    private final ConfigLoader configLoader;
 
     /**
      * Private constructor to prevent direct instantiation.
