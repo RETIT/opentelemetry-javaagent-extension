@@ -44,6 +44,7 @@ public class ConfigLoader {
         this.region = initializeRegion();
         this.cloudInstanceName = initializeInstance();
         this.gridEmissionsFactor = initializeGridEmissionFactor(region);
+        this.cloudProvider = initializeCloudProvider();
         initializeCloudInstanceDetails(cloudInstanceName);
         this.instanceEnergyUsageIdle = cloudInstanceDetails[0];
         this.instanceEnergyUsageFull = cloudInstanceDetails[1];
@@ -51,7 +52,6 @@ public class ConfigLoader {
         this.platformTotalVcpu = cloudInstanceDetails[3];
         this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
         this.pueValue = initializePueValue();
-        this.cloudProvider = initializeCloudProvider();
     }
 
     private StorageType initializeStorageType() {
@@ -126,15 +126,38 @@ public class ConfigLoader {
     }
 
     private void initializeCloudInstanceDetails(String instanceType) {
-        //Double[] cloudInstanceDetails = new Double[4];
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
-            String line;
-            // Read the header line to skip it
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                String[] fields = parseCSVLine(line);
-                if (fields.length >= 31) { // Ensure there are enough fields
+        if (cloudProvider.equals(CloudProvider.AZURE)) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/azure-instances.csv"))))) {
+                String line;
+                reader.readLine();
+                boolean found = false;
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = parseCSVLine(line);
+                    String csvInstanceType = fields[1].trim();
+                    if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
+                        cloudInstanceDetails[2] = Double.parseDouble(fields[3].trim());
+                        cloudInstanceDetails[3] = Double.parseDouble(fields[5].trim());
+                        System.out.println("instance: " + instanceType + " Instance vCPUs: " + cloudInstanceDetails[2]
+                                + " Platform vCPUs: " + cloudInstanceDetails[3]);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new RuntimeException("Instance type not found in CSV file: " + instanceType);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load vCPU values from CSV file", e);
+            }
+        } else if (cloudProvider.equals(CloudProvider.AWS)) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
+                String line;
+                reader.readLine();
+                boolean found = false;
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = parseCSVLine(line);
                     String csvInstanceType = fields[0].trim();
                     if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
                         cloudInstanceDetails[0] = Double.parseDouble(fields[27].replace("\"", "").trim().replace(',', '.')); // Instance @ Idle
@@ -145,16 +168,44 @@ public class ConfigLoader {
                                 + " instanceEnergyUsageFull: " + cloudInstanceDetails[1]
                                 + " instanceVCpu: " + cloudInstanceDetails[2]
                                 + " platformTotalVcpu: " + cloudInstanceDetails[3]);
+                        found = true;
                         break;
                     }
                 }
+                if (!found) {
+                    throw new IllegalArgumentException("Instance type not found in CSV file");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load instance details from CSV file", e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load instance details from CSV file", e);
+        } else if (cloudProvider.equals(CloudProvider.GCP)) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/gcp-instances.csv"))))) {
+                String line;
+                reader.readLine();
+                boolean found = false;
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = parseCSVLine(line);
+                    String csvInstanceType = fields[1].trim();
+                    if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
+                        cloudInstanceDetails[2] = Double.parseDouble(fields[3].trim()); // Instance vCPU
+                        cloudInstanceDetails[3] = Double.parseDouble(fields[5].trim()); // Platform Total Number of vCPU
+                        System.out.println("instance: " + instanceType + " instance VCpu: " + cloudInstanceDetails[2]
+                                + " platform Total Vcpu: " + cloudInstanceDetails[3]);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new IllegalArgumentException("Instance type not found in CSV file");
+                }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load instance details from CSV file", e);
+            }
         }
     }
 
-    public Double totalEmbodiedEmissions (String instanceType) {
+    public Double totalEmbodiedEmissions(String instanceType) {
         Double totalValue = null;
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
