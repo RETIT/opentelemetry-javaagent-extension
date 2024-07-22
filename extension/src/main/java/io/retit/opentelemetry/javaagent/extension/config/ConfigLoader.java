@@ -4,6 +4,7 @@ import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageType;
 import lombok.Getter;
+import lombok.NonNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -21,6 +22,8 @@ public class ConfigLoader {
     private final String region;
     @Getter
     private final String cloudInstanceName;
+    @Getter
+    private final String microarchitecture;
     @Getter
     private final CloudProvider cloudProvider;
     @Getter
@@ -43,13 +46,14 @@ public class ConfigLoader {
         this.storageType = initializeStorageType();
         this.region = initializeRegion();
         this.cloudInstanceName = initializeInstance();
-        this.gridEmissionsFactor = initializeGridEmissionFactor(region);
+        this.microarchitecture = initializeMicroarchitecture();
         this.cloudProvider = initializeCloudProvider();
+        this.gridEmissionsFactor = initializeGridEmissionFactor(region);
         initializeCloudInstanceDetails(cloudInstanceName);
-        this.instanceEnergyUsageIdle = cloudInstanceDetails[0];
-        this.instanceEnergyUsageFull = cloudInstanceDetails[1];
-        this.instanceVCpu = cloudInstanceDetails[2];
-        this.platformTotalVcpu = cloudInstanceDetails[3];
+        this.instanceVCpu = cloudInstanceDetails[0];
+        this.platformTotalVcpu = cloudInstanceDetails[1];
+        this.instanceEnergyUsageIdle = cloudInstanceDetails[2];
+        this.instanceEnergyUsageFull = cloudInstanceDetails[3];
         this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
         this.pueValue = initializePueValue();
     }
@@ -84,6 +88,14 @@ public class ConfigLoader {
                     "in case of serverless deployment");
         }
         return instance;
+    }
+
+    private String initializeMicroarchitecture() {
+        String microarchitecture = System.getenv("MICROARCHITECTURE");
+        if (microarchitecture == null || microarchitecture.trim().isEmpty()) {
+            return null;
+        }
+        return microarchitecture;
     }
 
     private CloudProvider initializeCloudProvider() {
@@ -136,10 +148,13 @@ public class ConfigLoader {
                     String[] fields = parseCSVLine(line);
                     String csvInstanceType = fields[1].trim();
                     if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
-                        cloudInstanceDetails[2] = Double.parseDouble(fields[3].trim());
-                        cloudInstanceDetails[3] = Double.parseDouble(fields[5].trim());
-                        System.out.println("instance: " + instanceType + " Instance vCPUs: " + cloudInstanceDetails[2]
-                                + " Platform vCPUs: " + cloudInstanceDetails[3]);
+                        cloudInstanceDetails[0] = Double.parseDouble(fields[3].trim());
+                        cloudInstanceDetails[1] = Double.parseDouble(fields[5].trim());
+                        cloudInstanceDetails[2] = Double.parseDouble(fields[12].trim());
+                        cloudInstanceDetails[3] = Double.parseDouble(fields[13].trim());
+                        System.out.println("instance: " + instanceType + " Instance vCPUs: " + cloudInstanceDetails[0]
+                                + " Platform vCPUs: " + cloudInstanceDetails[1] + " Min Watt: " + cloudInstanceDetails[2] +
+                                " Max Watt: " + cloudInstanceDetails[3]);
                         found = true;
                         break;
                     }
@@ -160,14 +175,16 @@ public class ConfigLoader {
                     String[] fields = parseCSVLine(line);
                     String csvInstanceType = fields[0].trim();
                     if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
-                        cloudInstanceDetails[0] = Double.parseDouble(fields[27].replace("\"", "").trim().replace(',', '.')); // Instance @ Idle
-                        cloudInstanceDetails[1] = Double.parseDouble(fields[30].replace("\"", "").trim().replace(',', '.')); // Instance @ 100%
-                        cloudInstanceDetails[2] = Double.parseDouble(fields[2].trim()); // Instance vCPU
-                        cloudInstanceDetails[3] = Double.parseDouble(fields[3].trim()); // Platform Total Number of vCPU
-                        System.out.println("instance " + instanceType + " instanceEnergyUsageIdle: " + cloudInstanceDetails[0]
-                                + " instanceEnergyUsageFull: " + cloudInstanceDetails[1]
-                                + " instanceVCpu: " + cloudInstanceDetails[2]
-                                + " platformTotalVcpu: " + cloudInstanceDetails[3]);
+                        cloudInstanceDetails[0] = Double.parseDouble(fields[2].trim()); // Instance vCPU
+                        cloudInstanceDetails[1] = Double.parseDouble(fields[3].trim()); // Platform Total Number of vCPU
+                        cloudInstanceDetails[2] = Double.parseDouble(fields[27].replace("\"", "").trim().replace(',', '.')); // Instance @ Idle
+                        cloudInstanceDetails[3] = Double.parseDouble(fields[30].replace("\"", "").trim().replace(',', '.')); // Instance @ 100%
+
+                        System.out.println("instance " + instanceType
+                                + " instanceVCpu: " + cloudInstanceDetails[0]
+                                + " platformTotalVcpu: " + cloudInstanceDetails[1]
+                                + " instanceEnergyUsageIdle: " + cloudInstanceDetails[2]
+                                + " instanceEnergyUsageFull: " + cloudInstanceDetails[3]);
                         found = true;
                         break;
                     }
@@ -180,27 +197,33 @@ public class ConfigLoader {
             }
         } else if (cloudProvider.equals(CloudProvider.GCP)) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/gcp-instances.csv"))))) {
+                    Objects.requireNonNull(getClass().getResourceAsStream("/gcp-instances.csv"))))) {
+                reader.readLine(); // Skip header line
                 String line;
-                reader.readLine();
                 boolean found = false;
                 while ((line = reader.readLine()) != null) {
-                    String[] fields = parseCSVLine(line);
+                    String[] fields = line.split(",");
                     String csvInstanceType = fields[1].trim();
-                    if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
-                        cloudInstanceDetails[2] = Double.parseDouble(fields[3].trim()); // Instance vCPU
-                        cloudInstanceDetails[3] = Double.parseDouble(fields[5].trim()); // Platform Total Number of vCPU
-                        System.out.println("instance: " + instanceType + " instance VCpu: " + cloudInstanceDetails[2]
-                                + " platform Total Vcpu: " + cloudInstanceDetails[3]);
+                    String csvMicroarchitecture = fields[2].trim();
+                    if ((microarchitecture == null && csvInstanceType.equalsIgnoreCase(instanceType.trim())) ||
+                            (csvInstanceType.equalsIgnoreCase(instanceType.trim()) &&
+                                    csvMicroarchitecture.equalsIgnoreCase(microarchitecture))) {
+                        cloudInstanceDetails[0] = Double.parseDouble(fields[3].trim());
+                        cloudInstanceDetails[1] = Double.parseDouble(fields[5].trim());
+                        cloudInstanceDetails[2] = (microarchitecture == null) ? 1 : Double.parseDouble(fields[12].trim());
+                        cloudInstanceDetails[3] = (microarchitecture == null) ? 1 : Double.parseDouble(fields[13].trim());
+                        System.out.println("instance: " + instanceType + " Instance vCPUs: " + cloudInstanceDetails[0]
+                                + " Platform vCPUs: " + cloudInstanceDetails[1] + " Min Watt: " + cloudInstanceDetails[2] +
+                                " Max Watt: " + cloudInstanceDetails[3]);
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    throw new IllegalArgumentException("Instance type not found in CSV file");
+                    throw new RuntimeException("Instance type not found in CSV file: " + instanceType);
                 }
             } catch (IOException e) {
-                throw new RuntimeException("Failed to load instance details from CSV file", e);
+                throw new RuntimeException("Failed to load vCPU values from CSV file", e);
             }
         }
     }
