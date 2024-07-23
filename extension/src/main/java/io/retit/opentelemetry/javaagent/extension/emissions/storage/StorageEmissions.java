@@ -43,13 +43,12 @@ public class StorageEmissions {
      * @param amountInBytes The amount of storage used in bytes.
      * @return The calculated carbon emissions in grams.
      */
-    public double calculateStorageEmissionsInGramm(double amountInBytes) {
-        double storageSize = 10000; //simplification for now
-        //double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024; // Convert bytes to terabytes
+    public double calculateStorageEmissionsInMilliGram(double amountInBytes) {
+        double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024; // Convert bytes to terabytes
         if (configLoader.getStorageType() == StorageType.HDD) {
-            storageSize *= STORAGE_EMISSIONS_HDD_PER_TB_HOUR;
+            storageSize *= STORAGE_EMISSIONS_HDD_PER_TB_HOUR * 1000000;
         } else {
-            storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR;
+            storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR * 1000000;
         }
         storageSize *= configLoader.getPueValue() * configLoader.getGridEmissionsFactor();
         return storageSize;

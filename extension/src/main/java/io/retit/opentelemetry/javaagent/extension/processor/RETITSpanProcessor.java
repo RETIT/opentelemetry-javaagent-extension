@@ -144,6 +144,8 @@ public class RETITSpanProcessor implements SpanProcessor {
                 long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
                 totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+                System.out.println("Total CPU time used in ms: " + totalCpuTimeUsed);
+
                 MetricPublishingService.getInstance().publishEmissions(Attributes.of(AttributeKey.stringKey("Servicecall"), readableSpan.getName()), totalStorageDemand, totalCpuTimeUsed, totalHeapDemand);
 
             } else {

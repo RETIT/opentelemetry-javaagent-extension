@@ -40,10 +40,9 @@ public class MemoryEmissions {
      * @param amountInBytes The amount of memory used in bytes.
      * @return The calculated carbon emissions in grams.
      */
-    public double calculateMemoryEmissionsInGramm(double amountInBytes) {
-        // Simplification for now, assuming a fixed amount of memory usage
-        amountInBytes = 10000; // Simplification to get easier numbers
-        amountInBytes *= 0.000392 * configLoader.getPueValue() * configLoader.getGridEmissionsFactor(); // 0.000392 is a fixed coefficient
-        return amountInBytes;
+    public double calculateMemoryEmissionsInMilliGram(double amountInBytes) {
+        System.out.println("amountInBytes: " + amountInBytes);
+        double amountInGb = amountInBytes / 1024 / 1024 / 1024; // Convert bytes to gigabytes
+        return amountInGb * 0.000392 * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 }

@@ -37,38 +37,38 @@ public class MetricPublishingService {
 
         storageEmissionMeter = meter.counterBuilder("storage_emissions")
                 .setDescription("Total emissions from storage")
-                .setUnit("gCO2e")
+                .setUnit("mgCO2e")
                 .build();
 
         cpuEmissionMeter = meter.counterBuilder("cpu_emissions")
                 .setDescription("Total emissions from CPU")
-                .setUnit("gCO2e")
+                .setUnit("mgCO2e")
                 .build();
 
         embeddedEmissionMeter = meter.counterBuilder("embedded_emissions")
                 .setDescription("Total emissions from embedded components")
-                .setUnit("gCO2e")
+                .setUnit("mgCO2e")
                 .build();
 
         memoryEmissionMeter = meter.counterBuilder("memory_emissions")
                 .setDescription("Total emissions from memory")
-                .setUnit("gCO2e")
+                .setUnit("mgCO2e")
                 .build();
     }
 
     public void publishStorageEmissions(double totalStorageDemand, Attributes attributes) {
-        double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInGramm(totalStorageDemand);
+        double totalEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(totalStorageDemand);
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider().toString());
         attributesBuilder.put(AttributeKey.stringKey("storage-type"), configLoader.getStorageType().toString());
         storageEmissionMeter.add((long) totalEmissions, attributes);
-        System.out.println("Total storage emissions: " + totalEmissions + " on ");
+        System.out.println("Total storage emissions: " + totalEmissions);
     }
 
     public void publishCpuEmissions(double totalCpuDemand, Attributes attributes) {
-        double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInGramm(totalCpuDemand);
+        double totalEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(totalCpuDemand);
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
@@ -78,7 +78,7 @@ public class MetricPublishingService {
     }
 
     public void publishEmbeddedEmissions(double totalCPUTimeUsedInHours, Attributes attributes) {
-        double totalEmbodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInGramm(totalCPUTimeUsedInHours);
+        double totalEmbodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGram(totalCPUTimeUsedInHours);
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
@@ -88,7 +88,7 @@ public class MetricPublishingService {
     }
 
     public void publishMemoryEmissions(double totalMemoryDemand, Attributes attributes) {
-        double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInGramm(totalMemoryDemand);
+        double totalMemoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(totalMemoryDemand);
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
@@ -97,10 +97,10 @@ public class MetricPublishingService {
         System.out.println("Total memory emissions: " + totalMemoryEmissions);
     }
 
-    public void publishEmissions(Attributes attributes, double totalStorageDemand, long totalCpuTimeUsedInHours, double totalHeapDemand) {
-        publishStorageEmissions(totalStorageDemand, attributes);
-        publishCpuEmissions(totalCpuTimeUsedInHours, attributes);
-        publishEmbeddedEmissions(totalCpuTimeUsedInHours, attributes);
-        publishMemoryEmissions(totalHeapDemand, attributes);
+    public void publishEmissions(Attributes attributes, double totalStorageDemandInBytes, long totalCpuTimeUsedInMilliseconds, double totalHeapDemandInBytes) {
+        publishStorageEmissions(totalStorageDemandInBytes, attributes);
+        publishCpuEmissions(totalCpuTimeUsedInMilliseconds, attributes);
+        publishEmbeddedEmissions(totalCpuTimeUsedInMilliseconds, attributes);
+        publishMemoryEmissions(totalHeapDemandInBytes, attributes);
     }
 }

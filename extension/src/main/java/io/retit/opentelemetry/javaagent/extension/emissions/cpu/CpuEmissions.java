@@ -2,8 +2,6 @@ package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 
-import static io.retit.opentelemetry.javaagent.extension.config.CloudProvider.AWS;
-
 /**
  * The {@code CpuEmissions} class calculates the carbon emissions associated with CPU usage.
  * It utilizes configuration settings to estimate emissions based on the cloud provider's energy consumption data.
@@ -36,11 +34,11 @@ public class CpuEmissions {
     /**
      * Calculates the carbon emissions in grams for a given CPU usage time and utilization.
      *
-     * @param cpuTimeUsed The CPU time used in nanoseconds.
+     * @param cpuTimeUsed    The CPU time used in nanoseconds.
      * @param cpuUtilization The CPU utilization as a percentage.
      * @return The calculated carbon emissions in grams.
      */
-    public double calculateCpuEmissionsInGramm(double cpuTimeUsed, double cpuUtilization) {
+    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsed, double cpuUtilization) {
         return configLoader.getInstanceEnergyUsageIdle() + cpuUtilization * (configLoader.getInstanceEnergyUsageFull()
                 - configLoader.getInstanceEnergyUsageIdle()) / 1000 * cpuTimeUsed;
     }
@@ -49,19 +47,14 @@ public class CpuEmissions {
      * Overloaded method to calculate carbon emissions based on CPU time used in hours.
      * This method simplifies calculations by assuming a fixed CPU time used.
      *
-     * @param cpuTimeUsedinHours The CPU time used in hours.
-     * @return The calculated carbon emissions in grams.
+     * @param cpuTimeUsedinMilliseconds The CPU time used in hours.
+     * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateCpuEmissionsInGramm(double cpuTimeUsedinHours) {
-        cpuTimeUsedinHours = 10000; // Simplification for now
-        if (configLoader.getCloudInstanceName() == null && configLoader.getCloudProvider().equals(AWS)) {
-            return (0.74 + 0.5 * (0.74 - 3.5) * cpuTimeUsedinHours * configLoader.getPueValue()
-                    - configLoader.getInstanceEnergyUsageIdle() / 1000 * cpuTimeUsedinHours * configLoader.getPueValue()
-                    * configLoader.getGridEmissionsFactor());
-        } else {
-            return configLoader.getInstanceEnergyUsageIdle() + 0.5 * (configLoader.getInstanceEnergyUsageFull()
-                    - configLoader.getInstanceEnergyUsageIdle()) / 1000 * cpuTimeUsedinHours * configLoader.getPueValue()
-                    * configLoader.getGridEmissionsFactor();
-        }
+    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedinMilliseconds) {
+        double cpuTimeInHours = cpuTimeUsedinMilliseconds / 3600000.0 / 1000000;
+        double computeKiloWattHours = (configLoader.getInstanceEnergyUsageIdle() + 0.5
+                * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle())
+                * cpuTimeInHours) / 1000;
+        return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 }
