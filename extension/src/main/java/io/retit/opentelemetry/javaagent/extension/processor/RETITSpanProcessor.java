@@ -30,7 +30,6 @@ public class RETITSpanProcessor implements SpanProcessor {
     @Getter
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
-    private final Map<String, TraceInfo> traceList = new HashMap<>();
 
     public RETITSpanProcessor(BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder) {
         this.delegateBatchSpanProcessorBuilder = delegateBatchSpanProcessorBuilder;
@@ -46,20 +45,7 @@ public class RETITSpanProcessor implements SpanProcessor {
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
 
-        String traceId = readWriteSpan.getSpanContext().getTraceId();
         long startJavaThreadId = Thread.currentThread().getId();
-        long startSystemThreadId;
-
-        try {
-            startSystemThreadId = NativeFacade.getThreadId();
-        } catch (Exception e) {
-            startSystemThreadId = -1;
-        }
-
-        if (getTrace(traceId) == null) {
-            createTrace(traceId, String.valueOf(startJavaThreadId), String.valueOf(startSystemThreadId),
-                    readWriteSpan.getSpanContext().getSpanId());
-        }
 
         TelemetryUtils.addStartResourceDemandValuesToSpanAttributes(
                 logCPUDemand,
@@ -69,7 +55,6 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readWriteSpan);
         readWriteSpan.setAttribute("startJavaThreadId", startJavaThreadId);
-        //readWriteSpan.setAttribute("totalCpuEmission",0);
     }
 
     @Override
@@ -113,8 +98,6 @@ public class RETITSpanProcessor implements SpanProcessor {
                         logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                         readableSpan);
 
-        String traceId = readableSpan.getSpanContext().getTraceId();
-        TraceInfo trace = getTrace(traceId);
         Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
         long endJavaThreadId = Thread.currentThread().getId();
 
@@ -151,12 +134,8 @@ public class RETITSpanProcessor implements SpanProcessor {
             } else {
                 System.out.println("No top level span");
             }
-        } else if (trace.getStartJavaThreadID() != endJavaThreadId) {
+        } else {
             System.out.println("Different thread ID");
-            traceList.remove(traceId);
-            trace = new TraceInfo(trace.getStartJavaThreadID(), trace.getStartSystemThreadID(), totalCpuTimeUsed,
-                    totalHeapDemand, trace.getStartSpanId(), 0, totalStorageDemand);
-            traceList.put(traceId, trace);
         }
 
         Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logCPUDemand, totalCpuTimeUsed,
@@ -164,38 +143,6 @@ public class RETITSpanProcessor implements SpanProcessor {
                 totalHeapDemand, readableSpan);
 
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
-    }
-
-    @Getter
-    private static class TraceInfo {
-
-        private final long startJavaThreadID;
-        private final long startSystemThreadID;
-        private final long cpuTime;
-        private final long memory;
-        private final String startSpanId;
-        private final long network;
-        private final long storage;
-
-        public TraceInfo(long startJavaThreadID, long startSystemThreadID, long cpuTime, long memory, String startSpanID,
-                         long network, long storage) {
-            this.startJavaThreadID = startJavaThreadID;
-            this.startSystemThreadID = startSystemThreadID;
-            this.cpuTime = cpuTime;
-            this.memory = memory;
-            this.startSpanId = startSpanID;
-            this.network = network;
-            this.storage = storage;
-        }
-    }
-
-    private TraceInfo getTrace(String traceId) {
-        return traceList.get(traceId);
-    }
-
-    private void createTrace(String traceId, String startThreadId, String startSystemThreadId, String startSpanID) {
-        traceList.put(traceId,
-                new TraceInfo(Long.parseLong(startThreadId), Long.parseLong(startSystemThreadId), 0, 0, startSpanID, 0, 0));
     }
 
     @Override
