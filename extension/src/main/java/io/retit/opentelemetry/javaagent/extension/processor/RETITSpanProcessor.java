@@ -69,7 +69,7 @@ public class RETITSpanProcessor implements SpanProcessor {
                 logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                 readWriteSpan);
         readWriteSpan.setAttribute("startJavaThreadId", startJavaThreadId);
-
+        //readWriteSpan.setAttribute("totalCpuEmission",0);
     }
 
     @Override
@@ -93,7 +93,6 @@ public class RETITSpanProcessor implements SpanProcessor {
      * @return {@link ReadableSpan} containing preexisting and our custom attributes
      */
     private ReadableSpan beforeEnd(ReadableSpan readableSpan) {
-        System.out.println("beforeEnd called");
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
@@ -129,9 +128,7 @@ public class RETITSpanProcessor implements SpanProcessor {
                 System.out.println("Top level span");
 
                 Long startCpuTime = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
-                System.out.println("startCpuTime: " + startCpuTime);
                 Long endCpuTime = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
-                System.out.println("endCpuTime: " + endCpuTime);
                 totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
 
                 Long startHeapByteAllocation = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
@@ -147,7 +144,7 @@ public class RETITSpanProcessor implements SpanProcessor {
                 long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
                 totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
-                MetricPublishingService.getInstance().publishEmissions(readableSpan, totalStorageDemand, totalCpuTimeUsed, totalHeapDemand);
+                MetricPublishingService.getInstance().publishEmissions(Attributes.of(AttributeKey.stringKey("Servicecall"), readableSpan.getName()), totalStorageDemand, totalCpuTimeUsed, totalHeapDemand);
 
             } else {
                 System.out.println("No top level span");

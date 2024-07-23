@@ -198,7 +198,7 @@ public class ConfigLoader {
         } else if (cloudProvider.equals(CloudProvider.GCP)) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     Objects.requireNonNull(getClass().getResourceAsStream("/gcp-instances.csv"))))) {
-                reader.readLine(); // Skip header line
+                reader.readLine();
                 String line;
                 boolean found = false;
                 while ((line = reader.readLine()) != null) {
@@ -233,7 +233,6 @@ public class ConfigLoader {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
             String line;
-            // Read the header line to skip it
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] fields = parseCSVLine(line);
@@ -284,15 +283,15 @@ public class ConfigLoader {
         java.util.List<String> fields = new java.util.ArrayList<>();
         for (char c : line.toCharArray()) {
             if (c == '\"') {
-                inQuotes = !inQuotes; // Toggle the state of inQuotes
+                inQuotes = !inQuotes;
             } else if (c == ',' && !inQuotes) {
                 fields.add(field.toString());
-                field = new StringBuilder(); // Start a new field
+                field = new StringBuilder();
             } else {
                 field.append(c);
             }
         }
-        fields.add(field.toString()); // Add the last field
+        fields.add(field.toString());
         return fields.toArray(new String[0]);
     }
 }

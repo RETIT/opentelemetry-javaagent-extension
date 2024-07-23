@@ -248,17 +248,16 @@ public class TelemetryUtils {
                                                                       ReadableSpan readableSpan) {
         if (!isExternalDatabaseCall(readableSpan)) {
             if (logCpuDemand) {
-                attributesBuilder.put("Total CPU-time used", totalCPUTimeUsed);
+                attributesBuilder.put("total_cputime_used", totalCPUTimeUsed);
             }
 
             if (logTotalStorageDemand) {
-                attributesBuilder.put("Total Storage used", totalStorageDemand);
+                attributesBuilder.put("total_storage_used", totalStorageDemand);
             }
 
             if (logHeapDemand) {
-                attributesBuilder.put("Total Heap Demand", totalHeapDemand);
+                attributesBuilder.put(AttributeKey.longKey("total_heap_demand"), totalHeapDemand);
             }
-
             return attributesBuilder.build();
         }
         return attributesBuilder.build();
