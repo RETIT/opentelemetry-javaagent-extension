@@ -45,7 +45,7 @@ public class StorageEmissions {
      */
     public double calculateStorageEmissionsInMilliGram(double amountInBytes) {
         double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024; // Convert bytes to terabytes
-        if (configLoader.getStorageType() == StorageType.HDD) {
+        if (configLoader.getStorageType().equals("HDD")) {
             storageSize *= STORAGE_EMISSIONS_HDD_PER_TB_HOUR * 1000000;
         } else {
             storageSize *= STORAGE_EMISSIONS_SSD_PER_TB_HOUR * 1000000;

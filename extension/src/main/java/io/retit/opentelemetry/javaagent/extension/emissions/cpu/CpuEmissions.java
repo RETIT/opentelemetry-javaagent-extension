@@ -52,9 +52,30 @@ public class CpuEmissions {
      */
     public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedinMilliseconds) {
         double cpuTimeInHours = cpuTimeUsedinMilliseconds / 3600000.0 / 1000000;
-        double computeKiloWattHours = (configLoader.getInstanceEnergyUsageIdle() + 0.5
-                * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle())
-                * cpuTimeInHours) / 1000;
+        double computeKiloWattHours;
+        double averageMinWatts = 0;
+        double averageMaxWatts = 0;
+        if (configLoader.getCloudInstanceName().equals("SERVERLESS")) {
+            switch (configLoader.getCloudProvider()) {
+                case "AWS":
+                    averageMinWatts = 1.14;
+                    averageMaxWatts = 4.34;
+                    break;
+                case "AZURE":
+                    averageMinWatts = 0.85;
+                    averageMaxWatts = 3.69;
+                    break;
+                case "GCP":
+                    averageMinWatts = 0.68;
+                    averageMaxWatts = 3.77;
+                    break;
+            }
+            computeKiloWattHours = (averageMinWatts + 0.5 * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000;
+        } else {
+            computeKiloWattHours = (configLoader.getInstanceEnergyUsageIdle() + 0.5
+                    * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle())
+                    * cpuTimeInHours) / 1000;
+        }
         return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 }

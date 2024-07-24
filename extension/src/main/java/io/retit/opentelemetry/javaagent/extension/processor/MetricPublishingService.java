@@ -61,8 +61,8 @@ public class MetricPublishingService {
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider().toString());
-        attributesBuilder.put(AttributeKey.stringKey("storage-type"), configLoader.getStorageType().toString());
+        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
+        attributesBuilder.put(AttributeKey.stringKey("storage-type"), configLoader.getStorageType());
         storageEmissionMeter.add((long) totalEmissions, attributes);
         System.out.println("Total storage emissions: " + totalEmissions);
     }
@@ -72,7 +72,7 @@ public class MetricPublishingService {
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider().toString());
+        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
         cpuEmissionMeter.add((long) totalEmissions, attributes);
         System.out.println("Total CPU emissions: " + totalEmissions);
     }
@@ -82,7 +82,7 @@ public class MetricPublishingService {
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider().toString());
+        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
         embeddedEmissionMeter.add((long) totalEmbodiedEmissions, attributes);
         System.out.println("Total embodied emissions: " + totalEmbodiedEmissions);
     }
@@ -92,7 +92,7 @@ public class MetricPublishingService {
         AttributesBuilder attributesBuilder = attributes.toBuilder();
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider().toString());
+        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
         memoryEmissionMeter.add((long) totalMemoryEmissions, attributes);
         System.out.println("Total memory emissions: " + totalMemoryEmissions);
     }

@@ -1,10 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.config;
 
-import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageType;
 import lombok.Getter;
-import lombok.NonNull;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,7 +13,7 @@ public class ConfigLoader {
     private static final ConfigLoader configInstance = new ConfigLoader();
 
     @Getter
-    private final StorageType storageType;
+    private final String storageType;
     @Getter
     private final String region;
     @Getter
@@ -25,7 +21,7 @@ public class ConfigLoader {
     @Getter
     private final String microarchitecture;
     @Getter
-    private final CloudProvider cloudProvider;
+    private final String cloudProvider;
     @Getter
     private final Double gridEmissionsFactor;
     @Getter
@@ -58,36 +54,32 @@ public class ConfigLoader {
         this.pueValue = initializePueValue();
     }
 
-    private StorageType initializeStorageType() {
-        String storageType = System.getenv("STORAGE_TYPE").trim();
+    private String initializeStorageType() {
+        String storageType = System.getenv("STORAGE_TYPE");
         System.out.println("Storage type: " + storageType);
         if (storageType.isEmpty()) {
             throw new IllegalStateException("STORAGE_TYPE environment variable is not set");
         }
-        if (storageType.equalsIgnoreCase("HDD")) {
-            return StorageType.HDD;
-        } else {
-            return StorageType.SSD;
-        }
+        return storageType.equalsIgnoreCase("HDD") ? "HDD" : "SSD";
     }
 
     private String initializeRegion() {
-        String region = System.getenv("REGION").trim();
+        String region = System.getenv("REGION");
         System.out.println("Region: " + region);
-        if (region.isEmpty()) {
+        if (region == null || region.isEmpty()) {
             throw new IllegalStateException("REGION environment variable is required but not set");
         }
-        return region;
+        return region.toUpperCase();
     }
 
     private String initializeInstance() {
-        String instance = System.getenv("INSTANCE").trim();
+        String instance = System.getenv("INSTANCE");
         System.out.println("Instance: " + instance);
-        if (instance.isEmpty()) {
+        if (instance == null || instance.isEmpty()) {
             throw new IllegalStateException("INSTANCE environment variable is required but not set. Set it to 'SERVERLESS' " +
-                    "in case of serverless deployment");
+                    "in case of serverless usage.");
         }
-        return instance;
+        return instance.toUpperCase();
     }
 
     private String initializeMicroarchitecture() {
@@ -95,22 +87,16 @@ public class ConfigLoader {
         if (microarchitecture == null || microarchitecture.trim().isEmpty()) {
             return null;
         }
-        return microarchitecture;
+        return microarchitecture.toUpperCase();
     }
 
-    private CloudProvider initializeCloudProvider() {
+    private String initializeCloudProvider() {
         String providerName = System.getenv("CLOUD_PROVIDER");
-        if (providerName == null || providerName.trim().isEmpty()) {
-            throw new IllegalStateException("CLOUD_PROVIDER environment variable is required but not set");
+        if (providerName == null || providerName.isEmpty() || (!providerName.equalsIgnoreCase("AWS")
+                && !providerName.equalsIgnoreCase("AZURE") && !providerName.equalsIgnoreCase("GCP"))) {
+            throw new IllegalStateException("CLOUD_PROVIDER environment variable not set or not supported (AWS, AZURE, GCP)");
         }
-
-        CloudProvider cloudProvider;
-        try {
-            cloudProvider = CloudProvider.valueOf(providerName.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Invalid CLOUD_PROVIDER value: " + providerName);
-        }
-        return cloudProvider;
+        return providerName.toUpperCase();
     }
 
     private Double initializeGridEmissionFactor(String region) {
@@ -138,7 +124,7 @@ public class ConfigLoader {
     }
 
     private void initializeCloudInstanceDetails(String instanceType) {
-        if (cloudProvider.equals(CloudProvider.AZURE)) {
+        if (cloudProvider.equalsIgnoreCase("AZURE")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     Objects.requireNonNull(getClass().getResourceAsStream("/instances/azure-instances.csv"))))) {
                 String line;
@@ -165,7 +151,7 @@ public class ConfigLoader {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load vCPU values from CSV file", e);
             }
-        } else if (cloudProvider.equals(CloudProvider.AWS)) {
+        } else if (cloudProvider.equalsIgnoreCase("AWS")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
                 String line;
@@ -195,7 +181,7 @@ public class ConfigLoader {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load instance details from CSV file", e);
             }
-        } else if (cloudProvider.equals(CloudProvider.GCP)) {
+        } else if (cloudProvider.equalsIgnoreCase("GCP")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     Objects.requireNonNull(getClass().getResourceAsStream("/gcp-instances.csv"))))) {
                 reader.readLine();
@@ -236,10 +222,10 @@ public class ConfigLoader {
             reader.readLine();
             while ((line = reader.readLine()) != null) {
                 String[] fields = parseCSVLine(line);
-                if (fields.length >= 6) { // Ensure there are enough fields
-                    String csvInstanceType = fields[1].trim(); // Assuming 'type' is the second field
+                if (fields.length >= 6) {
+                    String csvInstanceType = fields[1].trim();
                     if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
-                        totalValue = Double.parseDouble(fields[6].trim()); // Assuming 'total' is the seventh field
+                        totalValue = Double.parseDouble(fields[6].trim());
                         System.out.println("Instance: " + instanceType + " Total: " + totalValue);
                         break;
                     }
@@ -253,23 +239,12 @@ public class ConfigLoader {
 
     private Double initializePueValue() {
         Double returnValue = null;
-        String providerName = System.getenv("CLOUD_PROVIDER");
-        if (providerName == null || providerName.trim().isEmpty()) {
-            throw new IllegalStateException("CLOUD_PROVIDER environment variable is required but not set");
-        }
 
-        CloudProvider cloudProvider;
-        try {
-            cloudProvider = CloudProvider.valueOf(providerName.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalStateException("Invalid CLOUD_PROVIDER value: " + providerName);
-        }
-
-        if (cloudProvider == CloudProvider.AWS) {
+        if (cloudProvider.equalsIgnoreCase("AWS")) {
             returnValue = 1.135;
-        } else if (cloudProvider == CloudProvider.AZURE) {
+        } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
             returnValue = 1.125;
-        } else if (cloudProvider == CloudProvider.GCP) {
+        } else if (cloudProvider.equalsIgnoreCase("GCP")) {
             returnValue = 1.1;
         }
 
