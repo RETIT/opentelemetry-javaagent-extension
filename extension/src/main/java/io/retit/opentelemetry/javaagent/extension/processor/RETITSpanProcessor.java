@@ -25,15 +25,12 @@ import java.util.Map;
 
 public class RETITSpanProcessor implements SpanProcessor {
 
-    private static final IResourceDemandDataCollector RESOURCE_DEMAND_DATA_COLLECTOR =
-            CommonResourceDemandDataCollector.getResourceDemandDataCollector();
     @Getter
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
 
     public RETITSpanProcessor(BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder) {
         this.delegateBatchSpanProcessorBuilder = delegateBatchSpanProcessorBuilder;
-        //this.metricPublishService = new MetricPublishService();
     }
 
     @Override
@@ -81,22 +78,12 @@ public class RETITSpanProcessor implements SpanProcessor {
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
-
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
-        final Attributes mergedAttributes =
-                TelemetryUtils.addEndResourceDemandValuesToSpanAttributes(
-                        attributesBuilder,
-                        logCPUDemand,
-                        logResponseTime,
-                        logHeapDemand,
-                        logDiskDemand,
-                        logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
-                        readableSpan);
 
         Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
         long endJavaThreadId = Thread.currentThread().getId();
@@ -107,30 +94,27 @@ public class RETITSpanProcessor implements SpanProcessor {
 
         if (startJavaThreadIdObj != null && startJavaThreadIdObj == endJavaThreadId) {
             System.out.println("same thread ID");
+            Long startCpuTime = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
+            Long endCpuTime = readableSpan.getAttribute(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
+            totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
+
+            Long startHeapByteAllocation = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
+            Long endHeapByteAllocation = readableSpan.getAttribute((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
+            totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
+
+            Long startDiskReadDemand = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+            Long endDiskReadDemand = readableSpan.getAttribute((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND)));
+            long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
+
+            Long startDiskWriteDemand = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
+            Long endDiskWriteDemand = readableSpan.getAttribute((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND)));
+            long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
+
+            totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+
             if (!readableSpan.getParentSpanContext().isValid()) {
                 System.out.println("Top level span");
-
-                Long startCpuTime = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
-                Long endCpuTime = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
-                totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
-
-                Long startHeapByteAllocation = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
-                Long endHeapByteAllocation = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION));
-                totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
-
-                Long startDiskReadDemand = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
-                Long endDiskReadDemand = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
-                long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
-
-                Long startDiskWriteDemand = attributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
-                Long endDiskWriteDemand = mergedAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
-                long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
-
-                totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
-                System.out.println("Total CPU time used in ms: " + totalCpuTimeUsed);
-
                 MetricPublishingService.getInstance().publishEmissions(Attributes.of(AttributeKey.stringKey("Servicecall"), readableSpan.getName()), totalStorageDemand, totalCpuTimeUsed, totalHeapDemand);
-
             } else {
                 System.out.println("No top level span");
             }
@@ -138,16 +122,21 @@ public class RETITSpanProcessor implements SpanProcessor {
             System.out.println("Different thread ID");
         }
 
-        Attributes finalAttributes = TelemetryUtils.addResourceDemandMetricsToSpanAttributes(attributesBuilder, logCPUDemand, totalCpuTimeUsed,
-                logDiskDemand, totalStorageDemand, logHeapDemand,
-                totalHeapDemand, readableSpan);
+        final Attributes mergedAttributes =
+                TelemetryUtils.addEndResourceDemandValuesToSpanAttributes(
+                        attributesBuilder,
+                        logCPUDemand,
+                        logResponseTime,
+                        logHeapDemand,
+                        logDiskDemand,
+                        logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
+                        readableSpan);
 
-        return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
+        return TelemetryUtils.createReadableSpan(readableSpan, mergedAttributes);
     }
 
     @Override
     public boolean isEndRequired() {
-        System.out.println("isEndRequired called");
         return delegateBatchSpanProcessor.isEndRequired();
     }
 

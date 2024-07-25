@@ -234,35 +234,11 @@ public class TelemetryUtils {
                 attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND, readAndWriteBytes[1]);
             }
             if (logHeapConsumption) {
-                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION,
-                        RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
+                attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION, RESOURCE_DEMAND_DATA_COLLECTOR.getCurrentThreadAllocatedBytes());
             }
         }
         return attributesBuilder.build();
     }
-
-    public static Attributes addResourceDemandMetricsToSpanAttributes(AttributesBuilder attributesBuilder,
-                                                                      boolean logCpuDemand, long totalCPUTimeUsed,
-                                                                      boolean logTotalStorageDemand, long totalStorageDemand,
-                                                                      boolean logHeapDemand, long totalHeapDemand,
-                                                                      ReadableSpan readableSpan) {
-        if (!isExternalDatabaseCall(readableSpan)) {
-            if (logCpuDemand) {
-                attributesBuilder.put("total_cputime_used", totalCPUTimeUsed);
-            }
-
-            if (logTotalStorageDemand) {
-                attributesBuilder.put("total_storage_used", totalStorageDemand);
-            }
-
-            if (logHeapDemand) {
-                attributesBuilder.put(AttributeKey.longKey("total_heap_demand"), totalHeapDemand);
-            }
-            return attributesBuilder.build();
-        }
-        return attributesBuilder.build();
-    }
-
     private static boolean isExternalDatabaseCall(ReadableSpan span) {
         return span.getAttribute(DB_SYSTEM) != null;
     }

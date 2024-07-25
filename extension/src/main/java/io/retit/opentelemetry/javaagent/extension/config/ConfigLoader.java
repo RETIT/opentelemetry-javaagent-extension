@@ -100,27 +100,63 @@ public class ConfigLoader {
     }
 
     private Double initializeGridEmissionFactor(String region) {
-        Double returnValue = null;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
-            String line;
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                String[] fields = line.split(",", -1);
-                if (fields.length >= 4) {
+        double gridEmissionFactorMetricTonPerKwh = 0.0;
+        if (cloudProvider.equalsIgnoreCase("AWS")) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
+                String line;
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = line.split(",", -1);
                     String csvRegion = fields[0].trim();
                     if (csvRegion.equalsIgnoreCase(region.trim())) {
-                        String co2eValue = fields[3].replace("\"", "").trim().replace(',', '.'); //
-                        returnValue = Double.parseDouble(co2eValue);
-                        break;
+                        String co2eValue = fields[3]; //
+                        gridEmissionFactorMetricTonPerKwh = Double.parseDouble(co2eValue);
+                        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
                     }
                 }
+                throw new RuntimeException("Region not found in the CSV file");
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load CO2 values from CSV file", e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load CO2 values from CSV file", e);
+        } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-azure.csv"))))) {
+                String line;
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = line.split(",", -1);
+                    String csvRegion = fields[0].trim();
+                    if (csvRegion.equalsIgnoreCase(region.trim())) {
+                        gridEmissionFactorMetricTonPerKwh = Double.parseDouble(fields[3].trim());
+                        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
+                    }
+                }
+                throw new RuntimeException("Region not found in the CSV file");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else if (cloudProvider.equalsIgnoreCase("GCP")) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-gcp.csv"))))) {
+                String line;
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = line.split(",", -1);
+                    String csvRegion = fields[0].trim();
+                    if (csvRegion.equalsIgnoreCase(region.trim())) {
+                        gridEmissionFactorMetricTonPerKwh = Double.parseDouble(fields[2].trim());
+                        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
+                    }
+                }
+                throw new RuntimeException("Region not found in the CSV file");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+
         }
-        System.out.println("Region: " + region + " has grid emission of: " + returnValue);
-        return returnValue;
+        System.out.println("Region: " + region + " has grid emission of: " + gridEmissionFactorMetricTonPerKwh);
+        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
     }
 
     private void initializeCloudInstanceDetails(String instanceType) {
@@ -183,7 +219,7 @@ public class ConfigLoader {
             }
         } else if (cloudProvider.equalsIgnoreCase("GCP")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/gcp-instances.csv"))))) {
+                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/gcp-instances.csv"))))) {
                 reader.readLine();
                 String line;
                 boolean found = false;
