@@ -251,58 +251,89 @@ public class ConfigLoader {
     }
 
     public Double totalEmbodiedEmissions(String instanceType) {
-        Double totalValue = null;
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
-            String line;
-            reader.readLine();
-            while ((line = reader.readLine()) != null) {
-                String[] fields = parseCSVLine(line);
-                if (fields.length >= 6) {
-                    String csvInstanceType = fields[1].trim();
-                    if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
-                        totalValue = Double.parseDouble(fields[6].trim());
-                        System.out.println("Instance: " + instanceType + " Total: " + totalValue);
-                        break;
+        if (cloudProvider.equalsIgnoreCase("AWS")) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
+                String line;
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = parseCSVLine(line);
+                    if (fields.length >= 6) {
+                        String csvInstanceType = fields[1].trim();
+                        if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
+                            return Double.parseDouble(fields[6].trim());
+                        }
                     }
                 }
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load total value from CSV file", e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to load total value from CSV file", e);
-        }
-        return totalValue;
-    }
-
-    private Double initializePueValue() {
-        Double returnValue = null;
-
-        if (cloudProvider.equalsIgnoreCase("AWS")) {
-            returnValue = 1.135;
+        } else if (cloudProvider.equalsIgnoreCase("GCP")){
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-gcp-embodied-mean.csv"))))) {
+                String line;
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = line.split(",", -1);
+                    String csvInstance = fields[1].trim();
+                    if (csvInstance.equalsIgnoreCase(instanceType.trim())) {
+                        return Double.parseDouble(fields[2].trim());
+                    }
+                }
+                throw new RuntimeException("Region not found in the CSV file");
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load CO2 values from CSV file", e);
+            }
         } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
-            returnValue = 1.125;
-        } else if (cloudProvider.equalsIgnoreCase("GCP")) {
-            returnValue = 1.1;
-        }
-
-        System.out.println("PUE value: " + returnValue);
-        return returnValue;
-    }
-
-    private String[] parseCSVLine(String line) {
-        boolean inQuotes = false;
-        StringBuilder field = new StringBuilder();
-        java.util.List<String> fields = new java.util.ArrayList<>();
-        for (char c : line.toCharArray()) {
-            if (c == '\"') {
-                inQuotes = !inQuotes;
-            } else if (c == ',' && !inQuotes) {
-                fields.add(field.toString());
-                field = new StringBuilder();
-            } else {
-                field.append(c);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-azure-embodied.csv"))))) {
+                String line;
+                reader.readLine();
+                while ((line = reader.readLine()) != null) {
+                    String[] fields = line.split(",", -1);
+                    String csvInstance = fields[2].trim();
+                    if (csvInstance.equalsIgnoreCase(instanceType.trim())) {
+                        return Double.parseDouble(fields[8].trim());
+                    }
+                }
+                throw new RuntimeException("Region not found in the CSV file");
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to load CO2 values from CSV file", e);
             }
         }
-        fields.add(field.toString());
-        return fields.toArray(new String[0]);
+        return 0.0;
     }
-}
+
+        private Double initializePueValue () {
+            Double returnValue = null;
+
+            if (cloudProvider.equalsIgnoreCase("AWS")) {
+                returnValue = 1.135;
+            } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
+                returnValue = 1.125;
+            } else if (cloudProvider.equalsIgnoreCase("GCP")) {
+                returnValue = 1.1;
+            }
+
+            System.out.println("PUE value: " + returnValue);
+            return returnValue;
+        }
+
+        private String[] parseCSVLine (String line){
+            boolean inQuotes = false;
+            StringBuilder field = new StringBuilder();
+            java.util.List<String> fields = new java.util.ArrayList<>();
+            for (char c : line.toCharArray()) {
+                if (c == '\"') {
+                    inQuotes = !inQuotes;
+                } else if (c == ',' && !inQuotes) {
+                    fields.add(field.toString());
+                    field = new StringBuilder();
+                } else {
+                    field.append(c);
+                }
+            }
+            fields.add(field.toString());
+            return fields.toArray(new String[0]);
+        }
+    }
