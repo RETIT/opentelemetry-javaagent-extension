@@ -6,6 +6,10 @@ import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
  * The {@code MemoryEmissions} class calculates the carbon emissions associated with memory usage.
  * It leverages configuration settings to estimate emissions based on the amount of memory used and
  * the specific energy consumption characteristics of the cloud provider.
+ * The approach and coefficients used in this class are derived from the methodology outlined by the
+ * Cloud Carbon Footprint project, which provides a comprehensive framework for calculating carbon emissions
+ * from cloud computing activities. More details can be found at:
+ * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
  */
 public class MemoryEmissions {
     public static MemoryEmissions instance;
@@ -41,7 +45,6 @@ public class MemoryEmissions {
      * @return The calculated carbon emissions in grams.
      */
     public double calculateMemoryEmissionsInMilliGram(double amountInBytes) {
-        System.out.println("amountInBytes: " + amountInBytes);
         double amountInGb = amountInBytes / 1024 / 1024 / 1024; // Convert bytes to gigabytes
         return amountInGb * 0.000392 * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }

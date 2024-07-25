@@ -6,6 +6,10 @@ import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
  * The {@code StorageEmissions} class calculates the carbon emissions associated with storage device usage.
  * It leverages configuration settings to estimate emissions based on the type of storage (HDD or SSD),
  * the amount of data stored, and the specific energy consumption characteristics of the cloud provider.
+ * The approach and coefficients used in this class are derived from the methodology outlined by the
+ * Cloud Carbon Footprint project, which provides a comprehensive framework for calculating carbon emissions
+ * from cloud computing activities. More details can be found at:
+ * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
  */
 public class StorageEmissions {
 

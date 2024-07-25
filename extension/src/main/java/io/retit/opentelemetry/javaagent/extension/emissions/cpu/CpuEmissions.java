@@ -5,6 +5,11 @@ import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 /**
  * The {@code CpuEmissions} class calculates the carbon emissions associated with CPU usage.
  * It utilizes configuration settings to estimate emissions based on the cloud provider's energy consumption data.
+ * <p>
+ * The approach and coefficients used in this class are derived from the methodology outlined by the
+ * Cloud Carbon Footprint project, which provides a comprehensive framework for calculating carbon emissions
+ * from cloud computing activities. More details can be found at:
+ * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
  */
 public class CpuEmissions {
 
@@ -33,25 +38,31 @@ public class CpuEmissions {
 
     /**
      * Calculates the carbon emissions in grams for a given CPU usage time and utilization.
+     * <p>
+     * The calculation uses a linear model based on the idle and full energy usage values provided by the cloud
+     * provider. This method estimates the power consumption during the given CPU utilization and multiplies
+     * it by the time the CPU was used to estimate the total energy consumed, which is then converted to carbon emissions.
      *
-     * @param cpuTimeUsed    The CPU time used in nanoseconds.
+     * @param cpuTimeUsedInNanoSeconds    The CPU time used in nanoseconds.
      * @param cpuUtilization The CPU utilization as a percentage.
      * @return The calculated carbon emissions in grams.
      */
-    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsed, double cpuUtilization) {
+    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds, double cpuUtilization) {
         return configLoader.getInstanceEnergyUsageIdle() + cpuUtilization * (configLoader.getInstanceEnergyUsageFull()
-                - configLoader.getInstanceEnergyUsageIdle()) / 1000 * cpuTimeUsed;
+                - configLoader.getInstanceEnergyUsageIdle()) / 1000 * cpuTimeUsedInNanoSeconds;
     }
 
     /**
-     * Overloaded method to calculate carbon emissions based on CPU time used in hours.
-     * This method simplifies calculations by assuming a fixed CPU time used.
+     * Overloaded method to calculate carbon emissions based on CPU time used in nanoseconds.
+     * <p>
+     * This method simplifies the calculations by assuming a fixed CPU time used, calculating the energy consumption
+     * based on idle and full energy usage, and then converting it into carbon emissions.
      *
-     * @param cpuTimeUsedinMilliseconds The CPU time used in hours.
+     * @param cpuTimeUsedInNanoSeconds The CPU time used in nanoseconds.
      * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedinMilliseconds) {
-        double cpuTimeInHours = cpuTimeUsedinMilliseconds / 3600000.0 / 1000000;
+    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds) {
+        double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
         double computeKiloWattHours;
         double averageMinWatts = 0;
         double averageMaxWatts = 0;

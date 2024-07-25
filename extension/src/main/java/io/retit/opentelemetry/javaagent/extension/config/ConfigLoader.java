@@ -56,7 +56,6 @@ public class ConfigLoader {
 
     private String initializeStorageType() {
         String storageType = System.getenv("STORAGE_TYPE");
-        System.out.println("Storage type: " + storageType);
         if (storageType.isEmpty()) {
             throw new IllegalStateException("STORAGE_TYPE environment variable is not set");
         }
@@ -65,7 +64,6 @@ public class ConfigLoader {
 
     private String initializeRegion() {
         String region = System.getenv("REGION");
-        System.out.println("Region: " + region);
         if (region == null || region.isEmpty()) {
             throw new IllegalStateException("REGION environment variable is required but not set");
         }
@@ -74,7 +72,6 @@ public class ConfigLoader {
 
     private String initializeInstance() {
         String instance = System.getenv("INSTANCE");
-        System.out.println("Instance: " + instance);
         if (instance == null || instance.isEmpty()) {
             throw new IllegalStateException("INSTANCE environment variable is required but not set. Set it to 'SERVERLESS' " +
                     "in case of serverless usage.");
@@ -155,7 +152,6 @@ public class ConfigLoader {
             }
 
         }
-        System.out.println("Region: " + region + " has grid emission of: " + gridEmissionFactorMetricTonPerKwh);
         return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
     }
 
@@ -174,9 +170,6 @@ public class ConfigLoader {
                         cloudInstanceDetails[1] = Double.parseDouble(fields[5].trim());
                         cloudInstanceDetails[2] = Double.parseDouble(fields[12].trim());
                         cloudInstanceDetails[3] = Double.parseDouble(fields[13].trim());
-                        System.out.println("instance: " + instanceType + " Instance vCPUs: " + cloudInstanceDetails[0]
-                                + " Platform vCPUs: " + cloudInstanceDetails[1] + " Min Watt: " + cloudInstanceDetails[2] +
-                                " Max Watt: " + cloudInstanceDetails[3]);
                         found = true;
                         break;
                     }
@@ -201,12 +194,6 @@ public class ConfigLoader {
                         cloudInstanceDetails[1] = Double.parseDouble(fields[3].trim()); // Platform Total Number of vCPU
                         cloudInstanceDetails[2] = Double.parseDouble(fields[27].replace("\"", "").trim().replace(',', '.')); // Instance @ Idle
                         cloudInstanceDetails[3] = Double.parseDouble(fields[30].replace("\"", "").trim().replace(',', '.')); // Instance @ 100%
-
-                        System.out.println("instance " + instanceType
-                                + " instanceVCpu: " + cloudInstanceDetails[0]
-                                + " platformTotalVcpu: " + cloudInstanceDetails[1]
-                                + " instanceEnergyUsageIdle: " + cloudInstanceDetails[2]
-                                + " instanceEnergyUsageFull: " + cloudInstanceDetails[3]);
                         found = true;
                         break;
                     }
@@ -234,9 +221,6 @@ public class ConfigLoader {
                         cloudInstanceDetails[1] = Double.parseDouble(fields[5].trim());
                         cloudInstanceDetails[2] = (microarchitecture == null) ? 1 : Double.parseDouble(fields[12].trim());
                         cloudInstanceDetails[3] = (microarchitecture == null) ? 1 : Double.parseDouble(fields[13].trim());
-                        System.out.println("instance: " + instanceType + " Instance vCPUs: " + cloudInstanceDetails[0]
-                                + " Platform vCPUs: " + cloudInstanceDetails[1] + " Min Watt: " + cloudInstanceDetails[2] +
-                                " Max Watt: " + cloudInstanceDetails[3]);
                         found = true;
                         break;
                     }
@@ -268,7 +252,7 @@ public class ConfigLoader {
             } catch (IOException e) {
                 throw new RuntimeException("Failed to load total value from CSV file", e);
             }
-        } else if (cloudProvider.equalsIgnoreCase("GCP")){
+        } else if (cloudProvider.equalsIgnoreCase("GCP")) {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                     Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-gcp-embodied-mean.csv"))))) {
                 String line;
@@ -319,7 +303,7 @@ public class ConfigLoader {
             return returnValue;
         }
 
-        private String[] parseCSVLine (String line){
+        private String[] parseCSVLine (String line) {
             boolean inQuotes = false;
             StringBuilder field = new StringBuilder();
             java.util.List<String> fields = new java.util.ArrayList<>();

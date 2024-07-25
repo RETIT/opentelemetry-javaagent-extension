@@ -14,8 +14,11 @@ import io.opentelemetry.sdk.trace.data.EventData;
 import io.opentelemetry.sdk.trace.data.LinkData;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
+import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.memory.MemoryEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
+import io.retit.opentelemetry.javaagent.extension.processor.MetricPublishingService;
 import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
 
@@ -239,6 +242,52 @@ public class TelemetryUtils {
         }
         return attributesBuilder.build();
     }
+
+    public static Attributes addEmissionDataToSpanAttributes(AttributesBuilder attributesBuilder, Attributes attributesOfStartSpan,
+                                                             Attributes attributesOfEndSpan, ReadableSpan readableSpan) {
+
+        Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
+        long endJavaThreadId = Thread.currentThread().getId();
+
+        long totalHeapDemand;
+        long totalCpuTimeUsed;
+        long totalStorageDemand;
+
+        if (!isExternalDatabaseCall(readableSpan)) {
+
+            if (startJavaThreadIdObj != null && startJavaThreadIdObj == endJavaThreadId) {
+                Long startCpuTime = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
+                Long endCpuTime = attributesOfEndSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
+                totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
+
+                Long startHeapByteAllocation = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
+                Long endHeapByteAllocation = attributesOfEndSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
+                totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
+
+                Long startDiskReadDemand = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+                Long endDiskReadDemand = attributesOfEndSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND)));
+                long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
+
+                Long startDiskWriteDemand = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
+                Long endDiskWriteDemand = attributesOfEndSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND)));
+                long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
+
+                totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+
+                double memoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(totalHeapDemand);
+                double storageEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(totalStorageDemand);
+                double cpuEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(totalCpuTimeUsed);
+                double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGram(totalCpuTimeUsed);
+
+                attributesBuilder.put(AttributeKey.doubleKey("cpuEmissionsInMg"), cpuEmissions);
+                attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"), memoryEmissions);
+                attributesBuilder.put(AttributeKey.doubleKey("storageEmissionsInMg"), storageEmissions);
+                attributesBuilder.put(AttributeKey.doubleKey("embodiedEmissionsInMg"), embodiedEmissions);
+            }
+        }
+        return attributesBuilder.build();
+    }
+
     private static boolean isExternalDatabaseCall(ReadableSpan span) {
         return span.getAttribute(DB_SYSTEM) != null;
     }
