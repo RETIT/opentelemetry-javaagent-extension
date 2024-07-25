@@ -1,8 +1,5 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
-import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.trace.SpanContext;
-import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.opentelemetry.api.common.Attributes;
@@ -15,13 +12,7 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
-import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
-import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
-import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
 import lombok.Getter;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RETITSpanProcessor implements SpanProcessor {
 
@@ -97,7 +88,7 @@ public class RETITSpanProcessor implements SpanProcessor {
 
         Attributes finalAttributes = TelemetryUtils.addEmissionDataToSpanAttributes(attributesBuilder, attributes, mergedAttributes, readableSpan);
 
-        if (!readableSpan.getParentSpanContext().isValid()) {
+        if (readableSpan.getParentSpanContext() != null && !readableSpan.getParentSpanContext().isValid()) {
             MetricPublishingService.getInstance().publishEmissions(finalAttributes);
         }
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
