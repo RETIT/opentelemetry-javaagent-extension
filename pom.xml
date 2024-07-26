@@ -9,6 +9,7 @@
 
     <properties>
         <retit.commons.version>1.5.27</retit.commons.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <modules>
