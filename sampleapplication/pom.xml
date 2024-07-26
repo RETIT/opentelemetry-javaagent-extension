@@ -98,7 +98,7 @@
                                 <resource>
                                     <directory>${project.build.directory}</directory>
                                     <includes>
-                                        <include>io.retit.opentelemetry.javaagent.sampleapplication-${project.version}.jar
+                                        <include>sampleapplication-${project.version}.jar
                                         </include>
                                     </includes>
                                 </resource>
@@ -116,7 +116,7 @@
                         <image>openjdk:17-slim</image>
                     </from>
                     <to>
-                        <image>registry.retit-support.de/brunnert/docker/otel-integration-test:${project.version}</image>
+                        <image>otel-integration-test:${project.version}</image>
                         <tags>
                             <tag>feature</tag>
                         </tags>
@@ -127,12 +127,15 @@
                             <path>${project.build.directory}/jib</path>
                         </paths>
                     </extraDirectories>
-                    <container>
-                        <entrypoint>
-                            java,-javaagent:opentelemetry-javaagent-all.jar,-Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar,-cp,io.retit.opentelemetry.javaagent.sampleapplication-${project.version}.jar,SampleApplication
-                        </entrypoint>
-                    </container>
                 </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
