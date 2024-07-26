@@ -6,6 +6,7 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 
 /**
@@ -141,7 +142,7 @@ public class MetricPublishingService {
      * Publishes emission metrics based on the provided attributes. It extracts values for
      * CPU, storage, embodied, and memory emissions from the attributes and delegates
      * publishing to specific methods.
-     * If a value is missing or null, the corresponding method handles it appropriately.     *
+     * If a value is missing or null, the corresponding method handles it appropriately.
      * @param attributes An {@link Attributes} object containing emission data.
      */
     public void publishEmissions(Attributes attributes) {

@@ -1,5 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
+import io.opentelemetry.api.common.AttributeKey;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.opentelemetry.api.common.Attributes;
@@ -86,9 +87,11 @@ public class RETITSpanProcessor implements SpanProcessor {
                         logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                         readableSpan);
 
-        Attributes finalAttributes = TelemetryUtils.addEmissionDataToSpanAttributes(attributesBuilder, attributes, mergedAttributes, readableSpan);
+        Attributes finalAttributes = TelemetryUtils.addEmissionDataToSpanAttributes(attributesBuilder, mergedAttributes, readableSpan);
 
         if (readableSpan.getParentSpanContext() != null && !readableSpan.getParentSpanContext().isValid()) {
+            attributesBuilder.put(AttributeKey.stringKey("Servicecall"), readableSpan.getName());
+            finalAttributes = attributesBuilder.build();
             MetricPublishingService.getInstance().publishEmissions(finalAttributes);
         }
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);

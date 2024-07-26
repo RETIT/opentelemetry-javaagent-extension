@@ -187,7 +187,6 @@ public class TelemetryUtils {
         };
     }
 
-
     public static void addStartResourceDemandValuesToSpanAttributes(boolean logCPUTime, boolean logSystemTime, boolean logHeapConsumption,
                                                                     boolean logDiskDemand, boolean logThreadName, ReadWriteSpan readWriteSpan) {
         if (logSystemTime) {
@@ -239,8 +238,7 @@ public class TelemetryUtils {
         return attributesBuilder.build();
     }
 
-    public static Attributes addEmissionDataToSpanAttributes(AttributesBuilder attributesBuilder, Attributes attributesOfStartSpan,
-                                                             Attributes attributesOfEndSpan, ReadableSpan readableSpan) {
+    public static Attributes addEmissionDataToSpanAttributes(AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
 
         Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
         long endJavaThreadId = Thread.currentThread().getId();
@@ -252,20 +250,20 @@ public class TelemetryUtils {
         if (!isExternalDatabaseCall(readableSpan)) {
 
             if (startJavaThreadIdObj != null && startJavaThreadIdObj == endJavaThreadId) {
-                Long startCpuTime = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
-                Long endCpuTime = attributesOfEndSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
+                Long startCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
+                Long endCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
                 totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
 
-                Long startHeapByteAllocation = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
-                Long endHeapByteAllocation = attributesOfEndSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
+                Long startHeapByteAllocation = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
+                Long endHeapByteAllocation = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
                 totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
 
-                Long startDiskReadDemand = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
-                Long endDiskReadDemand = attributesOfEndSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND)));
+                Long startDiskReadDemand = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+                Long endDiskReadDemand = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND)));
                 long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
 
-                Long startDiskWriteDemand = attributesOfStartSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
-                Long endDiskWriteDemand = attributesOfEndSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND)));
+                Long startDiskWriteDemand = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
+                Long endDiskWriteDemand = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND)));
                 long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
                 totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
