@@ -64,3 +64,4 @@ local.properties
 
 # Maven
 de.retit.apm/de.retit.apm.javaagent.sampleapplication/dependency-reduced-pom.xml
+/sampleapplication/dependency-reduced-pom.xml

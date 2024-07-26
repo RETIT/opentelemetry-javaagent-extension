@@ -34,11 +34,13 @@ class JavaAgentExtensionIntegrationTest {
 
     @BeforeEach
     public void setupApplication() {
-        String image = "registry.retit-support.de/brunnert/docker/otel-integration-test:feature";
+        String image = "otel-integration-test:feature";
         LOGGER.info("Using image: " + image);
         applicationContainer = new GenericContainer<>(image)
+                .withEnv("OTEL_LOGS_EXPORTER", "none")
                 .withEnv("OTEL_METRICS_EXPORTER", "none")
-                .withEnv("OTEL_TRACES_EXPORTER", "logging");
+                .withEnv("OTEL_TRACES_EXPORTER", "logging")
+                .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:opentelemetry-javaagent-all.jar -Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar");
         spanDemands = new HashMap<>();
     }
 
