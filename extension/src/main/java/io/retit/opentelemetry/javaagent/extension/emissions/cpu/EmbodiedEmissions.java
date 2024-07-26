@@ -36,15 +36,16 @@ public class EmbodiedEmissions {
      * Calculates the embodied carbon emissions in grams for a given CPU usage time in hours.
      * This method estimates the emissions based on the cloud instance's specifications and the total embodied emissions data.
      *
-     * @param cpuTimeUsedInMilliSeconds The CPU time used in hours.
+     * @param cpuTimeUsedInNanoSeconds The CPU time used in hours.
      * @return The calculated embodied carbon emissions in grams.
      */
-    public double calculateEmbodiedEmissionsInMilliGram(double cpuTimeUsedInMilliSeconds) {
+    public double calculateEmbodiedEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds) {
         if (configLoader.getCloudInstanceName() == null) {
             return 0;
         } else {
+            double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
             return (configLoader.getTotalEmbodiedEmissions() * 0.0289 * (configLoader.getInstanceVCpu() /
-                    configLoader.getPlatformTotalVcpu()) * cpuTimeUsedInMilliSeconds / 3600000) * 1000000;
+                    configLoader.getPlatformTotalVcpu()) * cpuTimeInHours) * 1000;
         }
     }
 }

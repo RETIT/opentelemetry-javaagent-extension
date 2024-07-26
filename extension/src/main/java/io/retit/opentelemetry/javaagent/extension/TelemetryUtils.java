@@ -18,7 +18,6 @@ import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.memory.MemoryEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
-import io.retit.opentelemetry.javaagent.extension.processor.MetricPublishingService;
 import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
 
@@ -188,9 +187,6 @@ public class TelemetryUtils {
         };
     }
 
-    public static void addCostumDataToSpanAttributes(double value, ReadWriteSpan readWriteSpan) {
-        readWriteSpan.setAttribute("randomNumberOnStart", value);
-    }
 
     public static void addStartResourceDemandValuesToSpanAttributes(boolean logCPUTime, boolean logSystemTime, boolean logHeapConsumption,
                                                                     boolean logDiskDemand, boolean logThreadName, ReadWriteSpan readWriteSpan) {

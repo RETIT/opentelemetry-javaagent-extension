@@ -83,8 +83,8 @@ public class CpuEmissions {
             }
             computeKiloWattHours = (averageMinWatts + 0.5 * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000;
         } else {
-            computeKiloWattHours = (configLoader.getInstanceEnergyUsageIdle() + 0.5
-                    * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle())
+            computeKiloWattHours = ((configLoader.getInstanceEnergyUsageIdle() + 0.5
+                    * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle()))
                     * cpuTimeInHours) / 1000;
         }
         return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
