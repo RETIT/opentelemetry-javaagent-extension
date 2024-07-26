@@ -1,6 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
 
 /**
  * The {@code CpuEmissions} class calculates the carbon emissions associated with CPU usage.
@@ -69,16 +70,16 @@ public class CpuEmissions {
         if (configLoader.getCloudInstanceName().equals("SERVERLESS")) {
             switch (configLoader.getCloudProvider()) {
                 case "AWS":
-                    averageMinWatts = 1.14;
-                    averageMaxWatts = 4.34;
+                    averageMinWatts = EmissionCoefficients.AVERAGE_MIN_WATT_AWS;
+                    averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_AWS;
                     break;
                 case "AZURE":
-                    averageMinWatts = 0.85;
-                    averageMaxWatts = 3.69;
+                    averageMinWatts = EmissionCoefficients.AVERAGE_MIN_WATT_AZURE;
+                    averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_AZURE;
                     break;
                 case "GCP":
-                    averageMinWatts = 0.68;
-                    averageMaxWatts = 3.77;
+                    averageMinWatts = EmissionCoefficients.AVERAGE_MIN_WATT_GCP;
+                    averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_GCP;
                     break;
             }
             computeKiloWattHours = (averageMinWatts + 0.5 * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000;

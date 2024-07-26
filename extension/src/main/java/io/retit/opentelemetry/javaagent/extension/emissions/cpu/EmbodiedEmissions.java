@@ -1,6 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
 
 /**
  * The {@code EmbodiedEmissions} class calculates the embodied carbon emissions associated with the usage of CPU resources.
@@ -44,8 +45,8 @@ public class EmbodiedEmissions {
             return 0;
         } else {
             double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
-            return (configLoader.getTotalEmbodiedEmissions() * 0.0289 * (configLoader.getInstanceVCpu() /
-                    configLoader.getPlatformTotalVcpu()) * cpuTimeInHours) * 1000;
+            return (configLoader.getTotalEmbodiedEmissions() * EmissionCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR *
+                    (configLoader.getInstanceVCpu() / configLoader.getPlatformTotalVcpu()) * cpuTimeInHours) * 1000;
         }
     }
 }

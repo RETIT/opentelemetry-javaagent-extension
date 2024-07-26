@@ -1,6 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.memory;
 
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
 
 /**
  * The {@code MemoryEmissions} class calculates the carbon emissions associated with memory usage.
@@ -46,6 +47,6 @@ public class MemoryEmissions {
      */
     public double calculateMemoryEmissionsInMilliGram(double amountInBytes) {
         double amountInGb = amountInBytes / 1024 / 1024 / 1024; // Convert bytes to gigabytes
-        return amountInGb * 0.000392 * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+        return amountInGb * EmissionCoefficients.MEMORY_KWH_PER_GB * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 }
