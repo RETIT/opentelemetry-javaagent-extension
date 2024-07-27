@@ -309,8 +309,6 @@ public class ConfigLoader {
             } else if (cloudProvider.equalsIgnoreCase("GCP")) {
                 returnValue = 1.1;
             }
-
-            System.out.println("PUE value: " + returnValue);
             return returnValue;
         }
 

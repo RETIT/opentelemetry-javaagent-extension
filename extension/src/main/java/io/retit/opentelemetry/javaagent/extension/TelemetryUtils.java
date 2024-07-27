@@ -238,7 +238,8 @@ public class TelemetryUtils {
         return attributesBuilder.build();
     }
 
-    public static Attributes addEmissionDataToSpanAttributes(AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
+    public static Attributes addEmissionDataToSpanAttributes(boolean logCPUDemand, boolean logHeapDemand, boolean logDiskDemand, boolean logNetworkDemand,
+                                                             AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
 
         Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
         long endJavaThreadId = Thread.currentThread().getId();
@@ -250,33 +251,39 @@ public class TelemetryUtils {
         if (!isExternalDatabaseCall(readableSpan)) {
 
             if (startJavaThreadIdObj != null && startJavaThreadIdObj == endJavaThreadId) {
-                Long startCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
-                Long endCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
-                totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
 
-                Long startHeapByteAllocation = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
-                Long endHeapByteAllocation = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
-                totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
+                if (logCPUDemand) {
+                    Long startCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
+                    Long endCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
+                    totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
+                    double cpuEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(totalCpuTimeUsed);
+                    double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGram(totalCpuTimeUsed);
+                    attributesBuilder.put(AttributeKey.doubleKey("cpuEmissionsInMg"), cpuEmissions);
+                    attributesBuilder.put(AttributeKey.doubleKey("embodiedEmissionsInMg"), embodiedEmissions);
+                }
 
-                Long startDiskReadDemand = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
-                Long endDiskReadDemand = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND)));
-                long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
+                if (logHeapDemand) {
+                    Long startHeapByteAllocation = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
+                    Long endHeapByteAllocation = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
+                    totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
+                    double memoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(totalHeapDemand);
+                    attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"), memoryEmissions);
+                }
 
-                Long startDiskWriteDemand = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
-                Long endDiskWriteDemand = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND)));
-                long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
+                if (logDiskDemand) {
+                    Long startDiskReadDemand = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+                    Long endDiskReadDemand = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND)));
+                    long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
 
-                totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+                    Long startDiskWriteDemand = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
+                    Long endDiskWriteDemand = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND)));
+                    long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
-                double memoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(totalHeapDemand);
-                double storageEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(totalStorageDemand);
-                double cpuEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(totalCpuTimeUsed);
-                double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGram(totalCpuTimeUsed);
+                    totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
-                attributesBuilder.put(AttributeKey.doubleKey("cpuEmissionsInMg"), cpuEmissions);
-                attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"), memoryEmissions);
-                attributesBuilder.put(AttributeKey.doubleKey("storageEmissionsInMg"), storageEmissions);
-                attributesBuilder.put(AttributeKey.doubleKey("embodiedEmissionsInMg"), embodiedEmissions);
+                    double storageEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(totalStorageDemand);
+                    attributesBuilder.put(AttributeKey.doubleKey("storageEmissionsInMg"), storageEmissions);
+                }
             }
         }
         return attributesBuilder.build();

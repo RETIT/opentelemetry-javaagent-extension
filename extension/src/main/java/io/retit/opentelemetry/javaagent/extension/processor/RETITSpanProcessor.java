@@ -87,8 +87,8 @@ public class RETITSpanProcessor implements SpanProcessor {
                         logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                         readableSpan);
 
-        Attributes finalAttributes = TelemetryUtils.addEmissionDataToSpanAttributes(attributesBuilder, mergedAttributes, readableSpan);
-
+        Attributes finalAttributes = TelemetryUtils.addEmissionDataToSpanAttributes(logCPUDemand,
+                logHeapDemand, logDiskDemand, logNetworkDemand, attributesBuilder, mergedAttributes, readableSpan);
         if (readableSpan.getParentSpanContext() != null && !readableSpan.getParentSpanContext().isValid()) {
             attributesBuilder.put(AttributeKey.stringKey("Servicecall"), readableSpan.getName());
             finalAttributes = attributesBuilder.build();

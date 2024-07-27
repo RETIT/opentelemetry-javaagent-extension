@@ -76,7 +76,7 @@
                 <resource>
                   <directory>${project.build.directory}</directory>
                   <includes>
-                    <include>io.retit.opentelemetry.javaagent.sampleapplication-${project.version}.jar</include>
+                    <include>sampleapplication-${project.version}.jar</include>
                   </includes>
                 </resource>
               </resources>
@@ -88,12 +88,20 @@
         <groupId>com.google.cloud.tools</groupId>
         <artifactId>jib-maven-plugin</artifactId>
         <version>3.4.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>dockerBuild</goal>
+            </goals>
+          </execution>
+        </executions>
         <configuration>
           <from>
             <image>openjdk:17-slim</image>
           </from>
           <to>
-            <image>registry.retit-support.de/brunnert/docker/otel-integration-test:${project.version}</image>
+            <image>otel-integration-test:${project.version}</image>
             <tags>
               <tag>feature</tag>
             </tags>
@@ -103,9 +111,6 @@
               <path>${project.build.directory}/jib</path>
             </paths>
           </extraDirectories>
-          <container>
-            <entrypoint>java,-javaagent:opentelemetry-javaagent-all.jar,-Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar,-cp,io.retit.opentelemetry.javaagent.sampleapplication-${project.version}.jar,SampleApplication</entrypoint>
-          </container>
         </configuration>
       </plugin>
       <plugin>

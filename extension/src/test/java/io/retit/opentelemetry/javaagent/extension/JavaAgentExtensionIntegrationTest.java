@@ -15,10 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class JavaAgentExtensionIntegrationTest {
@@ -73,6 +70,11 @@ class JavaAgentExtensionIntegrationTest {
      */
     @Test
     void testAllOperationsPresent() {
+        applicationContainer.withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         // Check that operations are there
@@ -108,7 +110,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
                 .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
                 .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true");
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -131,6 +138,10 @@ class JavaAgentExtensionIntegrationTest {
                 assertNotEquals(0, spanDemandEntry.startDiskWriteDemand);
                 assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
                 assertNotEquals(0, spanDemandEntry.logSystemTime);
+                assertNotEquals(0, spanDemandEntry.cpuEmissionsInMg);
+                assertNotEquals(0, spanDemandEntry.memoryEmissionsInMg);
+                assertNotEquals(0, spanDemandEntry.embodiedEmissionsInMg);
+                assertTrue(spanDemandEntry.storageEmissionsInMg >= 0.0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
             }
         }
     }
@@ -141,7 +152,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -150,6 +166,8 @@ class JavaAgentExtensionIntegrationTest {
             SpanDemand sd = sds.get(0);
             assertNotEquals(0, sd.startCpuTime);
             assertNotEquals(0, sd.endCpuTime);
+            assertNotEquals(0, sd.cpuEmissionsInMg);
+            assertNotEquals(0, sd.embodiedEmissionsInMg);
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
@@ -157,6 +175,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
+            assertEquals(0.0,sd.memoryEmissionsInMg);
+            assertEquals(0.0,sd.storageEmissionsInMg);
         }
     }
 
@@ -166,7 +186,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -185,6 +210,10 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
+            assertEquals(0.0,sd.cpuEmissionsInMg);
+            assertEquals(0.0,sd.memoryEmissionsInMg);
+            assertEquals(0.0,sd.storageEmissionsInMg);
+            assertEquals(0.0,sd.embodiedEmissionsInMg);
         }
     }
 
@@ -194,7 +223,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
                 .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -205,11 +239,15 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endCpuTime);
             assertNotEquals(0, sd.startHeapDemand);
             assertNotEquals(0, sd.endHeapDemand);
+            assertNotEquals(0, sd.memoryEmissionsInMg);
             assertNull(sd.totalHeapSize);
             assertNull(sd.startDiskReadDemand);
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
+            assertEquals(0.0, sd.cpuEmissionsInMg);
+            assertEquals(0.0,sd.storageEmissionsInMg);
+            assertEquals(0.0,sd.embodiedEmissionsInMg);
         }
     }
 
@@ -219,7 +257,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true");
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -251,7 +294,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
                 .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
                 .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -263,10 +311,14 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
+            assertEquals(0.0,sd.memoryEmissionsInMg);
+            assertEquals(0.0,sd.cpuEmissionsInMg);
+            assertEquals(0.0,sd.embodiedEmissionsInMg);
             assertNotEquals(0, sd.startDiskReadDemand);
             assertNotEquals(0, sd.endDiskReadDemand);
             assertNotEquals(0, sd.startDiskWriteDemand);
             assertNotEquals(0, sd.endDiskWriteDemand);
+            assertTrue(sd.storageEmissionsInMg >= 0.0); //allo wboth because start up might create disk operations, while no disk operations are done in the sampleapplication
         }
     }
 
@@ -318,7 +370,15 @@ class JavaAgentExtensionIntegrationTest {
             } else if (elems[0].contains("de.retit.logsystemtime")) {
                 spanDemand.logSystemTime = Long.valueOf(elems[1]);
             } else if (elems[0].contains("de.retit.totalheapsize")) {
-                spanDemand.totalHeapSize = Long.valueOf(elems[1]);
+                spanDemand. totalHeapSize = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("cpuEmissionsInMg")) {
+                spanDemand.cpuEmissionsInMg = Double.valueOf(elems[1]);
+            } else if (elems[0].contains("memoryEmissionsInMg")) {
+                spanDemand.memoryEmissionsInMg = Double.valueOf(elems[1]);
+            } else if (elems[0].contains("storageEmissionsInMg")) {
+                spanDemand.storageEmissionsInMg = Double.valueOf(elems[1]);
+            } else if (elems[0].contains("embodiedEmissionsInMg")) {
+                spanDemand.embodiedEmissionsInMg = Double.valueOf(elems[1]);
             }
         }
         return spanDemand;
@@ -341,5 +401,9 @@ class JavaAgentExtensionIntegrationTest {
         public Long endDiskWriteDemand = null;
         public Long logSystemTime = null;
         public Long totalHeapSize = null;
+        public Double cpuEmissionsInMg = null;
+        public Double memoryEmissionsInMg = null;
+        public Double storageEmissionsInMg = null;
+        public Double embodiedEmissionsInMg = null;
     }
 }
