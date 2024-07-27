@@ -6,7 +6,6 @@ import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.common.Attributes;
-import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 
 /**
@@ -77,6 +76,7 @@ public class MetricPublishingService {
         }
         long emissionsInLong = storageEmissions.longValue();
         AttributesBuilder attributesBuilder = attributes.toBuilder();
+        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
@@ -96,6 +96,7 @@ public class MetricPublishingService {
         }
         long emissionsInLong = cpuEmissions.longValue();
         AttributesBuilder attributesBuilder = attributes.toBuilder();
+        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
@@ -114,6 +115,7 @@ public class MetricPublishingService {
         }
         long emissionsInLong = embodiedEmissions.longValue();
         AttributesBuilder attributesBuilder = attributes.toBuilder();
+        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
@@ -132,6 +134,7 @@ public class MetricPublishingService {
         }
         long emissionsInLong = memoryEmission.longValue();
         AttributesBuilder attributesBuilder = attributes.toBuilder();
+        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());

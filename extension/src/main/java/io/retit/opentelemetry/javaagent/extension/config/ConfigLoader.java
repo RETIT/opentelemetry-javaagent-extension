@@ -13,6 +13,8 @@ public class ConfigLoader {
     private static final ConfigLoader configInstance = new ConfigLoader();
 
     @Getter
+    private final String serviceName;
+    @Getter
     private final String storageType;
     @Getter
     private final String region;
@@ -39,6 +41,7 @@ public class ConfigLoader {
     private final Double[] cloudInstanceDetails = new Double[4];
 
     private ConfigLoader() {
+        this.serviceName = initializeServiceName();
         this.storageType = initializeStorageType();
         this.region = initializeRegion();
         this.cloudInstanceName = initializeInstance();
@@ -52,6 +55,14 @@ public class ConfigLoader {
         this.instanceEnergyUsageFull = cloudInstanceDetails[3];
         this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
         this.pueValue = initializePueValue();
+    }
+
+    private String initializeServiceName() {
+        String serviceName = System.getenv("SERVICE_NAME");
+        if (serviceName == null || serviceName.isEmpty()) {
+            throw new IllegalStateException("SERVICE_NAME environment variable is required but not set");
+        }
+        return serviceName;
     }
 
     private String initializeStorageType() {
