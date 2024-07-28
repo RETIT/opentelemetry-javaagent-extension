@@ -44,16 +44,19 @@ public class StorageEmissions {
      * and adjusts for the Power Usage Effectiveness (PUE) value and the grid emissions factor.
      *
      * @param amountInBytes The amount of storage used in bytes.
-     * @return The calculated carbon emissions in grams.
+     * @return The calculated carbon emissions in milligrams.
      */
     public double calculateStorageEmissionsInMilliGram(double amountInBytes) {
-        double storageSize = amountInBytes / 1024 / 1024 / 1024 / 1024; // Convert bytes to terabytes
-        if (configLoader.getStorageType().equals("HDD")) {
-            storageSize *= EmissionCoefficients.STORAGE_EMISSIONS_HDD_PER_TB_HOUR * 1000000;
-        } else {
-            storageSize *= EmissionCoefficients.STORAGE_EMISSIONS_SSD_PER_TB_HOUR * 1000000;
-        }
-        storageSize *= configLoader.getPueValue() * configLoader.getGridEmissionsFactor();
-        return storageSize;
+        // Convert bytes to terabytes
+        double storageSizeInTB = amountInBytes / (1024.0 * 1024.0 * 1024.0 * 1024.0);
+
+        // Determine the emissions coefficient based on storage type and adjust for 60 seconds
+        double emissionsCoefficientPer60Sec = (configLoader.getStorageType().equalsIgnoreCase("SSD")
+                ? EmissionCoefficients.STORAGE_EMISSIONS_SSD_PER_TB_HOUR
+                : EmissionCoefficients.STORAGE_EMISSIONS_HDD_PER_TB_HOUR) / 60.0;
+
+        // Calculate emissions in milligrams
+        return storageSizeInTB * emissionsCoefficientPer60Sec * configLoader.getPueValue() *
+                configLoader.getGridEmissionsFactor() * 1000000;
     }
 }

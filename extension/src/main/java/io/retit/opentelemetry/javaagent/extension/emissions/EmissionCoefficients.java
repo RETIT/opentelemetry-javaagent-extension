@@ -77,4 +77,28 @@ public class EmissionCoefficients {
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#memory">...</a>
      */
     public static final double MEMORY_KWH_PER_GB = 0.000392;
+
+    /**
+     * Coefficient for calculating network emissions in kWh per GB.
+     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">...</a>
+     */
+    public static final double NETWORK_EMISSIONS_PER_GB =  0.001;
+
+    /**
+     * Coefficient for Power Usage Effectiveness (PUE) for AWS.
+     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#power-usage-effectiveness">...</a>
+     */
+    public static final double AWS_PUE = 1.135;
+
+    /**
+     * Coefficient for Power Usage Effectiveness (PUE) for Azure.
+     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#power-usage-effectiveness">...</a>
+     */
+    public static final double AZURE_PUE = 1.185;
+
+    /**
+     * Coefficient for Power Usage Effectiveness (PUE) for GCP.
+     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#power-usage-effectiveness">...</a>
+     */
+    public static final double GCP_PUE = 1.1;
 }

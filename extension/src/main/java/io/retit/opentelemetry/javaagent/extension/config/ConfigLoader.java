@@ -1,5 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.config;
 
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
 import lombok.Getter;
 
 import java.io.BufferedReader;
@@ -303,11 +304,11 @@ public class ConfigLoader {
             Double returnValue = null;
 
             if (cloudProvider.equalsIgnoreCase("AWS")) {
-                returnValue = 1.135;
+                returnValue = EmissionCoefficients.AWS_PUE;
             } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
-                returnValue = 1.125;
+                returnValue = EmissionCoefficients.AZURE_PUE;
             } else if (cloudProvider.equalsIgnoreCase("GCP")) {
-                returnValue = 1.1;
+                returnValue = EmissionCoefficients.GCP_PUE;
             }
             return returnValue;
         }

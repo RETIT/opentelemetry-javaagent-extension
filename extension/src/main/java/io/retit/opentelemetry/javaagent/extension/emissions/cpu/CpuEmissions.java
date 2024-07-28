@@ -46,7 +46,7 @@ public class CpuEmissions {
      *
      * @param cpuTimeUsedInNanoSeconds    The CPU time used in nanoseconds.
      * @param cpuUtilization The CPU utilization as a percentage.
-     * @return The calculated carbon emissions in grams.
+     * @return The calculated carbon emissions in miligrams.
      */
     public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds, double cpuUtilization) {
         return configLoader.getInstanceEnergyUsageIdle() + cpuUtilization * (configLoader.getInstanceEnergyUsageFull()

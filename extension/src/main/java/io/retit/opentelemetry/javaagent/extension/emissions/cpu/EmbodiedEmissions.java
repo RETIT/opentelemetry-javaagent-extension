@@ -38,7 +38,7 @@ public class EmbodiedEmissions {
      * This method estimates the emissions based on the cloud instance's specifications and the total embodied emissions data.
      *
      * @param cpuTimeUsedInNanoSeconds The CPU time used in hours.
-     * @return The calculated embodied carbon emissions in grams.
+     * @return The calculated embodied carbon emissions in milligrams.
      */
     public double calculateEmbodiedEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds) {
         if (configLoader.getCloudInstanceName() == null) {

@@ -17,6 +17,7 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.memory.MemoryEmissions;
+import io.retit.opentelemetry.javaagent.extension.emissions.network.NetworkEmission;
 import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
 import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;

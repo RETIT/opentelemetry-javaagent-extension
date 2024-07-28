@@ -43,10 +43,17 @@ public class MemoryEmissions {
      * and adjusting for the Power Usage Effectiveness (PUE) value and the grid emissions factor.
      *
      * @param amountInBytes The amount of memory used in bytes.
-     * @return The calculated carbon emissions in grams.
+     * @return The calculated carbon emissions in milligrams.
      */
     public double calculateMemoryEmissionsInMilliGram(double amountInBytes) {
-        double amountInGb = amountInBytes / 1024 / 1024 / 1024; // Convert bytes to gigabytes
-        return amountInGb * EmissionCoefficients.MEMORY_KWH_PER_GB * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+        // Convert bytes to gigabytes
+        double amountInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0);
+
+        // Adjust the emissions coefficient for 60 seconds
+        double emissionsCoefficientPer60Sec = EmissionCoefficients.MEMORY_KWH_PER_GB / 60.0;
+
+        // Calculate emissions in milligrams
+        return amountInGb * emissionsCoefficientPer60Sec * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
+
 }
