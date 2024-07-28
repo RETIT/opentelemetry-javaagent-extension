@@ -253,7 +253,7 @@ class JavaAgentExtensionIntegrationTest {
         executeContainer();
         assertFalse(metricDemands.isEmpty());
         for (MetricDemand md : metricDemands) {
-            assertNotEquals(0.0, md.storageEmissionsInMg);
+            assertTrue(md.storageEmissionsInMg >= 0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
             assertEquals(0.0, md.cpuEmissionsInMg);
             assertEquals(0.0, md.memoryEmissionsInMg);
             assertEquals(0.0, md.embodiedEmissionsInMg);
@@ -431,17 +431,6 @@ class JavaAgentExtensionIntegrationTest {
         }
     }
 
-    /*private static void addToMetricDemands(String logOutput) {
-        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter")) {
-            LOGGER.info("hier ist er" + logOutput);
-            String[] keys = {"cpuEmissionsInMg", "memoryEmissionsInMg", "storageEmissionsInMg", "embodiedEmissionsInMg"};
-            Map<String, Double> extractedValues = extractMetricValuesFromLog(logOutput, keys);
-            metricDemands.putAll(extractedValues);
-        }
-    }
-
-     */
-
     private static MetricDemand extractMetricValuesFromLog(String logMessage, String[] keys) {
         MetricDemand demand = new MetricDemand();
         for (String key : keys) {
@@ -484,35 +473,6 @@ class JavaAgentExtensionIntegrationTest {
         }
         return demand;
     }
-    /*
-    private static Map<String, Double> extractMetricValuesFromLog(String logMessage, String[] keys) {
-        Map<String, Double> values = new HashMap<>();
-        for (String key : keys) {
-            LOGGER.info("Hier ist der key " + key);
-            String keyWithEqual = key + "=";
-            double value = 0.0;
-
-            int startIndex = logMessage.indexOf(keyWithEqual);
-            if (startIndex != -1) {
-                startIndex += keyWithEqual.length();
-                int endIndex = logMessage.indexOf(',', startIndex);
-                if (endIndex == -1) {
-                    endIndex = logMessage.indexOf('}', startIndex);
-                }
-                if (endIndex != -1) {
-                    String valueStr = logMessage.substring(startIndex, endIndex).trim();
-                    valueStr = valueStr.replaceAll("[^0-9.]", "");
-                    value = Double.parseDouble(valueStr);
-                }
-            }
-            values.put(key, value);
-            LOGGER.info("Hier ist der value " + value);
-        }
-        return values;
-    }
-
-     */
-
 
     private static String extractOperationNameFromLogOutput(String logOutput) {
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
