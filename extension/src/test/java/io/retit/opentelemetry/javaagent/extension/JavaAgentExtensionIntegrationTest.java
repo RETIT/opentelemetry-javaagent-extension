@@ -23,6 +23,7 @@ class JavaAgentExtensionIntegrationTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaAgentExtensionIntegrationTest.class);
     private static GenericContainer<?> applicationContainer;
     private static Map<String, List<SpanDemand>> spanDemands;
+    private static List<MetricDemand> metricDemands;
 
     // Operations in SampleApplication
     private static final String SAMPLE_METHOD = "SampleApplication.method";
@@ -35,10 +36,11 @@ class JavaAgentExtensionIntegrationTest {
         LOGGER.info("Using image: " + image);
         applicationContainer = new GenericContainer<>(image)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")
-                .withEnv("OTEL_METRICS_EXPORTER", "none")
+                .withEnv("OTEL_METRICS_EXPORTER", "logging")
                 .withEnv("OTEL_TRACES_EXPORTER", "logging")
                 .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:opentelemetry-javaagent-all.jar -Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar");
         spanDemands = new HashMap<>();
+        metricDemands = new ArrayList<>();
     }
 
     @AfterEach
@@ -51,7 +53,11 @@ class JavaAgentExtensionIntegrationTest {
     private void executeContainer() {
         // Start container and attach parser to log output
         applicationContainer.start();
-        applicationContainer.followOutput(outputFrame -> addToSpanDemands(outputFrame.getUtf8String()));
+        applicationContainer.followOutput(outputFrame -> {
+            String logOutput = outputFrame.getUtf8String();
+            addToSpanDemands(logOutput);
+            addToMetricDemands(logOutput);
+        });
 
         // Wait until container has stopped running
         while (applicationContainer.isRunning()) {
@@ -144,7 +150,14 @@ class JavaAgentExtensionIntegrationTest {
                 assertTrue(spanDemandEntry.storageEmissionsInMg >= 0.0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
             }
         }
+        for (MetricDemand md : metricDemands) {
+            assertNotEquals(0.0, md.cpuEmissionsInMg);
+            assertNotEquals(0.0, md.memoryEmissionsInMg);
+            assertNotEquals(0.0, md.storageEmissionsInMg);
+            assertNotEquals(0.0, md.embodiedEmissionsInMg);
+        }
     }
+
 
     @Test
     void testOnlyCPUDemand() {
@@ -175,8 +188,75 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
-            assertEquals(0.0,sd.memoryEmissionsInMg);
-            assertEquals(0.0,sd.storageEmissionsInMg);
+            assertEquals(0.0, sd.memoryEmissionsInMg);
+            assertEquals(0.0, sd.storageEmissionsInMg);
+        }
+    }
+
+    @Test
+    void testOnlyCpuMetricDemands() {
+        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "true")
+                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
+        executeContainer();
+        assertFalse(metricDemands.isEmpty());
+        for (MetricDemand md : metricDemands) {
+            assertNotEquals(0.0, md.cpuEmissionsInMg);
+            assertNotEquals(0.0, md.embodiedEmissionsInMg);
+            assertEquals(0.0, md.memoryEmissionsInMg);
+            assertEquals(0.0, md.storageEmissionsInMg);
+        }
+    }
+
+
+    @Test
+    void testOnlyMemoryMetricDemands() {
+        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
+                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
+        executeContainer();
+        assertFalse(metricDemands.isEmpty());
+        for (MetricDemand md : metricDemands) {
+            assertNotEquals(0.0, md.memoryEmissionsInMg);
+            assertEquals(0.0, md.cpuEmissionsInMg);
+            assertEquals(0.0, md.storageEmissionsInMg);
+            assertEquals(0.0, md.embodiedEmissionsInMg);
+        }
+    }
+
+    @Test
+    void testOnlyStorageMetricDemands() {
+        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
+                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
+                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("STORAGE_TYPE", "SSD")
+                .withEnv("REGION", "af-south-1")
+                .withEnv("INSTANCE", "a1.medium")
+                .withEnv("CLOUD_PROVIDER", "AWS");
+        executeContainer();
+        assertFalse(metricDemands.isEmpty());
+        for (MetricDemand md : metricDemands) {
+            assertNotEquals(0.0, md.storageEmissionsInMg);
+            assertEquals(0.0, md.cpuEmissionsInMg);
+            assertEquals(0.0, md.memoryEmissionsInMg);
+            assertEquals(0.0, md.embodiedEmissionsInMg);
         }
     }
 
@@ -210,10 +290,10 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
-            assertEquals(0.0,sd.cpuEmissionsInMg);
-            assertEquals(0.0,sd.memoryEmissionsInMg);
-            assertEquals(0.0,sd.storageEmissionsInMg);
-            assertEquals(0.0,sd.embodiedEmissionsInMg);
+            assertEquals(0.0, sd.cpuEmissionsInMg);
+            assertEquals(0.0, sd.memoryEmissionsInMg);
+            assertEquals(0.0, sd.storageEmissionsInMg);
+            assertEquals(0.0, sd.embodiedEmissionsInMg);
         }
     }
 
@@ -246,8 +326,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
             assertEquals(0.0, sd.cpuEmissionsInMg);
-            assertEquals(0.0,sd.storageEmissionsInMg);
-            assertEquals(0.0,sd.embodiedEmissionsInMg);
+            assertEquals(0.0, sd.storageEmissionsInMg);
+            assertEquals(0.0, sd.embodiedEmissionsInMg);
         }
     }
 
@@ -275,6 +355,10 @@ class JavaAgentExtensionIntegrationTest {
                     assertNull(spanDemandEntry.startHeapDemand);
                     assertNull(spanDemandEntry.endHeapDemand);
                     assertNull(spanDemandEntry.totalHeapSize);
+                    assertEquals(0.0, spanDemandEntry.memoryEmissionsInMg);
+                    assertEquals(0.0, spanDemandEntry.cpuEmissionsInMg);
+                    assertEquals(0.0, spanDemandEntry.embodiedEmissionsInMg);
+                    assertEquals(0.0, spanDemandEntry.storageEmissionsInMg);
                 } else {
                     assertNotEquals(0, spanDemandEntry.startHeapDemand);
                     assertNotEquals(0, spanDemandEntry.endHeapDemand);
@@ -311,14 +395,14 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
-            assertEquals(0.0,sd.memoryEmissionsInMg);
-            assertEquals(0.0,sd.cpuEmissionsInMg);
-            assertEquals(0.0,sd.embodiedEmissionsInMg);
+            assertEquals(0.0, sd.memoryEmissionsInMg);
+            assertEquals(0.0, sd.cpuEmissionsInMg);
+            assertEquals(0.0, sd.embodiedEmissionsInMg);
             assertNotEquals(0, sd.startDiskReadDemand);
             assertNotEquals(0, sd.endDiskReadDemand);
             assertNotEquals(0, sd.startDiskWriteDemand);
             assertNotEquals(0, sd.endDiskWriteDemand);
-            assertTrue(sd.storageEmissionsInMg >= 0.0); //allo wboth because start up might create disk operations, while no disk operations are done in the sampleapplication
+            assertTrue(sd.storageEmissionsInMg >= 0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
         }
     }
 
@@ -337,6 +421,98 @@ class JavaAgentExtensionIntegrationTest {
             opSpanDemands.add(spanDemand);
         }
     }
+
+    private static void addToMetricDemands(String logOutput) {
+        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter") && logOutput.contains("Servicecall")){
+            LOGGER.info("hier ist er" + logOutput);
+            String[] keys = {"cpuEmissionsInMg", "memoryEmissionsInMg", "storageEmissionsInMg", "embodiedEmissionsInMg"};
+            MetricDemand demand = extractMetricValuesFromLog(logOutput, keys);
+            metricDemands.add(demand);
+        }
+    }
+
+    /*private static void addToMetricDemands(String logOutput) {
+        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter")) {
+            LOGGER.info("hier ist er" + logOutput);
+            String[] keys = {"cpuEmissionsInMg", "memoryEmissionsInMg", "storageEmissionsInMg", "embodiedEmissionsInMg"};
+            Map<String, Double> extractedValues = extractMetricValuesFromLog(logOutput, keys);
+            metricDemands.putAll(extractedValues);
+        }
+    }
+
+     */
+
+    private static MetricDemand extractMetricValuesFromLog(String logMessage, String[] keys) {
+        MetricDemand demand = new MetricDemand();
+        for (String key : keys) {
+            LOGGER.info("Hier ist der key " + key);
+            String keyWithEqual = key + "=";
+            double value = 0.0;
+
+            int startIndex = logMessage.indexOf(keyWithEqual);
+            if (startIndex != -1) {
+                startIndex += keyWithEqual.length();
+                int endIndex = logMessage.indexOf(',', startIndex);
+                if (endIndex == -1) {
+                    endIndex = logMessage.indexOf('}', startIndex);
+                }
+                if (endIndex != -1) {
+                    String valueStr = logMessage.substring(startIndex, endIndex).trim();
+                    try {
+                        valueStr = valueStr.replaceAll("[^0-9.]", "");
+                        value = Double.parseDouble(valueStr);
+                    } catch (NumberFormatException e) {
+                        System.err.println("Error parsing " + key + ": " + e.getMessage());
+                    }
+                }
+            }
+            LOGGER.info("Hier ist der value " + value);
+            switch (key) {
+                case "cpuEmissionsInMg":
+                    demand.cpuEmissionsInMg = value;
+                    break;
+                case "memoryEmissionsInMg":
+                    demand.memoryEmissionsInMg = value;
+                    break;
+                case "storageEmissionsInMg":
+                    demand.storageEmissionsInMg = value;
+                    break;
+                case "embodiedEmissionsInMg":
+                    demand.embodiedEmissionsInMg = value;
+                    break;
+            }
+        }
+        return demand;
+    }
+    /*
+    private static Map<String, Double> extractMetricValuesFromLog(String logMessage, String[] keys) {
+        Map<String, Double> values = new HashMap<>();
+        for (String key : keys) {
+            LOGGER.info("Hier ist der key " + key);
+            String keyWithEqual = key + "=";
+            double value = 0.0;
+
+            int startIndex = logMessage.indexOf(keyWithEqual);
+            if (startIndex != -1) {
+                startIndex += keyWithEqual.length();
+                int endIndex = logMessage.indexOf(',', startIndex);
+                if (endIndex == -1) {
+                    endIndex = logMessage.indexOf('}', startIndex);
+                }
+                if (endIndex != -1) {
+                    String valueStr = logMessage.substring(startIndex, endIndex).trim();
+                    valueStr = valueStr.replaceAll("[^0-9.]", "");
+                    value = Double.parseDouble(valueStr);
+                }
+            }
+            values.put(key, value);
+            LOGGER.info("Hier ist der value " + value);
+        }
+        return values;
+    }
+
+     */
+
 
     private static String extractOperationNameFromLogOutput(String logOutput) {
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
@@ -370,7 +546,7 @@ class JavaAgentExtensionIntegrationTest {
             } else if (elems[0].contains("de.retit.logsystemtime")) {
                 spanDemand.logSystemTime = Long.valueOf(elems[1]);
             } else if (elems[0].contains("de.retit.totalheapsize")) {
-                spanDemand. totalHeapSize = Long.valueOf(elems[1]);
+                spanDemand.totalHeapSize = Long.valueOf(elems[1]);
             } else if (elems[0].contains("cpuEmissionsInMg")) {
                 spanDemand.cpuEmissionsInMg = Double.valueOf(elems[1]);
             } else if (elems[0].contains("memoryEmissionsInMg")) {
@@ -401,6 +577,13 @@ class JavaAgentExtensionIntegrationTest {
         public Long endDiskWriteDemand = null;
         public Long logSystemTime = null;
         public Long totalHeapSize = null;
+        public Double cpuEmissionsInMg = null;
+        public Double memoryEmissionsInMg = null;
+        public Double storageEmissionsInMg = null;
+        public Double embodiedEmissionsInMg = null;
+    }
+
+    private static class MetricDemand {
         public Double cpuEmissionsInMg = null;
         public Double memoryEmissionsInMg = null;
         public Double storageEmissionsInMg = null;
