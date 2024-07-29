@@ -38,22 +38,6 @@ public class CpuEmissions {
     }
 
     /**
-     * Calculates the carbon emissions in grams for a given CPU usage time and utilization.
-     * <p>
-     * The calculation uses a linear model based on the idle and full energy usage values provided by the cloud
-     * provider. This method estimates the power consumption during the given CPU utilization and multiplies
-     * it by the time the CPU was used to estimate the total energy consumed, which is then converted to carbon emissions.
-     *
-     * @param cpuTimeUsedInNanoSeconds    The CPU time used in nanoseconds.
-     * @param cpuUtilization The CPU utilization as a percentage.
-     * @return The calculated carbon emissions in miligrams.
-     */
-    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds, double cpuUtilization) {
-        return configLoader.getInstanceEnergyUsageIdle() + cpuUtilization * (configLoader.getInstanceEnergyUsageFull()
-                - configLoader.getInstanceEnergyUsageIdle()) / 1000 * cpuTimeUsedInNanoSeconds;
-    }
-
-    /**
      * Overloaded method to calculate carbon emissions based on CPU time used in nanoseconds.
      * <p>
      * This method simplifies the calculations by assuming a fixed CPU time used, calculating the energy consumption
@@ -82,9 +66,9 @@ public class CpuEmissions {
                     averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_GCP;
                     break;
             }
-            computeKiloWattHours = (averageMinWatts + 0.5 * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000 * ConfigLoader.getConfigInstance().getCpuCount();
+            computeKiloWattHours = (averageMinWatts + configLoader.getCpuUtilization() * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000 * ConfigLoader.getConfigInstance().getCpuCount();
         } else {
-            computeKiloWattHours = ((configLoader.getInstanceEnergyUsageIdle() + 0.5
+            computeKiloWattHours = ((configLoader.getInstanceEnergyUsageIdle() + configLoader.getCpuUtilization()
                     * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle()))
                     * cpuTimeInHours) / 1000;
         }

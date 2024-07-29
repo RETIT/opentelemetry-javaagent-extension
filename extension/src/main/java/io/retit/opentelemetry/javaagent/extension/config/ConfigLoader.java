@@ -44,6 +44,8 @@ public class ConfigLoader {
     private final Double pueValue;
     @Getter
     private final Integer cpuCount;
+    @Getter
+    private final Double cpuUtilization;
     private final Double[] cloudInstanceDetails = new Double[4];
 
     private ConfigLoader() {
@@ -52,6 +54,7 @@ public class ConfigLoader {
         this.region = initializeRegion();
         this.cloudInstanceName = initializeInstance();
         this.cpuCount = initializeCpuCount();
+        this.cpuUtilization = initializeCpuUtilization();
         this.microarchitecture = initializeMicroarchitecture();
         this.cloudProvider = initializeCloudProvider();
         this.gridEmissionsFactor = initializeGridEmissionFactor(region);
@@ -85,10 +88,26 @@ public class ConfigLoader {
     }
 
     private Integer initializeCpuCount() {
+        String cpuCount = System.getenv("CPU_COUNT");
+        if (cpuCount == null) {
+            return 1;
+        }
         try {
-            return Integer.valueOf(System.getenv("CPU_COUNT"));
+            return Integer.valueOf(cpuCount);
         } catch (NumberFormatException e) {
             return 1;
+        }
+    }
+
+    private Double initializeCpuUtilization() {
+        String cpuUtilization = System.getenv("CPU_UTILIZATION_IN_PERCENT");
+        if (cpuUtilization == null) {
+            return 0.5;
+        }
+        try {
+            return Double.valueOf(cpuUtilization);
+        } catch (NumberFormatException e) {
+            return 0.5;
         }
     }
 
