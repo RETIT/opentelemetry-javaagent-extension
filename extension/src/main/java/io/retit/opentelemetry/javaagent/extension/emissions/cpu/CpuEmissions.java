@@ -82,7 +82,7 @@ public class CpuEmissions {
                     averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_GCP;
                     break;
             }
-            computeKiloWattHours = (averageMinWatts + 0.5 * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000;
+            computeKiloWattHours = (averageMinWatts + 0.5 * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000 * ConfigLoader.getConfigInstance().getCpuCount();
         } else {
             computeKiloWattHours = ((configLoader.getInstanceEnergyUsageIdle() + 0.5
                     * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle()))
