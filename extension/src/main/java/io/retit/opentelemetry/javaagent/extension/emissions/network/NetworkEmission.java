@@ -39,16 +39,33 @@ public class NetworkEmission {
     }
 
     /**
-     * Calculates the carbon emissions in grams for a given amount of storage usage.
-     * This method estimates the emissions based on the storage type (HDD or SSD), the amount of data stored,
-     * and adjusts for the Power Usage Effectiveness (PUE) value and the grid emissions factor.
+     * Calculates the carbon emissions in milligrams for a given amount of network data usage.
+     * This method estimates emissions based on the amount of data transferred, applying the Power Usage Effectiveness (PUE)
+     * and grid emissions factor to convert the energy consumption into CO2 emissions.
      *
-     * @param amountInBytes The amount of storage used in bytes.
+     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param amountInBytes The amount of network data used in bytes.
      * @return The calculated carbon emissions in milligrams.
      */
     public double calculateNetworkEmissionInMg(double amountInBytes) {
-        double storageSize = amountInBytes / 1024 / 1024 / 1024; // Convert bytes to gigabytes
-        storageSize *= EmissionCoefficients.NETWORK_EMISSIONS_PER_GB * configLoader.getPueValue() * configLoader.getGridEmissionsFactor();
-        return storageSize;
+        return calculateKwhUsed(amountInBytes) * configLoader.getPueValue() * configLoader.getGridEmissionsFactor();
     }
+
+    /**
+     * Estimates the energy usage in kilowatt-hours based on the amount of network data used in bytes.
+     * Converts the data amount from bytes to gigabytes and applies a fixed coefficient for network emissions.
+     *
+     * This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param amountInBytes The amount of network data used in bytes.
+     * @return The estimated energy usage in kilowatt-hours.
+     */
+    public double calculateKwhUsed(double amountInBytes) {
+        double dataSizeInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0); // Convert bytes to gigabytes
+        return dataSizeInGb * EmissionCoefficients.NETWORK_EMISSIONS_PER_GB;
+    }
+
 }

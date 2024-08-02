@@ -38,15 +38,30 @@ public class CpuEmissions {
     }
 
     /**
-     * Overloaded method to calculate carbon emissions based on CPU time used in nanoseconds.
-     * <p>
-     * This method simplifies the calculations by assuming a fixed CPU time used, calculating the energy consumption
-     * based on idle and full energy usage, and then converting it into carbon emissions.
+     * Calculates the CO2 emissions in milligrams based on the given compute kilowatt-hours.
+     * This method uses the Power Usage Effectiveness (PUE) and grid emissions factor to convert
+     * energy consumption into CO2 emissions.
      *
-     * @param cpuTimeUsedInNanoSeconds The CPU time used in nanoseconds.
-     * @return The calculated carbon emissions in milligrams.
+     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param computeKiloWattHours The energy consumption in kilowatt-hours.
+     * @return The estimated CO2 emissions in milligrams.
      */
-    public double calculateCpuEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds) {
+    public double calculateCpuEmissionsInMilliGram(double computeKiloWattHours) {
+        return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+    }
+
+    /**
+     * Calculates the total energy consumption in kilowatt-hours based on CPU time used in nanoseconds.
+     * It considers whether the service is serverless and applies different energy usage factors accordingly.
+     * This method is part of the CO2 emissions calculation approach following the Cloud Carbon Footprint methodology:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param cpuTimeUsedInNanoSeconds The total CPU time used in nanoseconds.
+     * @return The total energy consumption in kilowatt-hours.
+     */
+    public double calculateKwhUsed(double cpuTimeUsedInNanoSeconds) {
         double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
         double computeKiloWattHours;
         double averageMinWatts = 0;
@@ -72,6 +87,6 @@ public class CpuEmissions {
                     * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle()))
                     * cpuTimeInHours) / 1000;
         }
-        return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+        return computeKiloWattHours;
     }
 }

@@ -17,7 +17,6 @@ import io.opentelemetry.sdk.trace.data.StatusData;
 import io.retit.opentelemetry.javaagent.extension.emissions.cpu.CpuEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.cpu.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.emissions.memory.MemoryEmissions;
-import io.retit.opentelemetry.javaagent.extension.emissions.network.NetworkEmission;
 import io.retit.opentelemetry.javaagent.extension.emissions.storage.StorageEmissions;
 import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
@@ -239,11 +238,8 @@ public class TelemetryUtils {
         return attributesBuilder.build();
     }
 
-    public static Attributes addEmissionDataToSpanAttributes(boolean logCPUDemand, boolean logHeapDemand, boolean logDiskDemand, boolean logNetworkDemand,
-                                                             AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
-
-        Long startJavaThreadIdObj = readableSpan.getAttribute(AttributeKey.longKey("startJavaThreadId"));
-        long endJavaThreadId = Thread.currentThread().getId();
+    public static Attributes addEmissionAndUsageDataToSpanAttributes(boolean logCPUDemand, boolean logHeapDemand, boolean logDiskDemand, boolean logNetworkDemand,
+                                                                     AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
 
         long totalHeapDemand;
         long totalCpuTimeUsed;
@@ -251,15 +247,20 @@ public class TelemetryUtils {
 
         if (!isExternalDatabaseCall(readableSpan)) {
 
-            if (startJavaThreadIdObj != null && startJavaThreadIdObj == endJavaThreadId) {
+            Long startThread = readableSpan.getAttribute(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD));
+            Long endThread = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
+
+            if (startThread != null && startThread.equals(endThread)) {
 
                 if (logCPUDemand) {
                     Long startCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
                     Long endCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
                     totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
-                    double cpuEmissions = CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(totalCpuTimeUsed);
                     double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGram(totalCpuTimeUsed);
-                    attributesBuilder.put(AttributeKey.doubleKey("cpuEmissionsInMg"), cpuEmissions);
+                    double cpuEnergyConsumption = CpuEmissions.getInstance().calculateKwhUsed(totalCpuTimeUsed);
+                    attributesBuilder.put(AttributeKey.doubleKey("cpuKwhUsed"), cpuEnergyConsumption);
+                    attributesBuilder.put(AttributeKey.doubleKey("cpuEmissionsInMg"),
+                            CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(cpuEnergyConsumption));
                     attributesBuilder.put(AttributeKey.doubleKey("embodiedEmissionsInMg"), embodiedEmissions);
                 }
 
@@ -267,8 +268,12 @@ public class TelemetryUtils {
                     Long startHeapByteAllocation = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
                     Long endHeapByteAllocation = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
                     totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
-                    double memoryEmissions = MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(totalHeapDemand);
-                    attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"), memoryEmissions);
+                    if (totalHeapDemand > 0) {
+                        double memoryEnergyConsumption = MemoryEmissions.getInstance().energyUsageInKiloWattHours(totalHeapDemand);
+                        attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"),
+                                MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(memoryEnergyConsumption));
+                        attributesBuilder.put(AttributeKey.doubleKey("memoryKwhUsed"), memoryEnergyConsumption);
+                    }
                 }
 
                 if (logDiskDemand) {
@@ -282,8 +287,9 @@ public class TelemetryUtils {
 
                     totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
-                    double storageEmissions = StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(totalStorageDemand);
-                    attributesBuilder.put(AttributeKey.doubleKey("storageEmissionsInMg"), storageEmissions);
+                    double storageEnergyConsumption = StorageEmissions.getInstance().energyUsageInKiloWattHours(totalStorageDemand);
+                    attributesBuilder.put(AttributeKey.doubleKey("storageKwhUsed"), storageEnergyConsumption);
+                    attributesBuilder.put(AttributeKey.doubleKey("storageEmissionsInMg"), StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(storageEnergyConsumption));
                 }
             }
         }

@@ -74,7 +74,7 @@ public class ConfigLoader {
 
     private String initializeStorageType() {
         String storageType = System.getenv("STORAGE_TYPE");
-        return storageType.equalsIgnoreCase("SSD") ? "SSD" : "HDD";
+        return storageType == null || storageType.isEmpty() ? "HDD" : "SSD";
     }
 
     private String initializeRegion() {
@@ -231,14 +231,19 @@ public class ConfigLoader {
                                     csvMicroarchitecture.equalsIgnoreCase(microarchitecture))) {
                         cloudInstanceDetails[0] = Double.parseDouble(fields[3].trim());
                         cloudInstanceDetails[1] = Double.parseDouble(fields[5].trim());
-                        cloudInstanceDetails[2] = (microarchitecture == null) ? 1 : Double.parseDouble(fields[12].trim());
-                        cloudInstanceDetails[3] = (microarchitecture == null) ? 1 : Double.parseDouble(fields[13].trim());
+                        cloudInstanceDetails[2] = Double.parseDouble(fields[12].trim());
+                        cloudInstanceDetails[3] = Double.parseDouble(fields[13].trim());
                         break;
                     }
                 }
             } catch (IOException e) {
                 LOGGER.warning("Failed to load instance details from CSV file");
             }
+        } else {
+            cloudInstanceDetails[0] = 0.0;
+            cloudInstanceDetails[1] = 0.0;
+            cloudInstanceDetails[2] = 0.0;
+            cloudInstanceDetails[3] = 0.0;
         }
     }
 
@@ -295,8 +300,7 @@ public class ConfigLoader {
     }
 
     private Double initializePueValue() {
-        Double returnValue = null;
-
+        double returnValue = 0.0;
         if (cloudProvider.equalsIgnoreCase("AWS")) {
             returnValue = EmissionCoefficients.AWS_PUE;
         } else if (cloudProvider.equalsIgnoreCase("AZURE")) {

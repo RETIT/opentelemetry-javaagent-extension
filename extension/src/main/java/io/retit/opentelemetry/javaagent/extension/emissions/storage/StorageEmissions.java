@@ -39,24 +39,38 @@ public class StorageEmissions {
     }
 
     /**
-     * Calculates the carbon emissions in grams for a given amount of storage usage.
-     * This method estimates the emissions based on the storage type (HDD or SSD), the amount of data stored,
-     * and adjusts for the Power Usage Effectiveness (PUE) value and the grid emissions factor.
+     * Calculates the carbon emissions in milligrams for a given amount of kilowatt-hours.
+     * The method estimates emissions based on the storage usage, applying a fixed coefficient
+     * and adjusting for the Power Usage Effectiveness (PUE) and the grid emissions factor.
      *
-     * @param amountInBytes The amount of storage used in bytes.
+     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#storage">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param storageKilowattHours The amount of storage used in bytes.
      * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateStorageEmissionsInMilliGram(double amountInBytes) {
-        // Convert bytes to terabytes
+    public double calculateStorageEmissionsInMilliGram(double storageKilowattHours) {
+        return storageKilowattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+    }
+
+    /**
+     * Estimates the energy usage in kilowatt-hours based on the amount of storage used in bytes.
+     * It converts the storage amount to terabytes and applies a fixed coefficient depending on the storage type,
+     * adjusting for a 60-second interval.
+     *
+     * This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param amountInBytes The amount of storage used in bytes.
+     * @return The estimated energy usage in kilowatt-hours.
+     */
+    public double energyUsageInKiloWattHours(double amountInBytes) {
         double storageSizeInTB = amountInBytes / (1024.0 * 1024.0 * 1024.0 * 1024.0);
 
-        // Determine the emissions coefficient based on storage type and adjust for 60 seconds
         double emissionsCoefficientPer60Sec = (configLoader.getStorageType().equalsIgnoreCase("SSD")
                 ? EmissionCoefficients.STORAGE_EMISSIONS_SSD_PER_TB_HOUR
                 : EmissionCoefficients.STORAGE_EMISSIONS_HDD_PER_TB_HOUR) / 60.0;
 
-        // Calculate emissions in milligrams
-        return storageSizeInTB * emissionsCoefficientPer60Sec * configLoader.getPueValue() *
-                configLoader.getGridEmissionsFactor() * 1000000;
+        return storageSizeInTB * emissionsCoefficientPer60Sec;
     }
 }

@@ -38,22 +38,33 @@ public class MemoryEmissions {
     }
 
     /**
-     * Calculates the carbon emissions in grams for a given amount of memory usage.
-     * This method estimates the emissions based on the amount of memory used, applying a fixed coefficient
-     * and adjusting for the Power Usage Effectiveness (PUE) value and the grid emissions factor.
+     * Calculates the carbon emissions in milligrams for a given amount of kilowatt-hours.
+     * The method estimates emissions based on the memory usage, applying a fixed coefficient
+     * and adjusting for the Power Usage Effectiveness (PUE) and the grid emissions factor.
      *
-     * @param amountInBytes The amount of memory used in bytes.
+     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#memory">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param memoryKilowattHours The amount of memory used in bytes.
      * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateMemoryEmissionsInMilliGram(double amountInBytes) {
-        // Convert bytes to gigabytes
-        double amountInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0);
-
-        // Adjust the emissions coefficient for 60 seconds
-        double emissionsCoefficientPer60Sec = EmissionCoefficients.MEMORY_KWH_PER_GB / 60.0;
-
-        // Calculate emissions in milligrams
-        return amountInGb * emissionsCoefficientPer60Sec * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+    public double calculateMemoryEmissionsInMilliGram(double memoryKilowattHours) {
+        return memoryKilowattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 
+    /**
+     * Estimates the energy usage in kilowatt-hours based on the amount of memory used in bytes.
+     * It converts the memory amount to gigabytes and applies a fixed coefficient per 60 seconds.
+     *
+     * This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
+     * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#memory">Cloud Carbon Footprint Methodology</a>.
+     *
+     * @param amountInBytes The amount of memory used in bytes.
+     * @return The estimated energy usage in kilowatt-hours.
+     */
+    public double energyUsageInKiloWattHours(double amountInBytes) {
+        double amountInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0);
+        double emissionsCoefficientPer60Sec = EmissionCoefficients.MEMORY_KWH_PER_GB / 60.0;
+        return amountInGb * emissionsCoefficientPer60Sec;
+    }
 }

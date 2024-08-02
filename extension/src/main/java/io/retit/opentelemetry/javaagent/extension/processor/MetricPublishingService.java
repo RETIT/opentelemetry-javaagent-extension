@@ -3,7 +3,7 @@ package io.retit.opentelemetry.javaagent.extension.processor;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.AttributesBuilder;
-import io.opentelemetry.api.metrics.LongCounter;
+import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.common.Attributes;
 import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
@@ -16,15 +16,16 @@ public class MetricPublishingService {
 
     public static MetricPublishingService instance;
 
-    private final LongCounter storageEmissionMeter;
-    private final LongCounter cpuEmissionMeter;
-    private final LongCounter embeddedEmissionMeter;
-    private final LongCounter memoryEmissionMeter;
+    private final DoubleHistogram storageEmissionMeter;
+    private final DoubleHistogram cpuEmissionMeter;
+    private final DoubleHistogram embeddedEmissionMeter;
+    private final DoubleHistogram memoryEmissionMeter;
 
     private final ConfigLoader configLoader;
 
     /**
      * Returns the singleton instance of MetricPublishingService, creating it if necessary.
+     *
      * @return The singleton instance of MetricPublishingService.
      */
     public static MetricPublishingService getInstance() {
@@ -43,22 +44,22 @@ public class MetricPublishingService {
 
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
 
-        storageEmissionMeter = meter.counterBuilder("storage_emissions")
+        storageEmissionMeter = meter.histogramBuilder("storage_emissions")
                 .setDescription("Total emissions from storage")
                 .setUnit("mgCO2e")
                 .build();
 
-        cpuEmissionMeter = meter.counterBuilder("cpu_emissions")
+        cpuEmissionMeter = meter.histogramBuilder("cpu_emissions")
                 .setDescription("Total emissions from CPU")
                 .setUnit("mgCO2e")
                 .build();
 
-        embeddedEmissionMeter = meter.counterBuilder("embedded_emissions")
+        embeddedEmissionMeter = meter.histogramBuilder("embedded_emissions")
                 .setDescription("Total emissions from embedded components")
                 .setUnit("mgCO2e")
                 .build();
 
-        memoryEmissionMeter = meter.counterBuilder("memory_emissions")
+        memoryEmissionMeter = meter.histogramBuilder("memory_emissions")
                 .setDescription("Total emissions from memory")
                 .setUnit("mgCO2e")
                 .build();
@@ -66,79 +67,55 @@ public class MetricPublishingService {
 
     /**
      * Publishes the calculated storage emissions.
+     *
      * @param storageEmissions The total demand for storage in bytes.
-     * @param attributes Additional attributes for the emission event.
+     * @param attributes       Additional attributes for the emission event.
      */
     public void publishStorageEmissions(Double storageEmissions, Attributes attributes) {
         if (storageEmissions == null) {
-            System.out.println("storageEmissions is null");
             return;
         }
-        long emissionsInLong = storageEmissions.longValue();
-        AttributesBuilder attributesBuilder = attributes.toBuilder();
-        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
-        attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
-        attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
-        attributesBuilder.put(AttributeKey.stringKey("storage-type"), configLoader.getStorageType());
-        storageEmissionMeter.add(emissionsInLong, attributes);
+        storageEmissionMeter.record(storageEmissions, attributes);
     }
 
     /**
      * Publishes the calculated CPU emissions.
+     *
      * @param cpuEmissions The total CPU demand in milliseconds.
-     * @param attributes Additional attributes for the emission event.
+     * @param attributes   Additional attributes for the emission event.
      */
     public void publishCpuEmissions(Double cpuEmissions, Attributes attributes) {
         if (cpuEmissions == null) {
-            System.out.println("storageEmissions is null");
             return;
         }
-        long emissionsInLong = cpuEmissions.longValue();
-        AttributesBuilder attributesBuilder = attributes.toBuilder();
-        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
-        attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
-        attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
-        cpuEmissionMeter.add( emissionsInLong, attributes);
+        cpuEmissionMeter.record(cpuEmissions, attributes);
     }
 
     /**
      * Publishes the calculated emissions from embedded components based on CPU time used.
+     *
      * @param embodiedEmissions The total CPU time used in hours.
-     * @param attributes Additional attributes for the emission event.
+     * @param attributes        Additional attributes for the emission event.
      */
     public void publishEmbeddedEmissions(Double embodiedEmissions, Attributes attributes) {
         if (embodiedEmissions == null) {
-            System.out.println("storageEmissions is null");
             return;
         }
-        long emissionsInLong = embodiedEmissions.longValue();
-        AttributesBuilder attributesBuilder = attributes.toBuilder();
-        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
-        attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
-        attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
-        embeddedEmissionMeter.add( emissionsInLong, attributes);
+        embeddedEmissionMeter.record(embodiedEmissions, attributes);
     }
 
     /**
      * Publishes the calculated memory emissions.
+     *
      * @param memoryEmission The total memory demand in bytes.
-     * @param attributes Additional attributes for the emission event.
+     * @param attributes     Additional attributes for the emission event.
      */
     public void publishMemoryEmissions(Double memoryEmission, Attributes attributes) {
         if (memoryEmission == null) {
-            System.out.println("storageEmissions is null");
+            System.out.println("Memory emissions are null.");
             return;
         }
-        long emissionsInLong = memoryEmission.longValue();
-        AttributesBuilder attributesBuilder = attributes.toBuilder();
-        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
-        attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
-        attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
-        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
-        memoryEmissionMeter.add( emissionsInLong, attributes);
+        memoryEmissionMeter.record(memoryEmission, attributes);
     }
 
     /**
@@ -146,6 +123,7 @@ public class MetricPublishingService {
      * CPU, storage, embodied, and memory emissions from the attributes and delegates
      * publishing to specific methods.
      * If a value is missing or null, the corresponding method handles it appropriately.
+     *
      * @param attributes An {@link Attributes} object containing emission data.
      */
     public void publishEmissions(Attributes attributes) {
@@ -154,9 +132,17 @@ public class MetricPublishingService {
         Double embodiedEmissions = attributes.get(AttributeKey.doubleKey("embodiedEmissionsInMg"));
         Double memoryEmissions = attributes.get(AttributeKey.doubleKey("memoryEmissionsInMg"));
 
+        AttributesBuilder attributesBuilder = attributes.toBuilder();
+        attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
+        attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
+        attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
+        attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
+        Attributes finalAttributes = attributesBuilder.build();
+
         publishStorageEmissions(storageEmissions, attributes);
         publishCpuEmissions(cpuEmissions, attributes);
         publishEmbeddedEmissions(embodiedEmissions, attributes);
         publishMemoryEmissions(memoryEmissions, attributes);
     }
 }
+
