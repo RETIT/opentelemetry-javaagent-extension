@@ -112,7 +112,6 @@ public class MetricPublishingService {
      */
     public void publishMemoryEmissions(Double memoryEmission, Attributes attributes) {
         if (memoryEmission == null) {
-            System.out.println("Memory emissions are null.");
             return;
         }
         memoryEmissionMeter.record(memoryEmission, attributes);
@@ -124,25 +123,22 @@ public class MetricPublishingService {
      * publishing to specific methods.
      * If a value is missing or null, the corresponding method handles it appropriately.
      *
-     * @param attributes An {@link Attributes} object containing emission data.
+     * @param httpRoute An {@link Attributes} object containing the route of the http request.
      */
-    public void publishEmissions(Attributes attributes) {
-        Double cpuEmissions = attributes.get(AttributeKey.doubleKey("cpuEmissionsInMg"));
-        Double storageEmissions = attributes.get(AttributeKey.doubleKey("storageEmissionsInMg"));
-        Double embodiedEmissions = attributes.get(AttributeKey.doubleKey("embodiedEmissionsInMg"));
-        Double memoryEmissions = attributes.get(AttributeKey.doubleKey("memoryEmissionsInMg"));
+    public void publishEmissions(Double cpuEmissions, Double memoryEmissions, Double storageEmissions, Double embodiedEmissions,
+                                 Attributes httpRoute) {
 
-        AttributesBuilder attributesBuilder = attributes.toBuilder();
+        /*AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
         attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
-        Attributes finalAttributes = attributesBuilder.build();
+        Attributes finalAttributes = attributesBuilder.build();*/
 
-        publishStorageEmissions(storageEmissions, attributes);
-        publishCpuEmissions(cpuEmissions, attributes);
-        publishEmbeddedEmissions(embodiedEmissions, attributes);
-        publishMemoryEmissions(memoryEmissions, attributes);
+        publishStorageEmissions(storageEmissions, httpRoute);
+        publishCpuEmissions(cpuEmissions, httpRoute);
+        publishEmbeddedEmissions(embodiedEmissions, httpRoute);
+        publishMemoryEmissions(memoryEmissions, httpRoute);
     }
 }
 

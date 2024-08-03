@@ -1,7 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
 import io.opentelemetry.api.common.AttributeKey;
-import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.opentelemetry.api.common.Attributes;
@@ -86,10 +85,17 @@ public class RETITSpanProcessor implements SpanProcessor {
 
         Attributes finalAttributes = TelemetryUtils.addEmissionAndUsageDataToSpanAttributes(logCPUDemand,
                 logHeapDemand, logDiskDemand, logNetworkDemand, attributesBuilder, mergedAttributes, readableSpan);
+
         if (readableSpan.getParentSpanContext() != null && !readableSpan.getParentSpanContext().isValid()) {
             attributesBuilder.put(AttributeKey.stringKey("Servicecall"), readableSpan.getName());
             finalAttributes = attributesBuilder.build();
-            MetricPublishingService.getInstance().publishEmissions(finalAttributes);
+            Double cpuEmissions = finalAttributes.get(AttributeKey.doubleKey("cpuEmissionsInMg"));
+            Double memoryEmissions = finalAttributes.get(AttributeKey.doubleKey("memoryEmissionsInMg"));
+            Double storageEmissions = finalAttributes.get(AttributeKey.doubleKey("storageEmissionsInMg"));
+            Double embodiedEmissions = finalAttributes.get(AttributeKey.doubleKey("embodiedEmissionsInMg"));
+
+            MetricPublishingService.getInstance().publishEmissions(cpuEmissions, memoryEmissions, storageEmissions,
+                    embodiedEmissions, Attributes.of(AttributeKey.stringKey("Servicecall"), readableSpan.getName()));
         }
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }

@@ -273,6 +273,8 @@ public class TelemetryUtils {
                         attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"),
                                 MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(memoryEnergyConsumption));
                         attributesBuilder.put(AttributeKey.doubleKey("memoryKwhUsed"), memoryEnergyConsumption);
+                    } else {
+                        attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"), 0.0);
                     }
                 }
 
