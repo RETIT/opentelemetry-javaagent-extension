@@ -42,7 +42,6 @@ public class EmbodiedEmissions {
      */
     public double calculateEmbodiedEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds) {
         if (configLoader.getCloudInstanceName() == null) {
-            System.out.println("Cloud instance name is not set. Cannot calculate embodied emissions.");
             return 0;
         } else {
             double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;

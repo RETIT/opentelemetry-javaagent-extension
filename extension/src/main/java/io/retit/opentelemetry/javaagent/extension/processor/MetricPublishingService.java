@@ -2,11 +2,9 @@ package io.retit.opentelemetry.javaagent.extension.processor;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
-import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.DoubleHistogram;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.common.Attributes;
-import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
 
 /**
  * Handles the publishing of various emissions metrics to an OpenTelemetry meter.
@@ -21,7 +19,9 @@ public class MetricPublishingService {
     private final DoubleHistogram embeddedEmissionMeter;
     private final DoubleHistogram memoryEmissionMeter;
 
-    private final ConfigLoader configLoader;
+    private final DoubleHistogram cpuEnergyUsageMeter;
+    private final DoubleHistogram memoryEnergyUsageMeter;
+    private final DoubleHistogram storageEnergyUsageMeter;
 
     /**
      * Returns the singleton instance of MetricPublishingService, creating it if necessary.
@@ -40,7 +40,6 @@ public class MetricPublishingService {
      * Initializes the meters for storage, CPU, embedded components, and memory emissions.
      */
     private MetricPublishingService() {
-        configLoader = ConfigLoader.getConfigInstance();
 
         Meter meter = GlobalOpenTelemetry.get().getMeter("instrumentation-library-name");
 
@@ -63,6 +62,21 @@ public class MetricPublishingService {
                 .setDescription("Total emissions from memory")
                 .setUnit("mgCO2e")
                 .build();
+
+        cpuEnergyUsageMeter = meter.histogramBuilder("cpu_energy_usage")
+                .setDescription("Total Watt usage from CPU")
+                .setUnit("W")
+                .build();
+
+        memoryEnergyUsageMeter = meter.histogramBuilder("memory_energy_usage")
+                .setDescription("Total Watt usage from memory")
+                .setUnit("W")
+                .build();
+
+        storageEnergyUsageMeter = meter.histogramBuilder("storage_energy_usage")
+                .setDescription("Total Watt usage from storage")
+                .setUnit("W")
+                .build();
     }
 
     /**
@@ -72,7 +86,7 @@ public class MetricPublishingService {
      * @param attributes       Additional attributes for the emission event.
      */
     public void publishStorageEmissions(Double storageEmissions, Attributes attributes) {
-        if (storageEmissions == null) {
+       if (storageEmissions == null) {
             return;
         }
         storageEmissionMeter.record(storageEmissions, attributes);
@@ -117,28 +131,65 @@ public class MetricPublishingService {
         memoryEmissionMeter.record(memoryEmission, attributes);
     }
 
+    public void publishCpuEnergyUsage(Double cpuEnergyUsage, Attributes attributes) {
+        if (cpuEnergyUsage == null) {
+            return;
+        }
+        cpuEnergyUsageMeter.record(cpuEnergyUsage, attributes);
+    }
+
+    public void publishMemoryEnergyUsage(Double memoryEnergyUsage, Attributes attributes) {
+        if (memoryEnergyUsage == null) {
+            return;
+        }
+        memoryEnergyUsageMeter.record(memoryEnergyUsage, attributes);
+    }
+
+    public void publishStorageEnergyUsage(Double storageEnergyUsage, Attributes attributes) {
+        if (storageEnergyUsage == null) {
+            return;
+        }
+        storageEnergyUsageMeter.record(storageEnergyUsage, attributes);
+    }
+
     /**
      * Publishes emission metrics based on the provided attributes. It extracts values for
      * CPU, storage, embodied, and memory emissions from the attributes and delegates
      * publishing to specific methods.
      * If a value is missing or null, the corresponding method handles it appropriately.
      *
-     * @param httpRoute An {@link Attributes} object containing the route of the http request.
+     * @param attributes An {@link Attributes} object containing the route of the http request.
      */
-    public void publishEmissions(Double cpuEmissions, Double memoryEmissions, Double storageEmissions, Double embodiedEmissions,
-                                 Attributes httpRoute) {
+    public void publishEmissions(Attributes attributes, Attributes servicecall) {
 
-        /*AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
+   /*     AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
         attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
         attributesBuilder.put(AttributeKey.stringKey("region"), configLoader.getRegion());
         attributesBuilder.put(AttributeKey.stringKey("instance-type"), configLoader.getCloudInstanceName());
         attributesBuilder.put(AttributeKey.stringKey("provider"), configLoader.getCloudProvider());
+        attributesBuilder.put(AttributeKey.stringKey("Servicecall"), servicecall.get(AttributeKey.stringKey("Servicecall")));
         Attributes finalAttributes = attributesBuilder.build();*/
 
-        publishStorageEmissions(storageEmissions, httpRoute);
-        publishCpuEmissions(cpuEmissions, httpRoute);
-        publishEmbeddedEmissions(embodiedEmissions, httpRoute);
-        publishMemoryEmissions(memoryEmissions, httpRoute);
+        Double cpuEmissions = attributes.get(AttributeKey.doubleKey("cpuEmissionsInMg"));
+        Double memoryEmissions = attributes.get(AttributeKey.doubleKey("memoryEmissionsInMg"));
+        Double storageEmissions = attributes.get(AttributeKey.doubleKey("storageEmissionsInMg"));
+        Double embodiedEmissions = attributes.get(AttributeKey.doubleKey("embodiedEmissionsInMg"));
+
+        publishStorageEmissions(storageEmissions, servicecall);
+        publishCpuEmissions(cpuEmissions, servicecall);
+        publishEmbeddedEmissions(embodiedEmissions, servicecall);
+        publishMemoryEmissions(memoryEmissions, servicecall);
+    }
+
+    public void publishWattHoursUsage(Attributes attributes, Attributes servicecall) {
+
+        Double cpuEnergyUsage = attributes.get(AttributeKey.doubleKey("cpuWattHoursUsage"));
+        Double memoryEnergyUsage = attributes.get(AttributeKey.doubleKey("memoryKwhUsed"));
+        Double storageEnergyUsage = attributes.get(AttributeKey.doubleKey("storageKwhUsed"));
+
+        publishCpuEnergyUsage(cpuEnergyUsage, servicecall);
+        publishMemoryEnergyUsage(memoryEnergyUsage, servicecall);
+        publishStorageEnergyUsage(storageEnergyUsage, servicecall);
     }
 }
 

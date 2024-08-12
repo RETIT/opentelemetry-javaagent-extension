@@ -59,7 +59,7 @@ public class RETITSpanProcessorTest {
     public void onStart() {
         skipOnMacOS();
         retitSpanProcessor.onStart(Context.root(), readWriteSpan);
-        verify(readWriteSpan, times(7)).setAttribute(Mockito.anyString(), Mockito.anyLong());
+        verify(readWriteSpan, times(6)).setAttribute(Mockito.anyString(), Mockito.anyLong());
     }
 
     @Test

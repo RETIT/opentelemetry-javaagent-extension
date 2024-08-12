@@ -65,7 +65,7 @@ public class NetworkEmission {
      */
     public double calculateKwhUsed(double amountInBytes) {
         double dataSizeInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0); // Convert bytes to gigabytes
-        return dataSizeInGb * EmissionCoefficients.NETWORK_EMISSIONS_PER_GB;
+        return dataSizeInGb * EmissionCoefficients.NETWORK_EMISSIONS_PER_GB_HOUR;
     }
 
 }

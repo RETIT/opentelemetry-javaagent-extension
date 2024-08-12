@@ -84,7 +84,13 @@ public class ConfigLoader {
 
     private String initializeInstance() {
         String instance = System.getenv("INSTANCE");
-        return instance == null || instance.isEmpty() ? "SERVERLESS" : instance.toUpperCase();
+        if (instance.equalsIgnoreCase("SERVERLESS")) {
+            return "SERVERLESS";
+        } else if (!instance.isEmpty()) {
+            return instance.toUpperCase();
+        } else {
+            return "not-set";
+        }
     }
 
     private Integer initializeCpuCount() {

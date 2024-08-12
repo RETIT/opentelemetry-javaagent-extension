@@ -89,13 +89,10 @@ public class RETITSpanProcessor implements SpanProcessor {
         if (readableSpan.getParentSpanContext() != null && !readableSpan.getParentSpanContext().isValid()) {
             attributesBuilder.put(AttributeKey.stringKey("Servicecall"), readableSpan.getName());
             finalAttributes = attributesBuilder.build();
-            Double cpuEmissions = finalAttributes.get(AttributeKey.doubleKey("cpuEmissionsInMg"));
-            Double memoryEmissions = finalAttributes.get(AttributeKey.doubleKey("memoryEmissionsInMg"));
-            Double storageEmissions = finalAttributes.get(AttributeKey.doubleKey("storageEmissionsInMg"));
-            Double embodiedEmissions = finalAttributes.get(AttributeKey.doubleKey("embodiedEmissionsInMg"));
-
-            MetricPublishingService.getInstance().publishEmissions(cpuEmissions, memoryEmissions, storageEmissions,
-                    embodiedEmissions, Attributes.of(AttributeKey.stringKey("Servicecall"), readableSpan.getName()));
+            MetricPublishingService.getInstance().publishEmissions(finalAttributes,
+                    Attributes.of(AttributeKey.stringKey("Servicecall"), finalAttributes.get(AttributeKey.stringKey("Servicecall"))));
+            MetricPublishingService.getInstance().publishWattHoursUsage(finalAttributes,
+                    Attributes.of(AttributeKey.stringKey("Servicecall"), finalAttributes.get(AttributeKey.stringKey("Servicecall"))));
         }
         return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
     }

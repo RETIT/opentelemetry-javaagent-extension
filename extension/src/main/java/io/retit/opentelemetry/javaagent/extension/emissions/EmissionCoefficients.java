@@ -73,16 +73,16 @@ public class EmissionCoefficients {
     public static final double TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR = 0.0289;
 
     /**
-     * Coefficient for calculating memory emissions in kWh per GB.
+     * Coefficient for calculating memory emissions in kWh per GB-hour.
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#memory">...</a>
      */
-    public static final double MEMORY_KWH_PER_GB = 0.000392;
+    public static final double MEMORY_KWH_PER_GB_HOUR = 0.000392;
 
     /**
-     * Coefficient for calculating network emissions in kWh per GB.
+     * Coefficient for calculating network emissions in kWh per GB-hour.
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">...</a>
      */
-    public static final double NETWORK_EMISSIONS_PER_GB =  0.001;
+    public static final double NETWORK_EMISSIONS_PER_GB_HOUR =  0.001;
 
     /**
      * Coefficient for Power Usage Effectiveness (PUE) for AWS.

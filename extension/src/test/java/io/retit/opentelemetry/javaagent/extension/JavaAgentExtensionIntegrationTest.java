@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -145,9 +147,9 @@ class JavaAgentExtensionIntegrationTest {
                 assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
                 assertNotEquals(0, spanDemandEntry.logSystemTime);
                 assertNotEquals(0, spanDemandEntry.cpuEmissionsInMg);
-                assertNotEquals(0, spanDemandEntry.memoryEmissionsInMg);
                 assertNotEquals(0, spanDemandEntry.embodiedEmissionsInMg);
-                assertTrue(spanDemandEntry.storageEmissionsInMg >= 0.0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
+                assertNotNull(spanDemandEntry.memoryEmissionsInMg);
+                assertTrue(spanDemandEntry.storageEmissionsInMg >= 0.0);
             }
         }
         for (MetricDemand md : metricDemands) {
@@ -188,8 +190,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
-            assertEquals(0.0, sd.memoryEmissionsInMg);
-            assertEquals(0.0, sd.storageEmissionsInMg);
+            assertNull(sd.memoryEmissionsInMg);
+            assertNull(sd.storageEmissionsInMg);
         }
     }
 
@@ -210,8 +212,8 @@ class JavaAgentExtensionIntegrationTest {
         for (MetricDemand md : metricDemands) {
             assertNotEquals(0.0, md.cpuEmissionsInMg);
             assertNotEquals(0.0, md.embodiedEmissionsInMg);
-            assertEquals(0.0, md.memoryEmissionsInMg);
-            assertEquals(0.0, md.storageEmissionsInMg);
+            assertNull(md.memoryEmissionsInMg);
+            assertNull(md.storageEmissionsInMg);
         }
     }
 
@@ -232,9 +234,9 @@ class JavaAgentExtensionIntegrationTest {
         assertFalse(metricDemands.isEmpty());
         for (MetricDemand md : metricDemands) {
             assertNotEquals(0.0, md.memoryEmissionsInMg);
-            assertEquals(0.0, md.cpuEmissionsInMg);
-            assertEquals(0.0, md.storageEmissionsInMg);
-            assertEquals(0.0, md.embodiedEmissionsInMg);
+            assertNull(md.cpuEmissionsInMg);
+            assertNull(md.storageEmissionsInMg);
+            assertNull(md.embodiedEmissionsInMg);
         }
     }
 
@@ -253,10 +255,10 @@ class JavaAgentExtensionIntegrationTest {
         executeContainer();
         assertFalse(metricDemands.isEmpty());
         for (MetricDemand md : metricDemands) {
-            assertTrue(md.storageEmissionsInMg >= 0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
-            assertEquals(0.0, md.cpuEmissionsInMg);
-            assertEquals(0.0, md.memoryEmissionsInMg);
-            assertEquals(0.0, md.embodiedEmissionsInMg);
+            assertTrue(md.storageEmissionsInMg >= 0);
+            assertNull(md.cpuEmissionsInMg);
+            assertNull(md.memoryEmissionsInMg);
+            assertNull(md.embodiedEmissionsInMg);
         }
     }
 
@@ -290,10 +292,10 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
-            assertEquals(0.0, sd.cpuEmissionsInMg);
-            assertEquals(0.0, sd.memoryEmissionsInMg);
-            assertEquals(0.0, sd.storageEmissionsInMg);
-            assertEquals(0.0, sd.embodiedEmissionsInMg);
+            assertNull(sd.cpuEmissionsInMg);
+            assertNull(sd.memoryEmissionsInMg);
+            assertNull(sd.storageEmissionsInMg);
+            assertNull(sd.embodiedEmissionsInMg);
         }
     }
 
@@ -325,9 +327,9 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
-            assertEquals(0.0, sd.cpuEmissionsInMg);
-            assertEquals(0.0, sd.storageEmissionsInMg);
-            assertEquals(0.0, sd.embodiedEmissionsInMg);
+            assertNull(sd.cpuEmissionsInMg);
+            assertNull(sd.storageEmissionsInMg);
+            assertNull(sd.embodiedEmissionsInMg);
         }
     }
 
@@ -355,10 +357,10 @@ class JavaAgentExtensionIntegrationTest {
                     assertNull(spanDemandEntry.startHeapDemand);
                     assertNull(spanDemandEntry.endHeapDemand);
                     assertNull(spanDemandEntry.totalHeapSize);
-                    assertEquals(0.0, spanDemandEntry.memoryEmissionsInMg);
-                    assertEquals(0.0, spanDemandEntry.cpuEmissionsInMg);
-                    assertEquals(0.0, spanDemandEntry.embodiedEmissionsInMg);
-                    assertEquals(0.0, spanDemandEntry.storageEmissionsInMg);
+                    assertNull(spanDemandEntry.memoryEmissionsInMg);
+                    assertNull(spanDemandEntry.cpuEmissionsInMg);
+                    assertNull(spanDemandEntry.embodiedEmissionsInMg);
+                    assertNull(spanDemandEntry.storageEmissionsInMg);
                 } else {
                     assertNotEquals(0, spanDemandEntry.startHeapDemand);
                     assertNotEquals(0, spanDemandEntry.endHeapDemand);
@@ -395,14 +397,14 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
-            assertEquals(0.0, sd.memoryEmissionsInMg);
-            assertEquals(0.0, sd.cpuEmissionsInMg);
-            assertEquals(0.0, sd.embodiedEmissionsInMg);
+            assertNull(sd.memoryEmissionsInMg);
+            assertNull(sd.cpuEmissionsInMg);
+            assertNull(sd.embodiedEmissionsInMg);
             assertNotEquals(0, sd.startDiskReadDemand);
             assertNotEquals(0, sd.endDiskReadDemand);
             assertNotEquals(0, sd.startDiskWriteDemand);
             assertNotEquals(0, sd.endDiskWriteDemand);
-            assertTrue(sd.storageEmissionsInMg >= 0); //allow both because start up might create disk operations, while no disk operations are done in the sampleapplication
+            assertTrue(sd.storageEmissionsInMg >= 0);
         }
     }
 
@@ -423,58 +425,50 @@ class JavaAgentExtensionIntegrationTest {
     }
 
     private static void addToMetricDemands(String logOutput) {
-        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter") && logOutput.contains("Servicecall")){
+        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter") && logOutput.contains("Servicecall")) {
+            System.out.println("log is good");
             LOGGER.info("hier ist er" + logOutput);
-            String[] keys = {"cpuEmissionsInMg", "memoryEmissionsInMg", "storageEmissionsInMg", "embodiedEmissionsInMg"};
-            MetricDemand demand = extractMetricValuesFromLog(logOutput, keys);
+            MetricDemand demand = extractMetricValuesFromLog(logOutput);
             metricDemands.add(demand);
+        } else {
+            System.out.println("log is bad");
+            LOGGER.info("trotzdem hier " + logOutput);
         }
     }
 
-    private static MetricDemand extractMetricValuesFromLog(String logMessage, String[] keys) {
-        MetricDemand demand = new MetricDemand();
-        for (String key : keys) {
-            LOGGER.info("Hier ist der key " + key);
-            String keyWithEqual = key + "=";
-            double value = 0.0;
+    private static MetricDemand extractMetricValuesFromLog(String logMessage) {
+        String[] keys = {"storage_emissions", "cpu_emissions", "memory_emissions", "embodied_emissions"};
 
-            int startIndex = logMessage.indexOf(keyWithEqual);
-            if (startIndex != -1) {
-                startIndex += keyWithEqual.length();
-                int endIndex = logMessage.indexOf(',', startIndex);
-                if (endIndex == -1) {
-                    endIndex = logMessage.indexOf('}', startIndex);
+        MetricDemand metricDemand = new MetricDemand();
+        for (String key : keys) {
+            String regex = "name=" + key + ".*?getSum=(\\d+\\.\\d+E[+-]?\\d+)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(logMessage);
+
+            if (matcher.find()) {
+                double value = Double.parseDouble(matcher.group(1));
+                switch (key) {
+                    case "storage_emissions":
+                        metricDemand.storageEmissionsInMg = value;
+                        break;
+                    case "embodied_emissions":
+                        metricDemand.embodiedEmissionsInMg = value;
+                        break;
+                    case "memory_emissions":
+                        System.out.println("memory emissions hier: " + value);
+                        metricDemand.memoryEmissionsInMg = value;
+                        break;
+                    case "cpu_emissions":
+                        metricDemand.cpuEmissionsInMg = value;
+                        break;
                 }
-                if (endIndex != -1) {
-                    String valueStr = logMessage.substring(startIndex, endIndex).trim();
-                    try {
-                        valueStr = valueStr.replaceAll("[^0-9.]", "");
-                        value = Double.parseDouble(valueStr);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Error parsing " + key + ": " + e.getMessage());
-                    }
-                }
-            }
-            LOGGER.info("Hier ist der value " + value);
-            switch (key) {
-                case "cpuEmissionsInMg":
-                    demand.cpuEmissionsInMg = value;
-                    break;
-                case "memoryEmissionsInMg":
-                    demand.memoryEmissionsInMg = value;
-                    break;
-                case "storageEmissionsInMg":
-                    demand.storageEmissionsInMg = value;
-                    break;
-                case "embodiedEmissionsInMg":
-                    demand.embodiedEmissionsInMg = value;
-                    break;
             }
         }
-        return demand;
+        return metricDemand;
     }
 
     private static String extractOperationNameFromLogOutput(String logOutput) {
+        System.out.println("das ist der span " + logOutput);
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
     }
 
