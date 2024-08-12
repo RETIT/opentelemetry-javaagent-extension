@@ -1,8 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
 import io.opentelemetry.api.common.AttributeKey;
-import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
-import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
@@ -13,11 +11,11 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
-import lombok.Getter;
+import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
+import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 
 public class RETITSpanProcessor implements SpanProcessor {
 
-    @Getter
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
 
@@ -124,5 +122,9 @@ public class RETITSpanProcessor implements SpanProcessor {
     // visible for testing
     protected BatchSpanProcessor getDelegateBatchSpanProcessor() {
         return delegateBatchSpanProcessor;
+    }
+
+    public BatchSpanProcessorBuilder getDelegateBatchSpanProcessorBuilder() {
+        return delegateBatchSpanProcessorBuilder;
     }
 }

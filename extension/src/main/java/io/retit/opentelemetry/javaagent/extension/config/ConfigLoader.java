@@ -1,7 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.config;
 
 import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
-import lombok.Getter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,38 +12,36 @@ public class ConfigLoader {
 
     private final Logger LOGGER = Logger.getLogger(ConfigLoader.class.getName());
 
-    @Getter
     private static final ConfigLoader configInstance = new ConfigLoader();
 
-    @Getter
     private final String serviceName;
-    @Getter
+
     private final String storageType;
-    @Getter
+
     private final String region;
-    @Getter
+
     private final String cloudInstanceName;
-    @Getter
+
     private final String microarchitecture;
-    @Getter
+
     private final String cloudProvider;
-    @Getter
+
     private final Double gridEmissionsFactor;
-    @Getter
+
     private final Double instanceEnergyUsageIdle;
-    @Getter
+
     private final Double instanceEnergyUsageFull;
-    @Getter
+
     private final Double instanceVCpu;
-    @Getter
+
     private final Double platformTotalVcpu;
-    @Getter
+
     private final Double totalEmbodiedEmissions;
-    @Getter
+
     private final Double pueValue;
-    @Getter
+
     private final Integer cpuCount;
-    @Getter
+
     private final Double cpuUtilization;
     private final Double[] cloudInstanceDetails = new Double[4];
 
@@ -130,8 +127,7 @@ public class ConfigLoader {
     private Double initializeGridEmissionFactor(String region) {
         double gridEmissionFactorMetricTonPerKwh = 0.0;
         if (cloudProvider.equalsIgnoreCase("AWS")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -147,8 +143,7 @@ public class ConfigLoader {
                 LOGGER.warning("Failed to load grid emission factor from CSV file");
             }
         } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-azure.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-azure.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -163,8 +158,7 @@ public class ConfigLoader {
                 LOGGER.warning("Failed to load grid emission factor from CSV file");
             }
         } else if (cloudProvider.equalsIgnoreCase("GCP")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-gcp.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-gcp.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -185,8 +179,7 @@ public class ConfigLoader {
 
     private void initializeCloudInstanceDetails(String instanceType) {
         if (cloudProvider.equalsIgnoreCase("AZURE")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/azure-instances.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/instances/azure-instances.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -205,8 +198,7 @@ public class ConfigLoader {
 
             }
         } else if (cloudProvider.equalsIgnoreCase("AWS")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -224,17 +216,14 @@ public class ConfigLoader {
                 LOGGER.warning("Failed to load instance details from CSV file");
             }
         } else if (cloudProvider.equalsIgnoreCase("GCP")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/instances/gcp-instances.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/instances/gcp-instances.csv"))))) {
                 reader.readLine();
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String[] fields = line.split(",");
                     String csvInstanceType = fields[1].trim();
                     String csvMicroarchitecture = fields[2].trim();
-                    if ((microarchitecture == null && csvInstanceType.equalsIgnoreCase(instanceType.trim())) ||
-                            (csvInstanceType.equalsIgnoreCase(instanceType.trim()) &&
-                                    csvMicroarchitecture.equalsIgnoreCase(microarchitecture))) {
+                    if ((microarchitecture == null && csvInstanceType.equalsIgnoreCase(instanceType.trim())) || (csvInstanceType.equalsIgnoreCase(instanceType.trim()) && csvMicroarchitecture.equalsIgnoreCase(microarchitecture))) {
                         cloudInstanceDetails[0] = Double.parseDouble(fields[3].trim());
                         cloudInstanceDetails[1] = Double.parseDouble(fields[5].trim());
                         cloudInstanceDetails[2] = Double.parseDouble(fields[12].trim());
@@ -255,8 +244,7 @@ public class ConfigLoader {
 
     public Double totalEmbodiedEmissions(String instanceType) {
         if (cloudProvider.equalsIgnoreCase("AWS")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -272,8 +260,7 @@ public class ConfigLoader {
                 LOGGER.warning("Failed to load total embodied emissions from CSV file");
             }
         } else if (cloudProvider.equalsIgnoreCase("GCP")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-gcp-embodied-mean.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-gcp-embodied-mean.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -287,8 +274,7 @@ public class ConfigLoader {
                 LOGGER.warning("Failed to load total embodied emissions from CSV file");
             }
         } else if (cloudProvider.equalsIgnoreCase("AZURE")) {
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-azure-embodied.csv"))))) {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-azure-embodied.csv"))))) {
                 String line;
                 reader.readLine();
                 while ((line = reader.readLine()) != null) {
@@ -333,5 +319,61 @@ public class ConfigLoader {
         }
         fields.add(field.toString());
         return fields.toArray(new String[0]);
+    }
+
+    public String getStorageType() {
+        return storageType;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public String getCloudInstanceName() {
+        return cloudInstanceName;
+    }
+
+    public String getCloudProvider() {
+        return cloudProvider;
+    }
+
+    public Double getGridEmissionsFactor() {
+        return gridEmissionsFactor;
+    }
+
+    public Double getInstanceEnergyUsageIdle() {
+        return instanceEnergyUsageIdle;
+    }
+
+    public Double getInstanceEnergyUsageFull() {
+        return instanceEnergyUsageFull;
+    }
+
+    public Double getInstanceVCpu() {
+        return instanceVCpu;
+    }
+
+    public Double getPlatformTotalVcpu() {
+        return platformTotalVcpu;
+    }
+
+    public Double getTotalEmbodiedEmissions() {
+        return totalEmbodiedEmissions;
+    }
+
+    public Double getPueValue() {
+        return pueValue;
+    }
+
+    public Integer getCpuCount() {
+        return cpuCount;
+    }
+
+    public Double getCpuUtilization() {
+        return cpuUtilization;
+    }
+
+    public static ConfigLoader getConfigInstance() {
+        return configInstance;
     }
 }
