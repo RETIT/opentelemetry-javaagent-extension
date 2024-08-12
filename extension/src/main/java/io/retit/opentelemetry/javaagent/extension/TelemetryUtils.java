@@ -257,10 +257,10 @@ public class TelemetryUtils {
                     Long endCpuTime = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
                     totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
                     double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGram(totalCpuTimeUsed);
-                    double cpuEnergyConsumption = CpuEmissions.getInstance().calculateKwhUsed(totalCpuTimeUsed);
-                    attributesBuilder.put(AttributeKey.doubleKey("cpuKwhUsed"), cpuEnergyConsumption);
+                    double cpuKwhUsage = CpuEmissions.getInstance().calculateKwhUsed(totalCpuTimeUsed);
+                    attributesBuilder.put(AttributeKey.doubleKey("cpuWattHoursUsage"), cpuKwhUsage * 1000);
                     attributesBuilder.put(AttributeKey.doubleKey("cpuEmissionsInMg"),
-                            CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(cpuEnergyConsumption));
+                            CpuEmissions.getInstance().calculateCpuEmissionsInMilliGram(cpuKwhUsage));
                     attributesBuilder.put(AttributeKey.doubleKey("embodiedEmissionsInMg"), embodiedEmissions);
                 }
 
@@ -272,7 +272,7 @@ public class TelemetryUtils {
                         double memoryEnergyConsumption = MemoryEmissions.getInstance().energyUsageInKiloWattHours(totalHeapDemand);
                         attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"),
                                 MemoryEmissions.getInstance().calculateMemoryEmissionsInMilliGram(memoryEnergyConsumption));
-                        attributesBuilder.put(AttributeKey.doubleKey("memoryKwhUsed"), memoryEnergyConsumption);
+                        attributesBuilder.put(AttributeKey.doubleKey("memoryWattHoursUsage"), memoryEnergyConsumption * 1000);
                     } else {
                         attributesBuilder.put(AttributeKey.doubleKey("memoryEmissionsInMg"), 0.0);
                     }
@@ -290,7 +290,7 @@ public class TelemetryUtils {
                     totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
                     double storageEnergyConsumption = StorageEmissions.getInstance().energyUsageInKiloWattHours(totalStorageDemand);
-                    attributesBuilder.put(AttributeKey.doubleKey("storageKwhUsed"), storageEnergyConsumption);
+                    attributesBuilder.put(AttributeKey.doubleKey("storageWattHoursUsage"), storageEnergyConsumption * 1000);
                     attributesBuilder.put(AttributeKey.doubleKey("storageEmissionsInMg"), StorageEmissions.getInstance().calculateStorageEmissionsInMilliGram(storageEnergyConsumption));
                 }
             }
