@@ -1,7 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension;
 
 import com.google.auto.service.AutoService;
-import io.retit.opentelemetry.javaagent.extension.processor.RETITSpanProcessor;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizer;
 import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvider;
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
@@ -10,6 +9,8 @@ import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
 import io.opentelemetry.sdk.trace.export.SpanExporter;
+import io.retit.opentelemetry.javaagent.extension.processor.RETITSpanProcessor;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.BiFunction;
@@ -23,7 +24,7 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
     private static final Logger LOGGER = Logger.getLogger(OpenTelemetryCustomizer.class.getName());
 
     @Override
-    public void customize(AutoConfigurationCustomizer autoConfiguration) {
+    public void customize(final AutoConfigurationCustomizer autoConfiguration) {
         if (TelemetryUtils.isLogGCEventDefaultTrue()) {
             JavaAgentGCHandler.addJavaAgentGCListener();
         }
@@ -52,7 +53,7 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
         return (sdkTracerProviderBuilder, configProperties) -> {
             try {
                 final Class<?> sdkTracerProviderBuilderClass =
-                    SdkTracerProviderBuilder.class.getClassLoader().loadClass("io.opentelemetry.sdk.trace.SdkTracerProviderBuilder");
+                        SdkTracerProviderBuilder.class.getClassLoader().loadClass("io.opentelemetry.sdk.trace.SdkTracerProviderBuilder");
                 final Field spanProcessors = sdkTracerProviderBuilderClass.getDeclaredField("spanProcessors");
                 spanProcessors.setAccessible(true);
                 List<SpanProcessor> spanProcessorList = (List<SpanProcessor>) spanProcessors.get(sdkTracerProviderBuilder);
@@ -62,7 +63,7 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
                     RETITSpanProcessor retitSpanProcessor = (RETITSpanProcessor) resultList.get(0);
                     BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder = retitSpanProcessor.getDelegateBatchSpanProcessorBuilder();
                     final Class<?> batchSpanProcessorBuilderClass =
-                        BatchSpanProcessorBuilder.class.getClassLoader().loadClass("io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder");
+                            BatchSpanProcessorBuilder.class.getClassLoader().loadClass("io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder");
                     final Field spanExporterField = batchSpanProcessorBuilderClass.getDeclaredField("spanExporter");
                     spanExporterField.setAccessible(true);
                     SpanExporter currentSpanExporter = (SpanExporter) spanExporterField.get(delegateBatchSpanProcessorBuilder);

@@ -1,7 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
 import io.opentelemetry.api.common.AttributeKey;
-
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
@@ -20,7 +19,7 @@ public class RETITSpanProcessor implements SpanProcessor {
     private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
     private BatchSpanProcessor delegateBatchSpanProcessor;
 
-    public RETITSpanProcessor(BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder) {
+    public RETITSpanProcessor(final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder) {
         this.delegateBatchSpanProcessorBuilder = delegateBatchSpanProcessorBuilder;
     }
 
@@ -29,7 +28,7 @@ public class RETITSpanProcessor implements SpanProcessor {
     }
 
     @Override
-    public void onStart(Context parentContext, ReadWriteSpan readWriteSpan) {
+    public void onStart(final Context parentContext, final ReadWriteSpan readWriteSpan) {
         boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
@@ -52,7 +51,7 @@ public class RETITSpanProcessor implements SpanProcessor {
     }
 
     @Override
-    public void onEnd(ReadableSpan readableSpan) {
+    public void onEnd(final ReadableSpan readableSpan) {
         delegateBatchSpanProcessor.onEnd(beforeEnd(readableSpan));
     }
 
@@ -65,7 +64,7 @@ public class RETITSpanProcessor implements SpanProcessor {
      * @param readableSpan - {@link ReadableSpan} from the {@code onEnd()} hook
      * @return {@link ReadableSpan} containing preexisting and our custom attributes
      */
-    private ReadableSpan beforeEnd(ReadableSpan readableSpan) {
+    private ReadableSpan beforeEnd(final ReadableSpan readableSpan) {
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);

@@ -44,7 +44,7 @@ public class TelemetryUtils {
         return InstanceConfiguration.getBooleanProperty(Constants.RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
-    public static SpanData createSpanData(SpanData spanData, Attributes attributes) {
+    public static SpanData createSpanData(final SpanData spanData, final Attributes attributes) {
         return new SpanData() {
             @Override
             public String getName() {
@@ -133,7 +133,7 @@ public class TelemetryUtils {
         };
     }
 
-    public static ReadableSpan createReadableSpan(ReadableSpan readableSpan, Attributes mergedAttributes) {
+    public static ReadableSpan createReadableSpan(final ReadableSpan readableSpan, final Attributes mergedAttributes) {
         return new ReadableSpan() {
             @Override
             public SpanContext getSpanContext() {
@@ -181,14 +181,14 @@ public class TelemetryUtils {
             }
 
             @Override
-            public <T> T getAttribute(AttributeKey<T> key) {
+            public <T> T getAttribute(final AttributeKey<T> key) {
                 return toSpanData().getAttributes().get(key);
             }
         };
     }
 
-    public static void addStartResourceDemandValuesToSpanAttributes(boolean logCPUTime, boolean logSystemTime, boolean logHeapConsumption,
-                                                                    boolean logDiskDemand, boolean logThreadName, ReadWriteSpan readWriteSpan) {
+    public static void addStartResourceDemandValuesToSpanAttributes(final boolean logCPUTime, final boolean logSystemTime, final boolean logHeapConsumption,
+                                                                    final boolean logDiskDemand, final boolean logThreadName, final ReadWriteSpan readWriteSpan) {
         if (logSystemTime) {
             readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_START_SYSTEM_TIME, System.nanoTime());
         }
@@ -212,9 +212,9 @@ public class TelemetryUtils {
         }
     }
 
-    public static Attributes addEndResourceDemandValuesToSpanAttributes(AttributesBuilder attributesBuilder, boolean logCPUTime,
-                                                                        boolean logSystemTime, boolean logHeapConsumption, boolean logDiskDemand,
-                                                                        boolean logThreadName, ReadableSpan readableSpan) {
+    public static Attributes addEndResourceDemandValuesToSpanAttributes(final AttributesBuilder attributesBuilder, final boolean logCPUTime,
+                                                                        final boolean logSystemTime, final boolean logHeapConsumption, final boolean logDiskDemand,
+                                                                        final boolean logThreadName, final ReadableSpan readableSpan) {
         attributesBuilder.put(Constants.SPAN_ATTRIBUTE_LOG_SYSTEM_TIME, System.currentTimeMillis());
         if (logSystemTime) {
             attributesBuilder.put(Constants.SPAN_ATTRIBUTE_END_SYSTEM_TIME, System.nanoTime());
@@ -244,17 +244,17 @@ public class TelemetryUtils {
      * This method calculates and adds various energy usage and emission metrics to the span attributes
      * based on the provided flags and span data. It includes CPU, memory, and storage energy usage and emissions.
      *
-     * @param logCPUDemand       Flag indicating whether to log CPU demand.
-     * @param logHeapDemand      Flag indicating whether to log heap demand.
-     * @param logDiskDemand      Flag indicating whether to log disk demand.
-     * @param logNetworkDemand   Flag indicating whether to log network demand.
-     * @param attributesBuilder  The builder containing the attributes of the current ReadableSpan to put values.
-     * @param attributesOfSpan   The existing attributes of the span.
-     * @param readableSpan       The span from which to read additional data.
+     * @param logCPUDemand      Flag indicating whether to log CPU demand.
+     * @param logHeapDemand     Flag indicating whether to log heap demand.
+     * @param logDiskDemand     Flag indicating whether to log disk demand.
+     * @param logNetworkDemand  Flag indicating whether to log network demand.
+     * @param attributesBuilder The builder containing the attributes of the current ReadableSpan to put values.
+     * @param attributesOfSpan  The existing attributes of the span.
+     * @param readableSpan      The span from which to read additional data.
      * @return The updated attributes including the emission and usage data.
      */
-    public static Attributes addEmissionAndUsageDataToSpanAttributes(boolean logCPUDemand, boolean logHeapDemand, boolean logDiskDemand, boolean logNetworkDemand,
-                                                                     AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
+    public static Attributes addEmissionAndUsageDataToSpanAttributes(final boolean logCPUDemand, final boolean logHeapDemand, final boolean logDiskDemand, final boolean logNetworkDemand,
+                                                                     final AttributesBuilder attributesBuilder, final Attributes attributesOfSpan, final ReadableSpan readableSpan) {
 
         long totalHeapDemand;
         long totalCpuTimeUsed;
@@ -313,7 +313,7 @@ public class TelemetryUtils {
         return attributesBuilder.build();
     }
 
-    private static boolean isExternalDatabaseCall(ReadableSpan span) {
+    private static boolean isExternalDatabaseCall(final ReadableSpan span) {
         return span.getAttribute(DB_SYSTEM) != null;
     }
 }

@@ -1,9 +1,10 @@
 package io.retit.opentelemetry.javaagent.extension;
 
 import com.sun.management.GarbageCollectionNotificationInfo;
-import java.util.logging.Logger;
+
 import javax.management.Notification;
 import javax.management.NotificationListener;
+import java.util.logging.Logger;
 
 /**
  * A {@link NotificationListener} which triggers on garbage collection invocations.
@@ -16,7 +17,7 @@ public class JavaAgentGCNotificationListener implements NotificationListener {
     private static final Logger LOGGER = Logger.getLogger(JavaAgentGCNotificationListener.class.getName());
 
     @Override
-    public void handleNotification(Notification notification, Object handback) {
+    public void handleNotification(final Notification notification, final Object handback) {
         if (notification != null && notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
             try {
                 JavaAgentGCHandler.handleGCNotification(notification);

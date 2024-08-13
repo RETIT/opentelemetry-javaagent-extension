@@ -16,8 +16,6 @@ import java.util.logging.Logger;
  * necessary for collecting resource demands on a system. These resource demands
  * are generally measured twice for a specific method invocation. This is done
  * by the {@link TelemetryUtils}.
- *
-
  */
 public abstract class CommonResourceDemandDataCollector implements IResourceDemandDataCollector {
 
@@ -69,7 +67,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
             jvmCollector = getDataCollectorFromJVM(IBM_JVM_NAME);
         } else {
             throw new UnsupportedOperationException(
-                "Cannot collect Resource Demands for current JVM: " + System.getProperty(JVM_NAME_PROPERTY));
+                    "Cannot collect Resource Demands for current JVM: " + System.getProperty(JVM_NAME_PROPERTY));
         }
 
         osCollector.setJvmCollector(jvmCollector);
@@ -136,17 +134,12 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     /**
      * Sets the JVM collector to the specified one.
      */
-    public void setJvmCollector(IResourceDemandDataCollector jvmCollector) {
+    public void setJvmCollector(final IResourceDemandDataCollector jvmCollector) {
         this.jvmCollector = jvmCollector;
     }
 
     private static boolean isIBMJVM() {
         return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains(IBM_VENDOR);
-    }
-
-    private static boolean isJRockitJVM() {
-        return System.getProperty("jrockit.version") != null
-            || System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).indexOf("jrockit") >= 0;
     }
 
     private static boolean isHotspotJVM() {
