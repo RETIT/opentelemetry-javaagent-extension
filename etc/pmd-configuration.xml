@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- ${project.groupId}:${project.artifactId}:${project.version} -->
 <ruleset xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          name="pmd-eclipse"
@@ -8,7 +7,6 @@
     <exclude name="JUnitTestContainsTooManyAsserts"/>
     <exclude name="JUnitTestsShouldIncludeAssert"/>
     <exclude name="JUnitAssertionsShouldIncludeMessage"/>
-    <exclude name="UnusedImports"/>
     <exclude name="GuardLogStatement"/>
     <exclude name="AccessorMethodGeneration"/>
     <exclude name="JUnit5TestShouldBePackagePrivate"/>
@@ -16,13 +14,11 @@
     <exclude name="SystemPrintln" />
   </rule>
   <rule ref="category/java/codestyle.xml">
-    <exclude name="DuplicateImports"/>
     <exclude name="AtLeastOneConstructor"/>
     <exclude name="UnnecessaryConstructor"/>
     <exclude name="FieldDeclarationsShouldBeAtStartOfClass"/>
     <exclude name="CommentDefaultAccessModifier"/>
     <exclude name="LocalVariableCouldBeFinal"/>
-    <exclude name="DefaultPackage"/>
     <exclude name="LongVariable"/>
     <exclude name="ShortVariable"/>
     <exclude name="ShortClassName"/>
@@ -58,7 +54,6 @@
     <exclude name="TooManyMethods"/>
     <exclude name="ClassWithOnlyPrivateConstructorsShouldBeFinal"/>
     <exclude name="ExcessiveParameterList"/>
-    <exclude name="ExcessiveMethodLength"/>
     <exclude name="UseObjectForClearerAPI"/>
     <exclude name="AvoidCatchingGenericException"/>
     <exclude name="FinalFieldCouldBeStatic"/>
@@ -68,15 +63,8 @@
     <exclude name="UseUtilityClass"/>
     <exclude name="MutableStaticState"/>
   </rule>
-  <rule ref="category/java/design.xml/ImmutableField">
-    <properties>
-      <property name="ignoredAnnotations" value="org.junit.jupiter.api.io.TempDir|javax.inject.Inject|com.google.inject.Inject"/>
-    </properties>
-  </rule>
 
   <rule ref="category/java/errorprone.xml">
-    <exclude name="DataflowAnomalyAnalysis"/>
-    <exclude name="BeanMembersShouldSerialize"/>
     <exclude name="AvoidDuplicateLiterals"/>
     <exclude name="TestClassWithoutTestCases"/>
     <exclude name="EmptyCatchBlock"/>
