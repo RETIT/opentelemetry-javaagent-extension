@@ -14,7 +14,7 @@ import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients
  */
 public class StorageEmissions {
 
-    public static StorageEmissions instance;
+    private static StorageEmissions instance;
     private final ConfigLoader configLoader;
 
     /**
@@ -43,7 +43,7 @@ public class StorageEmissions {
      * The method estimates emissions based on the storage usage, applying a fixed coefficient
      * and adjusting for the Power Usage Effectiveness (PUE) and the grid emissions factor.
      *
-     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <p>This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
      * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#storage">Cloud Carbon Footprint Methodology</a>.
      *
      * @param storageKilowattHours The amount of storage used in bytes.
@@ -58,7 +58,7 @@ public class StorageEmissions {
      * It converts the storage amount to terabytes and applies a fixed coefficient depending on the storage type,
      * adjusting for a 60-second interval.
      *
-     * This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
+     * <p>This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
      * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
      *
      * @param amountInBytes The amount of storage used in bytes.

@@ -6,8 +6,8 @@ import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients
 /**
  * The {@code CpuEmissions} class calculates the carbon emissions associated with CPU usage.
  * It utilizes configuration settings to estimate emissions based on the cloud provider's energy consumption data.
- * <p>
- * The approach and coefficients used in this class are derived from the methodology outlined by the
+ *
+ * <p>The approach and coefficients used in this class are derived from the methodology outlined by the
  * Cloud Carbon Footprint project, which provides a comprehensive framework for calculating carbon emissions
  * from cloud computing activities. More details can be found at:
  * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
@@ -42,7 +42,7 @@ public class CpuEmissions {
      * This method uses the Power Usage Effectiveness (PUE) and grid emissions factor to convert
      * energy consumption into CO2 emissions.
      *
-     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <p>This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
      * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#compute">Cloud Carbon Footprint Methodology</a>.
      *
      * @param computeKiloWattHours The energy consumption in kilowatt-hours.

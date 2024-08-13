@@ -12,7 +12,7 @@ import io.opentelemetry.api.common.Attributes;
  */
 public class MetricPublishingService {
 
-    public static MetricPublishingService instance;
+    private static MetricPublishingService instance;
 
     private final DoubleHistogram storageEmissionMeter;
     private final DoubleHistogram cpuEmissionMeter;
@@ -86,7 +86,7 @@ public class MetricPublishingService {
      * @param attributes       Additional attributes for the emission event.
      */
     public void publishStorageEmissions(Double storageEmissions, Attributes attributes) {
-       if (storageEmissions == null) {
+        if (storageEmissions == null) {
             return;
         }
         storageEmissionMeter.record(storageEmissions, attributes);
@@ -131,6 +131,12 @@ public class MetricPublishingService {
         memoryEmissionMeter.record(memoryEmission, attributes);
     }
 
+    /**
+     * Publishes the calculated CPU energy usage.
+     *
+     * @param cpuEnergyUsage The total CPU energy usage in Watt-hours.
+     * @param attributes     Additional attributes for the energy usage event.
+     */
     public void publishCpuEnergyUsage(Double cpuEnergyUsage, Attributes attributes) {
         if (cpuEnergyUsage == null) {
             return;
@@ -138,6 +144,12 @@ public class MetricPublishingService {
         cpuEnergyUsageMeter.record(cpuEnergyUsage, attributes);
     }
 
+    /**
+     * Publishes the calculated memory energy usage.
+     *
+     * @param memoryEnergyUsage The total memory energy usage in Watt-hours.
+     * @param attributes        Additional attributes for the energy usage event.
+     */
     public void publishMemoryEnergyUsage(Double memoryEnergyUsage, Attributes attributes) {
         if (memoryEnergyUsage == null) {
             return;
@@ -145,6 +157,12 @@ public class MetricPublishingService {
         memoryEnergyUsageMeter.record(memoryEnergyUsage, attributes);
     }
 
+    /**
+     * Publishes the calculated storage energy usage.
+     *
+     * @param storageEnergyUsage The total storage energy usage in Watt-hours.
+     * @param attributes         Additional attributes for the energy usage event.
+     */
     public void publishStorageEnergyUsage(Double storageEnergyUsage, Attributes attributes) {
         if (storageEnergyUsage == null) {
             return;
@@ -159,6 +177,7 @@ public class MetricPublishingService {
      * If a value is missing or null, the corresponding method handles it appropriately.
      *
      * @param attributes An {@link Attributes} object containing the route of the http request.
+     * @param servicecall An {@link Attributes} object containing the service call.
      */
     public void publishEmissions(Attributes attributes, Attributes servicecall) {
 

@@ -7,14 +7,15 @@ import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients
  * The {@code NetworkEmission} class calculates the carbon emissions associated with network usage.
  * It leverages configuration settings to estimate emissions based on the amount of data transferred,
  * and the specific energy consumption characteristics of the cloud provider.
- * The approach and coefficients used in this class are derived
+ *
+ * <p>The approach and coefficients used in this class are derived
  * from the methodology outlined by the Cloud Carbon Footprint project, which provides a comprehensive framework
  * for calculating carbon emissions from cloud computing activities. More details can be found at:
  * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#network">Cloud Carbon Footprint Methodology</a>.
  */
 public class NetworkEmission {
 
-    public static NetworkEmission instance;
+    private static NetworkEmission instance;
     private final ConfigLoader configLoader;
 
     /**
@@ -43,7 +44,7 @@ public class NetworkEmission {
      * This method estimates emissions based on the amount of data transferred, applying the Power Usage Effectiveness (PUE)
      * and grid emissions factor to convert the energy consumption into CO2 emissions.
      *
-     * This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
+     * <p>This approach follows the methodology outlined in the Cloud Carbon Footprint documentation:
      * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">Cloud Carbon Footprint Methodology</a>.
      *
      * @param amountInBytes The amount of network data used in bytes.
@@ -57,7 +58,7 @@ public class NetworkEmission {
      * Estimates the energy usage in kilowatt-hours based on the amount of network data used in bytes.
      * Converts the data amount from bytes to gigabytes and applies a fixed coefficient for network emissions.
      *
-     * This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
+     * <p>This calculation is part of the overall carbon emissions estimation approach following the Cloud Carbon Footprint methodology:
      * <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">Cloud Carbon Footprint Methodology</a>.
      *
      * @param amountInBytes The amount of network data used in bytes.

@@ -238,6 +238,21 @@ public class TelemetryUtils {
         return attributesBuilder.build();
     }
 
+    /**
+     * Adds emission and usage data to the span attributes.
+     * <p>
+     * This method calculates and adds various energy usage and emission metrics to the span attributes
+     * based on the provided flags and span data. It includes CPU, memory, and storage energy usage and emissions.
+     *
+     * @param logCPUDemand       Flag indicating whether to log CPU demand.
+     * @param logHeapDemand      Flag indicating whether to log heap demand.
+     * @param logDiskDemand      Flag indicating whether to log disk demand.
+     * @param logNetworkDemand   Flag indicating whether to log network demand.
+     * @param attributesBuilder  The builder containing the attributes of the current ReadableSpan to put values.
+     * @param attributesOfSpan   The existing attributes of the span.
+     * @param readableSpan       The span from which to read additional data.
+     * @return The updated attributes including the emission and usage data.
+     */
     public static Attributes addEmissionAndUsageDataToSpanAttributes(boolean logCPUDemand, boolean logHeapDemand, boolean logDiskDemand, boolean logNetworkDemand,
                                                                      AttributesBuilder attributesBuilder, Attributes attributesOfSpan, ReadableSpan readableSpan) {
 

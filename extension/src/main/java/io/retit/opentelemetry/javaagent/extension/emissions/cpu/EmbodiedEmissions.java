@@ -45,8 +45,8 @@ public class EmbodiedEmissions {
             return 0;
         } else {
             double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
-            return (configLoader.getTotalEmbodiedEmissions() * EmissionCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR *
-                    (configLoader.getInstanceVCpu() / configLoader.getPlatformTotalVcpu()) * cpuTimeInHours) * 1000;
+            return (configLoader.getTotalEmbodiedEmissions() * EmissionCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR
+                    * (configLoader.getInstanceVCpu() / configLoader.getPlatformTotalVcpu()) * cpuTimeInHours) * 1000;
         }
     }
 }
