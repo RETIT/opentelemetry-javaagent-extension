@@ -79,10 +79,10 @@ class JavaAgentExtensionIntegrationTest {
     @Test
     void testAllOperationsPresent() {
         applicationContainer.withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         // Check that operations are there
@@ -120,10 +120,10 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
                 .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -163,16 +163,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyCPUDemand() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_APM_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -197,16 +197,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyCpuMetricDemands() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
         assertFalse(metricDemands.isEmpty());
         for (MetricDemand md : metricDemands) {
@@ -220,16 +220,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyMemoryMetricDemands() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
         assertFalse(metricDemands.isEmpty());
         for (MetricDemand md : metricDemands) {
@@ -242,16 +242,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyStorageMetricDemands() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
         assertFalse(metricDemands.isEmpty());
         for (MetricDemand md : metricDemands) {
@@ -264,16 +264,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyLogSystem() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -301,16 +301,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyHeapDemand() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -335,16 +335,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyGCDemands() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -376,16 +376,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyDiskDemand() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
-                .withEnv("STORAGE_TYPE", "SSD")
-                .withEnv("REGION", "af-south-1")
-                .withEnv("INSTANCE", "a1.medium")
-                .withEnv("CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
