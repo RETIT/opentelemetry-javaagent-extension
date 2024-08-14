@@ -102,7 +102,7 @@ public class EmissionDataLoader {
         String envInstance = System.getenv("INSTANCE");
         if ("SERVERLESS".equalsIgnoreCase(envInstance)) {
             return "SERVERLESS";
-        } else if (!envInstance.isEmpty()) {
+        } else if (envInstance != null && !envInstance.isEmpty()) {
             return envInstance.toUpperCase();
         } else {
             return "not-set";
