@@ -29,9 +29,9 @@ public class RETITSpanProcessor implements SpanProcessor {
 
     @Override
     public void onStart(final Context parentContext, final ReadWriteSpan readWriteSpan) {
-        boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
-        boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
-        boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
+        boolean logCPUDemand = InstanceConfiguration.isLogCpuDemandDefaultTrue();
+        boolean logHeapDemand = InstanceConfiguration.isLogHeapDemandDefaultTrue();
+        boolean logGCEvent = InstanceConfiguration.isLogGCEventDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
@@ -68,9 +68,9 @@ public class RETITSpanProcessor implements SpanProcessor {
         final SpanData currentReadableSpanData = readableSpan.toSpanData();
         final Attributes attributes = currentReadableSpanData.getAttributes();
         final AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
-        boolean logCPUDemand = TelemetryUtils.isLogCpuDemandDefaultTrue();
-        boolean logHeapDemand = TelemetryUtils.isLogHeapDemandDefaultTrue();
-        boolean logGCEvent = TelemetryUtils.isLogGCEventDefaultTrue();
+        boolean logCPUDemand = InstanceConfiguration.isLogCpuDemandDefaultTrue();
+        boolean logHeapDemand = InstanceConfiguration.isLogHeapDemandDefaultTrue();
+        boolean logGCEvent = InstanceConfiguration.isLogGCEventDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();

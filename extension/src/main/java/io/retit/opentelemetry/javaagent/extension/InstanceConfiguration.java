@@ -6,8 +6,7 @@ import java.util.logging.Logger;
 /**
  * General agent configuration class.
  * <p>
- * This class is used by both Java EE agents as well as the host agent to
- * configure which data is collected and where the collected data is persisted.
+ * This class is used to configure which data is collected and where the collected data is persisted.
  * For this purpose, System properties are used. Such System properties can also
  * be passed in a property file called retitapm.properties. If this file is
  * present on the classpath, it is read by the <code>InstanceConfiguration</code>
@@ -17,14 +16,16 @@ public class InstanceConfiguration {
 
     private static final Logger LOGGER = Logger.getLogger(InstanceConfiguration.class.getName());
 
-    /**
-     * Converts values of T1 to T2.
-     *
-     * @param <T1> Source type.
-     * @param <T2> Target type.
-     */
-    public interface Converter<T1, T2> {
-        T2 convert(T1 toConvert);
+    public static boolean isLogCpuDemandDefaultTrue() {
+        return getBooleanProperty(Constants.RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+    }
+
+    public static boolean isLogHeapDemandDefaultTrue() {
+        return getBooleanProperty(Constants.RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+    }
+
+    public static boolean isLogGCEventDefaultTrue() {
+        return getBooleanProperty(Constants.RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
     public static boolean isLogDiskDemand() {
@@ -69,4 +70,13 @@ public class InstanceConfiguration {
         System.setProperty(propertyName, Boolean.toString(value));
     }
 
+    /**
+     * Converts values of T1 to T2.
+     *
+     * @param <T1> Source type.
+     * @param <T2> Target type.
+     */
+    public interface Converter<T1, T2> {
+        T2 convert(T1 toConvert);
+    }
 }

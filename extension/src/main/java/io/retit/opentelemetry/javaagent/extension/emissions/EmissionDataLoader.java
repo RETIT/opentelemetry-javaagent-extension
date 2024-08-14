@@ -1,6 +1,4 @@
-package io.retit.opentelemetry.javaagent.extension.config;
-
-import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
+package io.retit.opentelemetry.javaagent.extension.emissions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,13 +10,12 @@ import java.util.logging.Logger;
  * ConfigLoader is responsible for loading configuration settings and instance details
  * from environment variables and CSV files.
  */
-public class ConfigLoader {
+public class EmissionDataLoader {
 
-    private final Logger logger = Logger.getLogger(ConfigLoader.class.getName());
+    private final Logger logger = Logger.getLogger(EmissionDataLoader.class.getName());
 
-    private static final ConfigLoader CONFIG_INSTANCE = new ConfigLoader();
+    private static final EmissionDataLoader CONFIG_INSTANCE = new EmissionDataLoader();
 
-    private final String serviceName;
     private final String storageType;
     private final String region;
     private final String cloudInstanceName;
@@ -40,20 +37,12 @@ public class ConfigLoader {
      *
      * @return the singleton instance of ConfigLoader
      */
-    public static ConfigLoader getConfigInstance() {
+    public static EmissionDataLoader getConfigInstance() {
         return CONFIG_INSTANCE;
-    }
-
-    public String getServiceName() {
-        return serviceName;
     }
 
     public String getStorageType() {
         return storageType;
-    }
-
-    public String getRegion() {
-        return region;
     }
 
     public String getCloudInstanceName() {
@@ -100,8 +89,7 @@ public class ConfigLoader {
         return cpuUtilization;
     }
 
-    private ConfigLoader() {
-        this.serviceName = initializeServiceName();
+    private EmissionDataLoader() {
         this.storageType = initializeStorageType();
         this.region = initializeRegion();
         this.cloudInstanceName = initializeInstance();
@@ -117,11 +105,6 @@ public class ConfigLoader {
         this.instanceEnergyUsageFull = cloudInstanceDetails[3];
         this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
         this.pueValue = initializePueValue();
-    }
-
-    private String initializeServiceName() {
-        String envServiceName = System.getenv("SERVICE_NAME");
-        return envServiceName == null || envServiceName.isEmpty() ? "your-service" : envServiceName;
     }
 
     private String initializeStorageType() {
@@ -301,8 +284,7 @@ public class ConfigLoader {
                     }
 
                 }
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 logger.warning("Failed to load instance details from CSV file");
             }
         } else {

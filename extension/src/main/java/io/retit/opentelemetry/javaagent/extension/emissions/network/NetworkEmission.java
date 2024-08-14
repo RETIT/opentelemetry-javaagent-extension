@@ -1,6 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.network;
 
-import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
 import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
 
 /**
@@ -16,14 +16,14 @@ import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients
 public class NetworkEmission {
 
     private static NetworkEmission instance;
-    private final ConfigLoader configLoader;
+    private final EmissionDataLoader configLoader;
 
     /**
      * Private constructor to prevent direct instantiation.
-     * Initializes the {@link ConfigLoader} to load necessary configuration for emissions calculations.
+     * Initializes the {@link EmissionDataLoader} to load necessary configuration for emissions calculations.
      */
     private NetworkEmission() {
-        configLoader = ConfigLoader.getConfigInstance();
+        configLoader = EmissionDataLoader.getConfigInstance();
     }
 
     /**

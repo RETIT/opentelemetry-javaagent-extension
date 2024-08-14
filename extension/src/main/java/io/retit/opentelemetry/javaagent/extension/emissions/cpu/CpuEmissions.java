@@ -1,6 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
 
-import io.retit.opentelemetry.javaagent.extension.config.ConfigLoader;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
 import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
 
 /**
@@ -15,14 +15,14 @@ import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients
 public class CpuEmissions {
 
     private static CpuEmissions instance;
-    private final ConfigLoader configLoader;
+    private final EmissionDataLoader configLoader;
 
     /**
      * Private constructor to prevent instantiation.
-     * Initializes the {@link ConfigLoader} to load necessary configuration.
+     * Initializes the {@link EmissionDataLoader} to load necessary configuration.
      */
     private CpuEmissions() {
-        configLoader = ConfigLoader.getConfigInstance();
+        configLoader = EmissionDataLoader.getConfigInstance();
     }
 
     /**
@@ -81,7 +81,7 @@ public class CpuEmissions {
                     averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_GCP;
                     break;
             }
-            computeKiloWattHours = (averageMinWatts + configLoader.getCpuUtilization() * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000 * ConfigLoader.getConfigInstance().getCpuCount();
+            computeKiloWattHours = (averageMinWatts + configLoader.getCpuUtilization() * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000 * EmissionDataLoader.getConfigInstance().getCpuCount();
         } else {
             computeKiloWattHours = ((configLoader.getInstanceEnergyUsageIdle() + configLoader.getCpuUtilization()
                     * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle()))

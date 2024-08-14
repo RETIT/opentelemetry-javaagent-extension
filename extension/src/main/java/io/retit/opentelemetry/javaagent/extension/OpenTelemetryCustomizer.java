@@ -25,7 +25,7 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
 
     @Override
     public void customize(final AutoConfigurationCustomizer autoConfiguration) {
-        if (TelemetryUtils.isLogGCEventDefaultTrue()) {
+        if (InstanceConfiguration.isLogGCEventDefaultTrue()) {
             JavaAgentGCHandler.addJavaAgentGCListener();
         }
 
