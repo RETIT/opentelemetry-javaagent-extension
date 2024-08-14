@@ -426,13 +426,8 @@ class JavaAgentExtensionIntegrationTest {
 
     private static void addToMetricDemands(String logOutput) {
         if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter") && logOutput.contains("Servicecall")) {
-            System.out.println("log is good");
-            LOGGER.info("hier ist er" + logOutput);
             MetricDemand demand = extractMetricValuesFromLog(logOutput);
             metricDemands.add(demand);
-        } else {
-            System.out.println("log is bad");
-            LOGGER.info("trotzdem hier " + logOutput);
         }
     }
 
@@ -477,29 +472,29 @@ class JavaAgentExtensionIntegrationTest {
         String[] properties = extractPropertiesFromLogOutput(logOutput);
         for (String prop : properties) {
             String[] elems = prop.split("=");
-            if (elems[0].contains("de.retit.endcputime")) {
+            if (elems[0].contains("io.retit.endcputime")) {
                 spanDemand.endCpuTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.enddiskreaddemand")) {
+            } else if (elems[0].contains("io.retit.enddiskreaddemand")) {
                 spanDemand.endDiskReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.enddiskwritedemand")) {
+            } else if (elems[0].contains("io.retit.enddiskwritedemand")) {
                 spanDemand.endDiskWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.endheapbyteallocation")) {
+            } else if (elems[0].contains("io.retit.endheapbyteallocation")) {
                 spanDemand.endHeapDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.endsystemtime")) {
+            } else if (elems[0].contains("io.retit.endsystemtime")) {
                 spanDemand.endSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startcputime")) {
+            } else if (elems[0].contains("io.retit.startcputime")) {
                 spanDemand.startCpuTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startdiskreaddemand")) {
+            } else if (elems[0].contains("io.retit.startdiskreaddemand")) {
                 spanDemand.startDiskReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startdiskwritedemand")) {
+            } else if (elems[0].contains("io.retit.startdiskwritedemand")) {
                 spanDemand.startDiskWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startheapbyteallocation")) {
+            } else if (elems[0].contains("io.retit.startheapbyteallocation")) {
                 spanDemand.startHeapDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startsystemtime")) {
+            } else if (elems[0].contains("io.retit.startsystemtime")) {
                 spanDemand.startSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.logsystemtime")) {
+            } else if (elems[0].contains("io.retit.logsystemtime")) {
                 spanDemand.logSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.totalheapsize")) {
+            } else if (elems[0].contains("io.retit.totalheapsize")) {
                 spanDemand.totalHeapSize = Long.valueOf(elems[1]);
             } else if (elems[0].contains("cpuEmissionsInMg")) {
                 spanDemand.cpuEmissionsInMg = Double.valueOf(elems[1]);
