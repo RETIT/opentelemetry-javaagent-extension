@@ -41,11 +41,11 @@ public class RETITSpanProcessorTest {
     @BeforeEach
     public void setup() {
         skipOnMacOS();
-        InstanceConfiguration.setBooleanProperty(Constants.RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
-        InstanceConfiguration.setBooleanProperty(Constants.RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
-        InstanceConfiguration.setBooleanProperty(Constants.RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
-        InstanceConfiguration.setBooleanProperty(Constants.RETIT_APM_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY, true);
-        InstanceConfiguration.setBooleanProperty(Constants.RETIT_APM_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY, true);
+        InstanceConfiguration.setBooleanProperty(Constants.RETIT_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+        InstanceConfiguration.setBooleanProperty(Constants.RETIT_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+        InstanceConfiguration.setBooleanProperty(Constants.RETIT_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+        InstanceConfiguration.setBooleanProperty(Constants.RETIT_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY, true);
+        InstanceConfiguration.setBooleanProperty(Constants.RETIT_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY, true);
         retitSpanProcessor = new RETITSpanProcessor(BatchSpanProcessor.builder(SpanExporter.composite()));
         retitSpanProcessor.buildBatchSpanProcessor();
         assertNotNull(retitSpanProcessor.getDelegateBatchSpanProcessor());

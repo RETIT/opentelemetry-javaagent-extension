@@ -17,27 +17,44 @@ public class InstanceConfiguration {
     private static final Logger LOGGER = Logger.getLogger(InstanceConfiguration.class.getName());
 
     public static boolean isLogCpuDemandDefaultTrue() {
-        return getBooleanProperty(Constants.RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+        return getBooleanProperty(Constants.RETIT_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
     public static boolean isLogHeapDemandDefaultTrue() {
-        return getBooleanProperty(Constants.RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
+        return getBooleanProperty(Constants.RETIT_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
     public static boolean isLogGCEventDefaultTrue() {
-        return getBooleanProperty(Constants.RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY, true);
+        return getBooleanProperty(Constants.RETIT_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY, true);
     }
 
     public static boolean isLogDiskDemand() {
-        return getBooleanProperty(Constants.RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
+        return getBooleanProperty(Constants.RETIT_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
     }
 
     public static boolean isLogNetworkDemand() {
-        return getBooleanProperty(Constants.RETIT_APM_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
+        return getBooleanProperty(Constants.RETIT_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY);
     }
 
     public static boolean isLogResponseTime() {
-        return getBooleanProperty(Constants.RETIT_APM_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY);
+        return getBooleanProperty(Constants.RETIT_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY);
+    }
+
+    public static String getCloudProvider() {
+        return getStringProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY);
+    }
+
+    public static String getCloudProviderRegion() {
+        return getStringProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY);
+    }
+
+    public static String getStorageType() {
+        return getProperty(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY,
+                toConvert -> String.valueOf(toConvert), Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD);
+    }
+
+    public static String getStringProperty(final String propertyName) {
+        return getProperty(propertyName, toConvert -> String.valueOf(toConvert), "not-set");
     }
 
     public static boolean getBooleanProperty(final String propertyName) {

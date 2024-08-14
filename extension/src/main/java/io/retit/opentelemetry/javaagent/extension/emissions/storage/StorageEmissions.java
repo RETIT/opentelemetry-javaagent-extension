@@ -1,7 +1,9 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.storage;
 
-import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
+import io.retit.opentelemetry.javaagent.extension.Constants;
+import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
 
 /**
  * The {@code StorageEmissions} class calculates the carbon emissions associated with storage device usage.
@@ -67,9 +69,7 @@ public class StorageEmissions {
     public double energyUsageInKiloWattHours(double amountInBytes) {
         double storageSizeInTB = amountInBytes / (1024.0 * 1024.0 * 1024.0 * 1024.0);
 
-        double emissionsCoefficientPer60Sec = (configLoader.getStorageType().equalsIgnoreCase("SSD")
-                ? EmissionCoefficients.STORAGE_EMISSIONS_SSD_PER_TB_HOUR
-                : EmissionCoefficients.STORAGE_EMISSIONS_HDD_PER_TB_HOUR) / 60.0;
+        double emissionsCoefficientPer60Sec = (InstanceConfiguration.getStorageType().equalsIgnoreCase(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD) ? EmissionCoefficients.STORAGE_EMISSIONS_SSD_PER_TB_HOUR : EmissionCoefficients.STORAGE_EMISSIONS_HDD_PER_TB_HOUR) / 60.0;
 
         return storageSizeInTB * emissionsCoefficientPer60Sec;
     }

@@ -1,8 +1,13 @@
 package io.retit.opentelemetry.javaagent.extension.emissions;
 
+import io.retit.opentelemetry.javaagent.extension.Constants;
+import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -16,11 +21,8 @@ public class EmissionDataLoader {
 
     private static final EmissionDataLoader CONFIG_INSTANCE = new EmissionDataLoader();
 
-    private final String storageType;
-    private final String region;
     private final String cloudInstanceName;
     private final String microarchitecture;
-    private final String cloudProvider;
     private final Double gridEmissionsFactor;
     private final Double instanceEnergyUsageIdle;
     private final Double instanceEnergyUsageFull;
@@ -32,6 +34,21 @@ public class EmissionDataLoader {
     private final Double cpuUtilization;
     private final Double[] cloudInstanceDetails = new Double[4];
 
+    private EmissionDataLoader() {
+        this.cloudInstanceName = initializeInstance();
+        this.cpuCount = initializeCpuCount();
+        this.cpuUtilization = initializeCpuUtilization();
+        this.microarchitecture = initializeMicroarchitecture();
+        this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
+        initializeCloudInstanceDetails(cloudInstanceName);
+        this.instanceVCpu = cloudInstanceDetails[0];
+        this.platformTotalVcpu = cloudInstanceDetails[1];
+        this.instanceEnergyUsageIdle = cloudInstanceDetails[2];
+        this.instanceEnergyUsageFull = cloudInstanceDetails[3];
+        this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
+        this.pueValue = initializePueValue();
+    }
+
     /**
      * Returns the singleton instance of ConfigLoader.
      *
@@ -41,16 +58,8 @@ public class EmissionDataLoader {
         return CONFIG_INSTANCE;
     }
 
-    public String getStorageType() {
-        return storageType;
-    }
-
     public String getCloudInstanceName() {
         return cloudInstanceName;
-    }
-
-    public String getCloudProvider() {
-        return cloudProvider;
     }
 
     public Double getGridEmissionsFactor() {
@@ -87,34 +96,6 @@ public class EmissionDataLoader {
 
     public Double getCpuUtilization() {
         return cpuUtilization;
-    }
-
-    private EmissionDataLoader() {
-        this.storageType = initializeStorageType();
-        this.region = initializeRegion();
-        this.cloudInstanceName = initializeInstance();
-        this.cpuCount = initializeCpuCount();
-        this.cpuUtilization = initializeCpuUtilization();
-        this.microarchitecture = initializeMicroarchitecture();
-        this.cloudProvider = initializeCloudProvider();
-        this.gridEmissionsFactor = initializeGridEmissionFactor(region);
-        initializeCloudInstanceDetails(cloudInstanceName);
-        this.instanceVCpu = cloudInstanceDetails[0];
-        this.platformTotalVcpu = cloudInstanceDetails[1];
-        this.instanceEnergyUsageIdle = cloudInstanceDetails[2];
-        this.instanceEnergyUsageFull = cloudInstanceDetails[3];
-        this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
-        this.pueValue = initializePueValue();
-    }
-
-    private String initializeStorageType() {
-        String envStorageType = System.getenv("STORAGE_TYPE");
-        return envStorageType == null || envStorageType.isEmpty() ? "HDD" : "SSD";
-    }
-
-    private String initializeRegion() {
-        String envRegion = System.getenv("REGION");
-        return envRegion != null && !envRegion.isEmpty() ? envRegion.toUpperCase() : "not-set";
     }
 
     private String initializeInstance() {
@@ -157,11 +138,6 @@ public class EmissionDataLoader {
         return envMicroarchitecture == null || envMicroarchitecture.trim().isEmpty() ? null : envMicroarchitecture.toUpperCase();
     }
 
-    private String initializeCloudProvider() {
-        String providerName = System.getenv("CLOUD_PROVIDER");
-        return providerName == null || providerName.isEmpty() ? "not-set" : providerName.toUpperCase();
-    }
-
     /**
      * Initializes the grid emission factor for the specified envRegion.
      * The grid emission factor is determined based on the cloud provider and Region.
@@ -173,58 +149,32 @@ public class EmissionDataLoader {
      */
     private Double initializeGridEmissionFactor(String envRegion) {
         double gridEmissionFactorMetricTonPerKwh = 0.0;
-        if ("AWS".equalsIgnoreCase(cloudProvider)) {
-            try (BufferedReader reader = new BufferedReader(new
-                    InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-aws.csv"))))) {
-                String line;
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] fields = line.split(",", -1);
-                    String csvRegion = fields[0].trim();
-                    if (csvRegion.equalsIgnoreCase(envRegion.trim())) {
-                        String co2eValue = fields[3]; //
-                        gridEmissionFactorMetricTonPerKwh = Double.parseDouble(co2eValue);
-                        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
-                    }
-                }
-            } catch (IOException e) {
-                logger.warning("Failed to load grid emission factor from CSV file");
-            }
-        } else if ("AZURE".equalsIgnoreCase(cloudProvider)) {
-            try (BufferedReader reader = new BufferedReader(new
-                    InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-azure.csv"))))) {
-                String line;
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] fields = line.split(",", -1);
-                    String csvRegion = fields[0].trim();
-                    if (csvRegion.equalsIgnoreCase(envRegion.trim())) {
-                        gridEmissionFactorMetricTonPerKwh = Double.parseDouble(fields[3].trim());
-                        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
-                    }
-                }
-            } catch (IOException e) {
-                logger.warning("Failed to load grid emission factor from CSV file");
-            }
-        } else if ("GCP".equalsIgnoreCase(cloudProvider)) {
-            try (BufferedReader reader = new BufferedReader(new
-                    InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/grid-emissions/grid-emissions-factors-gcp.csv"))))) {
-                String line;
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] fields = line.split(",", -1);
-                    String csvRegion = fields[0].trim();
-                    if (csvRegion.equalsIgnoreCase(envRegion.trim())) {
-                        gridEmissionFactorMetricTonPerKwh = Double.parseDouble(fields[2].trim());
-                        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
-                    }
-                }
-            } catch (IOException ignored) {
-                logger.warning("Failed to load grid emission factor from CSV file");
-            }
-
+        if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-aws.csv", 0, envRegion, 3);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-azure.csv", 0, envRegion, 3);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-gcp.csv", 0, envRegion, 2);
         }
         return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
+    }
+
+    private double getDoubleValueFromCSVForRegionOrInstance(final String csvFile, final int instanceTypeOrRegionCsvField, final String instanceTypeOrRegion, final int csvField) {
+        try (BufferedReader reader = new BufferedReader(new
+                InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(csvFile))))) {
+            String line;
+            reader.readLine();
+            while ((line = reader.readLine()) != null) {
+                String[] fields = line.split(",", -1);
+                String csvInstance = fields[instanceTypeOrRegionCsvField].trim();
+                if (csvInstance.equalsIgnoreCase(instanceTypeOrRegion.trim())) {
+                    return Double.parseDouble(fields[csvField].trim());
+                }
+            }
+        } catch (IOException e) {
+            logger.severe("Failed to load total embodied emissions from CSV file: " + csvFile);
+        }
+        return 0.0;
     }
 
     /**
@@ -238,11 +188,11 @@ public class EmissionDataLoader {
      * @param instanceType the type of the instance for which the details are to be initialized
      */
     private void initializeCloudInstanceDetails(String instanceType) {
-        if ("AZURE".equalsIgnoreCase(cloudProvider)) {
+        if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             initializeCloudInstanceDetailsForAzure(instanceType);
-        } else if ("AWS".equalsIgnoreCase(cloudProvider)) {
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             initializeCloudInstanceDetailsForAws(instanceType);
-        } else if ("GCP".equalsIgnoreCase(cloudProvider)) {
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             initializeCloudInstanceDetailsForGcp(instanceType);
         } else {
             cloudInstanceDetails[0] = 0.0; // Number of Instance vCPU
@@ -369,64 +319,23 @@ public class EmissionDataLoader {
      * @return the total embodied emissions in kilograms of CO2e
      */
     public Double totalEmbodiedEmissions(String instanceType) {
-        if ("AWS".equalsIgnoreCase(cloudProvider)) {
-            try (BufferedReader reader = new BufferedReader(new
-                    InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-aws-embodied.csv"))))) {
-                String line;
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] fields = parseCSVLine(line);
-                    if (fields.length >= 6) {
-                        String csvInstanceType = fields[1].trim();
-                        if (csvInstanceType.equalsIgnoreCase(instanceType.trim())) {
-                            return Double.parseDouble(fields[6].trim());
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                logger.warning("Failed to load total embodied emissions from CSV file");
-            }
-        } else if ("GCP".equalsIgnoreCase(cloudProvider)) {
-            try (BufferedReader reader = new BufferedReader(new
-                    InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-gcp-embodied-mean.csv"))))) {
-                String line;
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] fields = line.split(",", -1);
-                    String csvInstance = fields[1].trim();
-                    if (csvInstance.equalsIgnoreCase(instanceType.trim())) {
-                        return Double.parseDouble(fields[2].trim());
-                    }
-                }
-            } catch (IOException e) {
-                logger.warning("Failed to load total embodied emissions from CSV file");
-            }
-        } else if ("AZURE".equalsIgnoreCase(cloudProvider)) {
-            try (BufferedReader reader = new BufferedReader(new
-                    InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/embodied-emissions/coefficients-azure-embodied.csv"))))) {
-                String line;
-                reader.readLine();
-                while ((line = reader.readLine()) != null) {
-                    String[] fields = line.split(",", -1);
-                    String csvInstance = fields[2].trim();
-                    if (csvInstance.equalsIgnoreCase(instanceType.trim())) {
-                        return Double.parseDouble(fields[8].trim());
-                    }
-                }
-            } catch (IOException e) {
-                logger.warning("Failed to load total embodied emissions from CSV file");
-            }
+        if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-aws-embodied.csv", 1, instanceType, 6);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-gcp-embodied-mean.csv", 1, instanceType, 2);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-azure-embodied.csv", 2, instanceType, 8);
         }
         return 0.0;
     }
 
     private Double initializePueValue() {
         double returnValue = 0.0;
-        if ("AWS".equalsIgnoreCase(cloudProvider)) {
+        if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             returnValue = EmissionCoefficients.AWS_PUE;
-        } else if ("AZURE".equalsIgnoreCase(cloudProvider)) {
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             returnValue = EmissionCoefficients.AZURE_PUE;
-        } else if ("GCP".equalsIgnoreCase(cloudProvider)) {
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             returnValue = EmissionCoefficients.GCP_PUE;
         }
         return returnValue;
@@ -435,7 +344,7 @@ public class EmissionDataLoader {
     private String[] parseCSVLine(String line) {
         boolean inQuotes = false;
         StringBuilder field = new StringBuilder();
-        java.util.List<String> fields = new java.util.ArrayList<>();
+        List<String> fields = new ArrayList<>();
         for (char c : line.toCharArray()) {
             if (c == '\"') {
                 inQuotes = !inQuotes;

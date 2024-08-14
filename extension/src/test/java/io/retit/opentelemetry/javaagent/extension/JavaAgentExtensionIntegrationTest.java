@@ -114,11 +114,11 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testAllAttributes() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true")
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
                 .withEnv("SERVICE_NAME", "testService")
                 .withEnv("STORAGE_TYPE", "SSD")
                 .withEnv("REGION", "af-south-1")

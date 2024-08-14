@@ -1,14 +1,26 @@
 package io.retit.opentelemetry.javaagent.extension;
 
 public class Constants {
-    public static final String RETIT_NAMESPACE = "de.retit";
-    public static final String RETIT_APM_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.response.time";
-    public static final String RETIT_APM_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.cpu.demand";
-    public static final String RETIT_APM_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.heap.demand";
-    public static final String RETIT_APM_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.network.demand";
-    public static final String RETIT_APM_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.disk.demand";
-    public static final String RETIT_APM_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.gc.event";
-    public static final String RETIT_APM_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY = "de.retit.apm.log.thread.name";
+    public static final String RETIT_NAMESPACE = "io.retit";
+    public static final String RETIT_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.response.time";
+    public static final String RETIT_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.cpu.demand";
+    public static final String RETIT_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.heap.demand";
+    public static final String RETIT_NETWORK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.network.demand";
+    public static final String RETIT_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.disk.demand";
+    public static final String RETIT_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.gc.event";
+    public static final String RETIT_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.thread.name";
+
+    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider";
+    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider.region";
+    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider.instance.type";
+    public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.storage.type";
+
+    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS = "AWS";
+    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP = "GCP";
+    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE = "Azure";
+
+    public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD = "SSD";
+    public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_HDD = "HDD";
 
     public static final String STARTCPUTIME_FIELD = "startcputime";
     public static final String ENDCPUTIME_FIELD = "endcputime";
