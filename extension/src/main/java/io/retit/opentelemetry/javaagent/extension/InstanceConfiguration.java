@@ -66,7 +66,7 @@ public class InstanceConfiguration {
         return getProperty(propertyName, Boolean::valueOf, false);
     }
 
-    public static boolean getBooleanProperty(final String propertyName, boolean defaultValue) {
+    public static boolean getBooleanProperty(final String propertyName, final boolean defaultValue) {
         return getProperty(propertyName, Boolean::valueOf, defaultValue);
     }
 

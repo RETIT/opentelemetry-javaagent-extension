@@ -10,14 +10,14 @@ public interface IResourceDemandDataCollector {
      *
      * @return the number of bytes allocated
      */
-    public abstract long getCurrentThreadAllocatedBytes();
+    long getCurrentThreadAllocatedBytes();
 
     /**
      * get the current thread's CPU time
      *
      * @return the current CPU time
      */
-    public abstract long getCurrentThreadCpuTime();
+    long getCurrentThreadCpuTime();
 
     /**
      * get the amount of bytes read and written to the disk by current thread
@@ -25,5 +25,5 @@ public interface IResourceDemandDataCollector {
      * @return an array were the first element depicts the amount of bytes read to the disk and
      * the second element depicts the amount of bytes written
      */
-    public abstract long[] getDiskBytesReadAndWritten();
+    long[] getDiskBytesReadAndWritten();
 }

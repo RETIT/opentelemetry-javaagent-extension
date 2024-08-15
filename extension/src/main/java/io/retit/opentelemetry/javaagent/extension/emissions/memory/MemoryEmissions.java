@@ -50,7 +50,7 @@ public class MemoryEmissions {
      * @param memoryKilowattHours The amount of memory used in bytes.
      * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateMemoryEmissionsInMilliGram(double memoryKilowattHours) {
+    public double calculateMemoryEmissionsInMilliGram(final double memoryKilowattHours) {
         return memoryKilowattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 
@@ -65,7 +65,7 @@ public class MemoryEmissions {
      * @param amountInBytes The amount of memory used in bytes.
      * @return The estimated energy usage in kilowatt-hours.
      */
-    public double energyUsageInKiloWattHours(double amountInBytes) {
+    public double energyUsageInKiloWattHours(final double amountInBytes) {
         double amountInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0);
         double emissionsCoefficientPer60Sec = EmissionCoefficients.MEMORY_KWH_PER_GB_HOUR / 60.0;
         return amountInGb * emissionsCoefficientPer60Sec;

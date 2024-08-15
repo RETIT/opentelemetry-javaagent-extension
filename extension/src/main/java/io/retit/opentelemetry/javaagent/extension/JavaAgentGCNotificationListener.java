@@ -21,12 +21,12 @@ public class JavaAgentGCNotificationListener implements NotificationListener {
 
     private static final String END_OF_MINOR_GC = "end of minor GC";
     private static final String END_OF_MAJOR_GC = "end of major GC";
-    
+
     private static final Logger LOGGER = Logger.getLogger(JavaAgentGCNotificationListener.class.getName());
 
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
-        if (notification != null && notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
+        if (notification != null && GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION.equals(notification.getType())) {
             try {
                 handleGCNotification(notification);
             } catch (RuntimeException ex) {

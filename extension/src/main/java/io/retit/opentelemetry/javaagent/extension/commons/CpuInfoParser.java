@@ -31,7 +31,7 @@ public class CpuInfoParser {
      * This method takes the first entry with the specified name and ignores any
      * subsequent entries with the same name.
      */
-    public static String getEntry(String entryName) throws IOException {
+    public static String getEntry(final String entryName) throws IOException {
         List<String> cpuInfo = getCpuInfo();
         if (cpuInfo == null || cpuInfo.isEmpty()) {
             return null;

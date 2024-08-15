@@ -49,7 +49,7 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
      * @param spanExporter - preconfigured {@link SpanExporter} from auto-configuration
      * @return {@link BiFunction} with adjusted SdkTracerProviderBuilder
      */
-    private BiFunction<SdkTracerProviderBuilder, ConfigProperties, SdkTracerProviderBuilder> prepRetitSpanProcessor(SpanExporter spanExporter) {
+    private BiFunction<SdkTracerProviderBuilder, ConfigProperties, SdkTracerProviderBuilder> prepRetitSpanProcessor(final SpanExporter spanExporter) {
         return (sdkTracerProviderBuilder, configProperties) -> {
             try {
                 final Class<?> sdkTracerProviderBuilderClass =
@@ -59,7 +59,11 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
                 List<SpanProcessor> spanProcessorList = (List<SpanProcessor>) spanProcessors.get(sdkTracerProviderBuilder);
                 List<SpanProcessor> resultList = spanProcessorList.stream().filter(RETITSpanProcessor.class::isInstance).collect(Collectors.toList());
 
-                if (!resultList.isEmpty()) {
+                if (resultList.isEmpty()) {
+                    RETITSpanProcessor newRetitSpanProcessor = new RETITSpanProcessor(BatchSpanProcessor.builder(spanExporter));
+                    newRetitSpanProcessor.buildBatchSpanProcessor();
+                    resultList.add(newRetitSpanProcessor);
+                } else {
                     RETITSpanProcessor retitSpanProcessor = (RETITSpanProcessor) resultList.get(0);
                     BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder = retitSpanProcessor.getDelegateBatchSpanProcessorBuilder();
                     final Class<?> batchSpanProcessorBuilderClass =
@@ -69,10 +73,6 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
                     SpanExporter currentSpanExporter = (SpanExporter) spanExporterField.get(delegateBatchSpanProcessorBuilder);
                     spanExporterField.set(delegateBatchSpanProcessorBuilder, SpanExporter.composite(currentSpanExporter, spanExporter));
                     retitSpanProcessor.buildBatchSpanProcessor();
-                } else {
-                    RETITSpanProcessor newRetitSpanProcessor = new RETITSpanProcessor(BatchSpanProcessor.builder(spanExporter));
-                    newRetitSpanProcessor.buildBatchSpanProcessor();
-                    resultList.add(newRetitSpanProcessor);
                 }
 
                 spanProcessors.set(sdkTracerProviderBuilder, resultList);

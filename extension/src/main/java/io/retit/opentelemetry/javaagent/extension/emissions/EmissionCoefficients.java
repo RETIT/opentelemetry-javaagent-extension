@@ -10,7 +10,7 @@ public class EmissionCoefficients {
      * HDD storage emissions per TB per hour.
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#storage">...</a>
      */
-    public static final double STORAGE_EMISSIONS_HDD_PER_TB_HOUR = 0.00065;
+    public static final double STORAGE_EMISSIONS_HDD_PER_TB_HOUR = 0.000_65;
 
     /**
      * SSD storage emissions per TB per hour.

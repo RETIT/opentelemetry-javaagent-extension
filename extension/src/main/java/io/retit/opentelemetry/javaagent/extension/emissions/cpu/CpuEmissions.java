@@ -49,8 +49,8 @@ public class CpuEmissions {
      * @param computeKiloWattHours The energy consumption in kilowatt-hours.
      * @return The estimated CO2 emissions in milligrams.
      */
-    public double calculateCpuEmissionsInMilliGram(double computeKiloWattHours) {
-        return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
+    public double calculateCpuEmissionsInMilliGram(final double computeKiloWattHours) {
+        return computeKiloWattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1_000_000;
     }
 
     /**
@@ -62,12 +62,12 @@ public class CpuEmissions {
      * @param cpuTimeUsedInNanoSeconds The total CPU time used in nanoseconds.
      * @return The total energy consumption in kilowatt-hours.
      */
-    public double calculateKwhUsed(double cpuTimeUsedInNanoSeconds) {
-        double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
+    public double calculateKwhUsed(final double cpuTimeUsedInNanoSeconds) {
+        double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3_600_000.0 / 1_000_000;
         double computeKiloWattHours;
         double averageMinWatts = 0;
         double averageMaxWatts = 0;
-        if (InstanceConfiguration.getCloudProviderInstanceType().equals("SERVERLESS")) {
+        if ("SERVERLESS".equals(InstanceConfiguration.getCloudProviderInstanceType())) {
             switch (InstanceConfiguration.getCloudProvider()) {
                 case "AWS":
                     averageMinWatts = EmissionCoefficients.AVERAGE_MIN_WATT_AWS;
@@ -82,11 +82,11 @@ public class CpuEmissions {
                     averageMaxWatts = EmissionCoefficients.AVERAGE_MAX_WATT_GCP;
                     break;
             }
-            computeKiloWattHours = (averageMinWatts + configLoader.getCpuUtilization() * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1000 * EmissionDataLoader.getConfigInstance().getCpuCount();
+            computeKiloWattHours = (averageMinWatts + configLoader.getCpuUtilization() * (averageMaxWatts - averageMinWatts) * cpuTimeInHours) / 1_000 * EmissionDataLoader.getConfigInstance().getCpuCount();
         } else {
             computeKiloWattHours = ((configLoader.getInstanceEnergyUsageIdle() + configLoader.getCpuUtilization()
                     * (configLoader.getInstanceEnergyUsageFull() - configLoader.getInstanceEnergyUsageIdle()))
-                    * cpuTimeInHours) / 1000;
+                    * cpuTimeInHours) / 1_000;
         }
         return computeKiloWattHours;
     }

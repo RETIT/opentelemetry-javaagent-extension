@@ -50,7 +50,7 @@ public class NetworkEmission {
      * @param amountInBytes The amount of network data used in bytes.
      * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateNetworkEmissionInMg(double amountInBytes) {
+    public double calculateNetworkEmissionInMg(final double amountInBytes) {
         return calculateKwhUsed(amountInBytes) * configLoader.getPueValue() * configLoader.getGridEmissionsFactor();
     }
 
@@ -64,7 +64,7 @@ public class NetworkEmission {
      * @param amountInBytes The amount of network data used in bytes.
      * @return The estimated energy usage in kilowatt-hours.
      */
-    public double calculateKwhUsed(double amountInBytes) {
+    public double calculateKwhUsed(final double amountInBytes) {
         double dataSizeInGb = amountInBytes / (1024.0 * 1024.0 * 1024.0); // Convert bytes to gigabytes
         return dataSizeInGb * EmissionCoefficients.NETWORK_EMISSIONS_PER_GB_HOUR;
     }

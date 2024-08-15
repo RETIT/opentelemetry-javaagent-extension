@@ -282,7 +282,7 @@ public class TelemetryUtils {
     private static void addHeapEmissionDataToSpanAttributes(final boolean logHeapDemand, final AttributesBuilder attributesBuilder, final Attributes attributesOfSpan) {
         if (logHeapDemand) {
             Long startHeapByteAllocation = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
-            Long endHeapByteAllocation = attributesOfSpan.get((AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION)));
+            Long endHeapByteAllocation = attributesOfSpan.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION));
             long totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
             if (totalHeapDemand > 0) {
                 double memoryEnergyConsumption = MemoryEmissions.getInstance().energyUsageInKiloWattHours(totalHeapDemand);

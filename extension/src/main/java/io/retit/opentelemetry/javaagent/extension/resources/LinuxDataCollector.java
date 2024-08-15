@@ -59,12 +59,7 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
     private static final Logger LOGGER = Logger.getLogger(LinuxDataCollector.class.getName());
 
     private static final ThreadLocal<Path> THREAD_LOCAL_PATHHANDLE = new ThreadLocal<>();
-    private static final ThreadLocal<Long> THREAD_LOCAL_PROC_FS_READ_OVERHEAD = new ThreadLocal<Long>() {
-        @Override
-        public Long initialValue() {
-            return 0L;
-        }
-    };
+    private static final ThreadLocal<Long> THREAD_LOCAL_PROC_FS_READ_OVERHEAD = ThreadLocal.withInitial(() -> 0L);
 
     /**
      * Gets the path of the proc io file for the current thread.
@@ -141,21 +136,12 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      * There was a reason why we copied it instead of calling it directly, but
      * nobody documented it back then, so now it's unknown...
      */
-    public static byte[] readAllBytes(Path path) throws IOException {
-        SeekableByteChannel sbc = null;
-        InputStream in = null;
+    public static byte[] readAllBytes(final Path path) throws IOException {
+
         byte[] result = null;
-        try {
-            sbc = Files.newByteChannel(path);
-            in = Channels.newInputStream(sbc);
+        try (SeekableByteChannel sbc = Files.newByteChannel(path);
+             InputStream in = Channels.newInputStream(sbc)) {
             result = read(in, 1024);
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (sbc != null) {
-                sbc.close();
-            }
         }
         return result;
     }
@@ -169,7 +155,7 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      * int)}. There was a reason why we copied it instead of calling it
      * directly, but nobody documented it back then, so now it's unknown...
      */
-    private static byte[] read(InputStream source, int initialSize) throws IOException {
+    private static byte[] read(final InputStream source, final int initialSize) throws IOException {
         int capacity = initialSize;
         byte[] buf = new byte[capacity];
         int nread = 0;

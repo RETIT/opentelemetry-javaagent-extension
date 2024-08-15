@@ -50,9 +50,9 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         String osName = System.getProperty(OS_NAME_PROPERTY);
 
         CommonResourceDemandDataCollector osCollector;
-        if (osName.trim().toLowerCase().contains(WINDOWS_NAME)) {
+        if (osName.trim().toLowerCase(Locale.ENGLISH).contains(WINDOWS_NAME)) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(WINDOWS_NAME);
-        } else if (osName.trim().toLowerCase().contains(LINUX_NAME)) {
+        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(LINUX_NAME)) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(LINUX_NAME);
         } else {
             throw new UnsupportedOperationException("Cannot collect Resource Demands for current OS: " + osName);
@@ -82,10 +82,10 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
      * @return the JVMDataCollector for the selected JVM
      */
     protected static IResourceDemandDataCollector getDataCollectorFromOS(final String osName) {
-        if (osName.equals(WINDOWS_NAME)) {
+        if (WINDOWS_NAME.equals(osName)) {
             return new WindowsDataCollector();
         }
-        if (osName.equals(LINUX_NAME)) {
+        if (LINUX_NAME.equals(osName)) {
             return new LinuxDataCollector();
         }
         throw new UnsupportedOperationException("Unsupported OS: " + osName);
@@ -102,7 +102,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources." + jvmName + "DataCollector");
     }
 
-    private static Object loadInstance(String className) {
+    private static Object loadInstance(final String className) {
         Class<?> collectorClass;
         Object collector = null;
         try {

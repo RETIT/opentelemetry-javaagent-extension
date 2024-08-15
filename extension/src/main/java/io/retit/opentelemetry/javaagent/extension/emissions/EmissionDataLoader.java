@@ -130,7 +130,7 @@ public class EmissionDataLoader {
      * @param envRegion the Region for which the grid emission factor is to be initialized
      * @return the grid emission factor in kilograms per kWh
      */
-    private Double initializeGridEmissionFactor(String envRegion) {
+    private Double initializeGridEmissionFactor(final String envRegion) {
         double gridEmissionFactorMetricTonPerKwh = 0.0;
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-aws.csv", 0, envRegion, 3);
@@ -145,14 +145,16 @@ public class EmissionDataLoader {
     private double getDoubleValueFromCSVForRegionOrInstance(final String csvFile, final int instanceTypeOrRegionCsvField, final String instanceTypeOrRegion, final int csvField) {
         try (BufferedReader reader = new BufferedReader(new
                 InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(csvFile))))) {
-            String line;
+            // skip first line
             reader.readLine();
-            while ((line = reader.readLine()) != null) {
+            String line = reader.readLine();
+            while (line != null) {
                 String[] fields = line.split(",", -1);
                 String csvInstance = fields[instanceTypeOrRegionCsvField].trim();
                 if (csvInstance.equalsIgnoreCase(instanceTypeOrRegion.trim())) {
                     return Double.parseDouble(fields[csvField].trim());
                 }
+                line = reader.readLine();
             }
         } catch (IOException e) {
             logger.severe("Failed to load total embodied emissions from CSV file: " + csvFile);
@@ -170,7 +172,7 @@ public class EmissionDataLoader {
      *
      * @param instanceType the type of the instance for which the details are to be initialized
      */
-    private void initializeCloudInstanceDetails(String instanceType) {
+    private void initializeCloudInstanceDetails(final String instanceType) {
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             initializeCloudInstanceDetailsForAzure(instanceType);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
@@ -185,7 +187,7 @@ public class EmissionDataLoader {
         }
     }
 
-    private void initializeCloudInstanceDetailsForGcp(String instanceType) {
+    private void initializeCloudInstanceDetailsForGcp(final String instanceType) {
         try (BufferedReader reader = new BufferedReader(new
                 InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/instances/gcp-instances.csv"))))) {
             reader.readLine();
@@ -226,7 +228,7 @@ public class EmissionDataLoader {
         }
     }
 
-    private void initializeCloudInstanceDetailsForAws(String instanceType) {
+    private void initializeCloudInstanceDetailsForAws(final String instanceType) {
         try (BufferedReader reader = new BufferedReader(new
                 InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/instances/aws-instances.csv"))))) {
             String line;
@@ -247,7 +249,7 @@ public class EmissionDataLoader {
         }
     }
 
-    private void initializeCloudInstanceDetailsForAzure(String instanceType) {
+    private void initializeCloudInstanceDetailsForAzure(final String instanceType) {
         try (BufferedReader reader = new BufferedReader(new
                 InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream("/instances/azure-instances.csv"))))) {
             String line;
@@ -301,7 +303,7 @@ public class EmissionDataLoader {
      * @param instanceType the type of the instance for which the embodied emissions are to be initialized
      * @return the total embodied emissions in kilograms of CO2e
      */
-    public Double totalEmbodiedEmissions(String instanceType) {
+    public Double totalEmbodiedEmissions(final String instanceType) {
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-aws-embodied.csv", 1, instanceType, 6);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
@@ -324,7 +326,7 @@ public class EmissionDataLoader {
         return returnValue;
     }
 
-    private String[] parseCSVLine(String line) {
+    private String[] parseCSVLine(final String line) {
         boolean inQuotes = false;
         StringBuilder field = new StringBuilder();
         List<String> fields = new ArrayList<>();

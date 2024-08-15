@@ -51,7 +51,7 @@ public class StorageEmissions {
      * @param storageKilowattHours The amount of storage used in bytes.
      * @return The calculated carbon emissions in milligrams.
      */
-    public double calculateStorageEmissionsInMilliGram(double storageKilowattHours) {
+    public double calculateStorageEmissionsInMilliGram(final double storageKilowattHours) {
         return storageKilowattHours * configLoader.getPueValue() * configLoader.getGridEmissionsFactor() * 1000000;
     }
 
@@ -66,7 +66,7 @@ public class StorageEmissions {
      * @param amountInBytes The amount of storage used in bytes.
      * @return The estimated energy usage in kilowatt-hours.
      */
-    public double energyUsageInKiloWattHours(double amountInBytes) {
+    public double energyUsageInKiloWattHours(final double amountInBytes) {
         double storageSizeInTB = amountInBytes / (1024.0 * 1024.0 * 1024.0 * 1024.0);
 
         double emissionsCoefficientPer60Sec = (InstanceConfiguration.getStorageType().equalsIgnoreCase(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD) ? EmissionCoefficients.STORAGE_EMISSIONS_SSD_PER_TB_HOUR : EmissionCoefficients.STORAGE_EMISSIONS_HDD_PER_TB_HOUR) / 60.0;

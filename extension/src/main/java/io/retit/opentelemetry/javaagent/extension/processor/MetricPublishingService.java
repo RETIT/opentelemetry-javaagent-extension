@@ -85,7 +85,7 @@ public class MetricPublishingService {
      * @param storageEmissions The total demand for storage in bytes.
      * @param attributes       Additional attributes for the emission event.
      */
-    public void publishStorageEmissions(Double storageEmissions, Attributes attributes) {
+    public void publishStorageEmissions(final Double storageEmissions, final Attributes attributes) {
         if (storageEmissions == null) {
             return;
         }
@@ -98,7 +98,7 @@ public class MetricPublishingService {
      * @param cpuEmissions The total CPU demand in milliseconds.
      * @param attributes   Additional attributes for the emission event.
      */
-    public void publishCpuEmissions(Double cpuEmissions, Attributes attributes) {
+    public void publishCpuEmissions(final Double cpuEmissions, final Attributes attributes) {
         if (cpuEmissions == null) {
             return;
         }
@@ -111,7 +111,7 @@ public class MetricPublishingService {
      * @param embodiedEmissions The total CPU time used in hours.
      * @param attributes        Additional attributes for the emission event.
      */
-    public void publishEmbeddedEmissions(Double embodiedEmissions, Attributes attributes) {
+    public void publishEmbeddedEmissions(final Double embodiedEmissions, final Attributes attributes) {
         if (embodiedEmissions == null) {
             return;
         }
@@ -124,7 +124,7 @@ public class MetricPublishingService {
      * @param memoryEmission The total memory demand in bytes.
      * @param attributes     Additional attributes for the emission event.
      */
-    public void publishMemoryEmissions(Double memoryEmission, Attributes attributes) {
+    public void publishMemoryEmissions(final Double memoryEmission, final Attributes attributes) {
         if (memoryEmission == null) {
             return;
         }
@@ -137,7 +137,7 @@ public class MetricPublishingService {
      * @param cpuEnergyUsage The total CPU energy usage in Watt-hours.
      * @param attributes     Additional attributes for the energy usage event.
      */
-    public void publishCpuEnergyUsage(Double cpuEnergyUsage, Attributes attributes) {
+    public void publishCpuEnergyUsage(final Double cpuEnergyUsage, final Attributes attributes) {
         if (cpuEnergyUsage == null) {
             return;
         }
@@ -150,7 +150,7 @@ public class MetricPublishingService {
      * @param memoryEnergyUsage The total memory energy usage in Watt-hours.
      * @param attributes        Additional attributes for the energy usage event.
      */
-    public void publishMemoryEnergyUsage(Double memoryEnergyUsage, Attributes attributes) {
+    public void publishMemoryEnergyUsage(final Double memoryEnergyUsage, final Attributes attributes) {
         if (memoryEnergyUsage == null) {
             return;
         }
@@ -163,7 +163,7 @@ public class MetricPublishingService {
      * @param storageEnergyUsage The total storage energy usage in Watt-hours.
      * @param attributes         Additional attributes for the energy usage event.
      */
-    public void publishStorageEnergyUsage(Double storageEnergyUsage, Attributes attributes) {
+    public void publishStorageEnergyUsage(final Double storageEnergyUsage, final Attributes attributes) {
         if (storageEnergyUsage == null) {
             return;
         }
@@ -179,7 +179,7 @@ public class MetricPublishingService {
      * @param attributes An {@link Attributes} object containing the route of the http request.
      * @param servicecall An {@link Attributes} object containing the service call.
      */
-    public void publishEmissions(Attributes attributes, Attributes servicecall) {
+    public void publishEmissions(final Attributes attributes, final Attributes servicecall) {
 
    /*     AttributesBuilder attributesBuilder = Attributes.builder().putAll(attributes);
         attributesBuilder.put(AttributeKey.stringKey("service-name"), configLoader.getServiceName());
@@ -200,7 +200,7 @@ public class MetricPublishingService {
         publishMemoryEmissions(memoryEmissions, servicecall);
     }
 
-    public void publishWattHoursUsage(Attributes attributes, Attributes servicecall) {
+    public void publishWattHoursUsage(final Attributes attributes, final Attributes servicecall) {
 
         Double cpuEnergyUsage = attributes.get(AttributeKey.doubleKey("cpuWattHoursUsage"));
         Double memoryEnergyUsage = attributes.get(AttributeKey.doubleKey("memoryKwhUsed"));
