@@ -48,13 +48,17 @@ public class InstanceConfiguration {
         return getStringProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY);
     }
 
+    public static String getCloudProviderInstanceType() {
+        return getStringProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY);
+    }
+
     public static String getStorageType() {
         return getProperty(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY,
                 toConvert -> String.valueOf(toConvert), Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD);
     }
 
     public static String getStringProperty(final String propertyName) {
-        return getProperty(propertyName, toConvert -> String.valueOf(toConvert), "not-set");
+        return getProperty(propertyName, toConvert -> String.valueOf(toConvert), Constants.RETIT_VALUE_NOT_SET);
     }
 
     public static boolean getBooleanProperty(final String propertyName) {

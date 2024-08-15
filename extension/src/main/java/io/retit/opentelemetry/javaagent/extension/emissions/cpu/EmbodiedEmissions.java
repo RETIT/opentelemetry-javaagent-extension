@@ -1,7 +1,9 @@
 package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
 
-import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
+import io.retit.opentelemetry.javaagent.extension.Constants;
+import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
+import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
 
 /**
  * The {@code EmbodiedEmissions} class calculates the embodied carbon emissions associated with the usage of CPU resources.
@@ -40,8 +42,8 @@ public class EmbodiedEmissions {
      * @param cpuTimeUsedInNanoSeconds The CPU time used in hours.
      * @return The calculated embodied carbon emissions in milligrams.
      */
-    public double calculateEmbodiedEmissionsInMilliGram(double cpuTimeUsedInNanoSeconds) {
-        if (configLoader.getCloudInstanceName() == null) {
+    public double calculateEmbodiedEmissionsInMilliGram(final double cpuTimeUsedInNanoSeconds) {
+        if (InstanceConfiguration.getCloudProviderInstanceType() == null || Constants.RETIT_VALUE_NOT_SET.equals(InstanceConfiguration.getCloudProviderInstanceType())) {
             return 0;
         } else {
             double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;

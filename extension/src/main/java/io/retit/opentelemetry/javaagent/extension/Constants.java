@@ -22,6 +22,8 @@ public class Constants {
     public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD = "SSD";
     public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_HDD = "HDD";
 
+    public static final String RETIT_VALUE_NOT_SET = "not-set";
+
     public static final String STARTCPUTIME_FIELD = "startcputime";
     public static final String ENDCPUTIME_FIELD = "endcputime";
 

@@ -167,7 +167,7 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
                 .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
                 .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
-                .withEnv("IO_RETIT_APM_LOG_GC_EVENT", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
                 .withEnv("SERVICE_NAME", "testService")
                 .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")

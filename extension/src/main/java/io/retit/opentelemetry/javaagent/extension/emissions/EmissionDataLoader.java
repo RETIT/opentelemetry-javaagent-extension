@@ -21,7 +21,6 @@ public class EmissionDataLoader {
 
     private static final EmissionDataLoader CONFIG_INSTANCE = new EmissionDataLoader();
 
-    private final String cloudInstanceName;
     private final String microarchitecture;
     private final Double gridEmissionsFactor;
     private final Double instanceEnergyUsageIdle;
@@ -35,17 +34,16 @@ public class EmissionDataLoader {
     private final Double[] cloudInstanceDetails = new Double[4];
 
     private EmissionDataLoader() {
-        this.cloudInstanceName = initializeInstance();
         this.cpuCount = initializeCpuCount();
         this.cpuUtilization = initializeCpuUtilization();
         this.microarchitecture = initializeMicroarchitecture();
         this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
-        initializeCloudInstanceDetails(cloudInstanceName);
+        initializeCloudInstanceDetails(InstanceConfiguration.getCloudProviderInstanceType());
         this.instanceVCpu = cloudInstanceDetails[0];
         this.platformTotalVcpu = cloudInstanceDetails[1];
         this.instanceEnergyUsageIdle = cloudInstanceDetails[2];
         this.instanceEnergyUsageFull = cloudInstanceDetails[3];
-        this.totalEmbodiedEmissions = totalEmbodiedEmissions(cloudInstanceName);
+        this.totalEmbodiedEmissions = totalEmbodiedEmissions(InstanceConfiguration.getCloudProviderInstanceType());
         this.pueValue = initializePueValue();
     }
 
@@ -56,10 +54,6 @@ public class EmissionDataLoader {
      */
     public static EmissionDataLoader getConfigInstance() {
         return CONFIG_INSTANCE;
-    }
-
-    public String getCloudInstanceName() {
-        return cloudInstanceName;
     }
 
     public Double getGridEmissionsFactor() {
@@ -96,17 +90,6 @@ public class EmissionDataLoader {
 
     public Double getCpuUtilization() {
         return cpuUtilization;
-    }
-
-    private String initializeInstance() {
-        String envInstance = System.getenv("INSTANCE");
-        if ("SERVERLESS".equalsIgnoreCase(envInstance)) {
-            return "SERVERLESS";
-        } else if (envInstance != null && !envInstance.isEmpty()) {
-            return envInstance.toUpperCase();
-        } else {
-            return "not-set";
-        }
     }
 
     private Integer initializeCpuCount() {

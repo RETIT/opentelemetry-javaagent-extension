@@ -67,7 +67,7 @@ public class CpuEmissions {
         double computeKiloWattHours;
         double averageMinWatts = 0;
         double averageMaxWatts = 0;
-        if (configLoader.getCloudInstanceName().equals("SERVERLESS")) {
+        if (InstanceConfiguration.getCloudProviderInstanceType().equals("SERVERLESS")) {
             switch (InstanceConfiguration.getCloudProvider()) {
                 case "AWS":
                     averageMinWatts = EmissionCoefficients.AVERAGE_MIN_WATT_AWS;
