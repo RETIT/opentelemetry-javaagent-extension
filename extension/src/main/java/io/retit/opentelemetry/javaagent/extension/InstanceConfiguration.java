@@ -1,5 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension;
 
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,19 +55,19 @@ public class InstanceConfiguration {
 
     public static String getStorageType() {
         return getProperty(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY,
-                toConvert -> String.valueOf(toConvert), Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD);
+                String::valueOf, Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD);
     }
 
     public static String getStringProperty(final String propertyName) {
-        return getProperty(propertyName, toConvert -> String.valueOf(toConvert), Constants.RETIT_VALUE_NOT_SET);
+        return getProperty(propertyName, String::valueOf, Constants.RETIT_VALUE_NOT_SET);
     }
 
     public static boolean getBooleanProperty(final String propertyName) {
-        return getProperty(propertyName, toConvert -> Boolean.valueOf(toConvert), false);
+        return getProperty(propertyName, Boolean::valueOf, false);
     }
 
     public static boolean getBooleanProperty(final String propertyName, boolean defaultValue) {
-        return getProperty(propertyName, toConvert -> Boolean.valueOf(toConvert), defaultValue);
+        return getProperty(propertyName, Boolean::valueOf, defaultValue);
     }
 
     private static <T> T getProperty(final String propertyName, final Converter<String, T> converter, final T defaultValue) {
@@ -76,7 +77,7 @@ public class InstanceConfiguration {
         if (System.getProperty(propertyName) != null) {
             return converter.convert(System.getProperty(propertyName));
         }
-        final String envVariableName = propertyName.toUpperCase().replace(".", "_");
+        final String envVariableName = propertyName.toUpperCase(Locale.ENGLISH).replace(".", "_");
         if (System.getenv(envVariableName) != null) {
             return converter.convert(System.getenv(envVariableName));
         }
@@ -87,17 +88,17 @@ public class InstanceConfiguration {
         return defaultValue;
     }
 
-    public static void setBooleanProperty(final String propertyName, boolean value) {
+    public static void setBooleanProperty(final String propertyName, final boolean value) {
         System.setProperty(propertyName, Boolean.toString(value));
     }
 
     /**
-     * Converts values of T1 to T2.
+     * Converts values of S to T.
      *
-     * @param <T1> Source type.
-     * @param <T2> Target type.
+     * @param <S> Source type.
+     * @param <T> Target type.
      */
-    public interface Converter<T1, T2> {
-        T2 convert(T1 toConvert);
+    public interface Converter<S, T> {
+        T convert(S toConvert);
     }
 }
