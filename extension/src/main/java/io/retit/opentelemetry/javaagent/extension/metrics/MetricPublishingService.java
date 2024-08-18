@@ -58,7 +58,7 @@ public class MetricPublishingService {
         Meter meter = GlobalOpenTelemetry.get().getMeter("opentelemetry-javaagent-extension");
 
         // CPU time of the whole process
-        meter.counterBuilder("io.retit.emissions.java.process.cpu.time")
+        meter.counterBuilder(Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME)
                 .buildWithCallback(measurement -> publishProcessCPUTime(measurement));
 
         // minimum power consumption of the CPU in Idle

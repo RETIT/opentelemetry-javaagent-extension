@@ -67,6 +67,10 @@ public class Constants {
     public static final String SPAN_ATTRIBUTE_SPAN_END_THREAD = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, END_THREAD_FIELD);
     public static final String JAVA_AGENT_INSTRUMENTATION_NAME_GC_LISTENER = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, GC_LISTENER_NAME);
 
+    public static final String RETIT_EMISSION_NAMESPACE = RETIT_NAMESPACE + ".emissions";
+    public static final String PROCESS_CPU_TIME_FIELD = ".java.process.cpu.time";
+    public static final String SPAN_ATTRIBUTE_PROCESS_CPU_TIME = RETIT_EMISSION_NAMESPACE + PROCESS_CPU_TIME_FIELD;
+
     public static final String GC_PREFIX = "gc";
     public static final String JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE =
             String.format("%s.%s.%s", RETIT_NAMESPACE, GC_PREFIX, MINOR_GC_OPERATION_NAME);

@@ -25,7 +25,7 @@ public class SampleApplication {
         method2();
         span.end();
 
-        while (true) {
+        if (System.getenv("WAIT_FOR_ONE_MINUTE") != null) {
             // we need to wait for 60 s so that the metrics are at least published once
             Thread.sleep(60_000);
         }
