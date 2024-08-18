@@ -15,11 +15,11 @@ import java.util.logging.Logger;
  * ConfigLoader is responsible for loading configuration settings and instance details
  * from environment variables and CSV files.
  */
-public class EmissionDataLoader {
+public class CloudCarbonFootprintData {
 
-    private final Logger logger = Logger.getLogger(EmissionDataLoader.class.getName());
+    private final Logger logger = Logger.getLogger(CloudCarbonFootprintData.class.getName());
 
-    private static final EmissionDataLoader CONFIG_INSTANCE = new EmissionDataLoader();
+    private static final CloudCarbonFootprintData CONFIG_INSTANCE = new CloudCarbonFootprintData();
 
     private final String microarchitecture;
     private final Double gridEmissionsFactor;
@@ -33,7 +33,7 @@ public class EmissionDataLoader {
     private final Double cpuUtilization;
     private final Double[] cloudInstanceDetails = new Double[4];
 
-    private EmissionDataLoader() {
+    private CloudCarbonFootprintData() {
         this.cpuCount = initializeCpuCount();
         this.cpuUtilization = initializeCpuUtilization();
         this.microarchitecture = initializeMicroarchitecture();
@@ -52,7 +52,7 @@ public class EmissionDataLoader {
      *
      * @return the singleton instance of ConfigLoader
      */
-    public static EmissionDataLoader getConfigInstance() {
+    public static CloudCarbonFootprintData getConfigInstance() {
         return CONFIG_INSTANCE;
     }
 
@@ -223,8 +223,8 @@ public class EmissionDataLoader {
                 logger.warning("Failed to load instance details from CSV file");
             }
         } else {
-            cloudInstanceDetails[2] = EmissionCoefficients.AVERAGE_MIN_WATT_GCP;
-            cloudInstanceDetails[3] = EmissionCoefficients.AVERAGE_MAX_WATT_GCP;
+            cloudInstanceDetails[2] = CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_GCP;
+            cloudInstanceDetails[3] = CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_GCP;
         }
     }
 
@@ -281,14 +281,14 @@ public class EmissionDataLoader {
                         return;
                     }
                 }
-                cloudInstanceDetails[2] = EmissionCoefficients.AVERAGE_MIN_WATT_AZURE;
-                cloudInstanceDetails[3] = EmissionCoefficients.AVERAGE_MAX_WATT_AZURE;
+                cloudInstanceDetails[2] = CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE;
+                cloudInstanceDetails[3] = CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AZURE;
             } catch (IOException e) {
                 logger.warning("Failed to load instance details from CSV file");
             }
         } else {
-            cloudInstanceDetails[2] = EmissionCoefficients.AVERAGE_MIN_WATT_AZURE;
-            cloudInstanceDetails[3] = EmissionCoefficients.AVERAGE_MAX_WATT_AZURE;
+            cloudInstanceDetails[2] = CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE;
+            cloudInstanceDetails[3] = CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AZURE;
         }
     }
 
@@ -317,11 +317,11 @@ public class EmissionDataLoader {
     private Double initializePueValue() {
         double returnValue = 0.0;
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            returnValue = EmissionCoefficients.AWS_PUE;
+            returnValue = CloudCarbonFootprintCoefficients.AWS_PUE;
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            returnValue = EmissionCoefficients.AZURE_PUE;
+            returnValue = CloudCarbonFootprintCoefficients.AZURE_PUE;
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            returnValue = EmissionCoefficients.GCP_PUE;
+            returnValue = CloudCarbonFootprintCoefficients.GCP_PUE;
         }
         return returnValue;
     }

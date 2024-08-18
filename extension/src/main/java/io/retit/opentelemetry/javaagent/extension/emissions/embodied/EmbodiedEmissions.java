@@ -1,9 +1,9 @@
-package io.retit.opentelemetry.javaagent.extension.emissions.cpu;
+package io.retit.opentelemetry.javaagent.extension.emissions.embodied;
 
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
-import io.retit.opentelemetry.javaagent.extension.emissions.EmissionCoefficients;
-import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
+import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintCoefficients;
+import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintData;
 
 /**
  * The {@code EmbodiedEmissions} class calculates the embodied carbon emissions associated with the usage of CPU resources.
@@ -12,14 +12,14 @@ import io.retit.opentelemetry.javaagent.extension.emissions.EmissionDataLoader;
 public class EmbodiedEmissions {
 
     private static EmbodiedEmissions instance;
-    private final EmissionDataLoader configLoader;
+    private final CloudCarbonFootprintData configLoader;
 
     /**
      * Private constructor to prevent direct instantiation.
-     * Initializes the {@link EmissionDataLoader} to load necessary configuration for emissions calculations.
+     * Initializes the {@link CloudCarbonFootprintData} to load necessary configuration for emissions calculations.
      */
     private EmbodiedEmissions() {
-        configLoader = EmissionDataLoader.getConfigInstance();
+        configLoader = CloudCarbonFootprintData.getConfigInstance();
     }
 
     /**
@@ -36,19 +36,17 @@ public class EmbodiedEmissions {
     }
 
     /**
-     * Calculates the embodied carbon emissions in grams for a given CPU usage time in hours.
+     * Calculates the embodied carbon emissions in grams in minutes.
      * This method estimates the emissions based on the cloud instance's specifications and the total embodied emissions data.
      *
-     * @param cpuTimeUsedInNanoSeconds The CPU time used in hours.
      * @return The calculated embodied carbon emissions in milligrams.
      */
-    public double calculateEmbodiedEmissionsInMilliGram(final double cpuTimeUsedInNanoSeconds) {
+    public double calculateEmbodiedEmissionsInMilliGramPerMinute() {
         if (InstanceConfiguration.getCloudProviderInstanceType() == null || Constants.RETIT_VALUE_NOT_SET.equals(InstanceConfiguration.getCloudProviderInstanceType())) {
             return 0;
         } else {
-            double cpuTimeInHours = cpuTimeUsedInNanoSeconds / 3600000.0 / 1000000;
-            return (configLoader.getTotalEmbodiedEmissions() * EmissionCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR
-                    * (configLoader.getInstanceVCpu() / configLoader.getPlatformTotalVcpu()) * cpuTimeInHours) * 1000;
+            return (configLoader.getTotalEmbodiedEmissions() * (CloudCarbonFootprintCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR / 60)
+                    * (configLoader.getInstanceVCpu() / configLoader.getPlatformTotalVcpu())) * 1_000;
         }
     }
 }

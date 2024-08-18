@@ -1,6 +1,5 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
-import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.context.Context;
@@ -13,6 +12,7 @@ import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
 import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
+import io.retit.opentelemetry.javaagent.extension.metrics.MetricPublishingService;
 
 public class RETITSpanProcessor implements SpanProcessor {
 
@@ -85,18 +85,11 @@ public class RETITSpanProcessor implements SpanProcessor {
                         logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
                         readableSpan);
 
-        Attributes finalAttributes = TelemetryUtils.addEmissionAndUsageDataToSpanAttributes(logCPUDemand,
-                logHeapDemand, logDiskDemand, logNetworkDemand, attributesBuilder, mergedAttributes, readableSpan);
-
         if (readableSpan.getParentSpanContext() != null && !readableSpan.getParentSpanContext().isValid()) {
-            attributesBuilder.put(AttributeKey.stringKey("Servicecall"), readableSpan.getName());
-            finalAttributes = attributesBuilder.build();
-            MetricPublishingService.getInstance().publishEmissions(finalAttributes,
-                    Attributes.of(AttributeKey.stringKey("Servicecall"), finalAttributes.get(AttributeKey.stringKey("Servicecall"))));
-            MetricPublishingService.getInstance().publishWattHoursUsage(finalAttributes,
-                    Attributes.of(AttributeKey.stringKey("Servicecall"), finalAttributes.get(AttributeKey.stringKey("Servicecall"))));
+            // publish resource demand vector for top level transactions as metric for SCI calculations in Grafana
+            MetricPublishingService.getInstance().publishResourceDemandVectorOfTransaction(readableSpan,mergedAttributes, logCPUDemand, logHeapDemand, logDiskDemand);
         }
-        return TelemetryUtils.createReadableSpan(readableSpan, finalAttributes);
+        return TelemetryUtils.createReadableSpan(readableSpan, mergedAttributes);
     }
 
     @Override

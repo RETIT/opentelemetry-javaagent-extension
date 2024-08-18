@@ -2,21 +2,23 @@ package io.retit.opentelemetry.javaagent.extension.emissions;
 
 /**
  * Class containing emission coefficients for different cloud resources.
- * These coefficients follow the approach of the Cloud Carbon Footprint project.
+ * These coefficients follow the approach of the Cloud Carbon Footprint project outlined here:
+ *
+ * https://www.cloudcarbonfootprint.org/docs/methodology
  */
-public class EmissionCoefficients {
+public class CloudCarbonFootprintCoefficients {
 
     /**
-     * HDD storage emissions per TB per hour.
-     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#storage">...</a>
+     * HDD storage energy consumption in Wh per TB per hour.
+     * Source: https://www.cloudcarbonfootprint.org/docs/methodology#appendix-i-energy-coefficients
      */
-    public static final double STORAGE_EMISSIONS_HDD_PER_TB_HOUR = 0.000_65;
+    public static final double STORAGE_ENERGY_CONSUMPTION_WH_HDD_PER_TB_HOUR = 0.65;
 
     /**
-     * SSD storage emissions per TB per hour.
-     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#storage">...</a>
+     * SSD storage energy consumption in Wh per TB per hour.
+     * Source: https://www.cloudcarbonfootprint.org/docs/methodology#appendix-i-energy-coefficients
      */
-    public static final double STORAGE_EMISSIONS_SSD_PER_TB_HOUR = 0.0012;
+    public static final double STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR = 0.12;
 
     /**
      * Average minimum watt consumption for AWS.
@@ -67,14 +69,19 @@ public class EmissionCoefficients {
     public static final double AVERAGE_MAX_WATT_GCP = 3.77;
 
     /**
-     * Coefficient for breaking down total kg embodied emissions to gram per hour (1000/4/30/24) based on four year usage.
+     * Coefficient for breaking down total kg embodied emissions to gram per hour based on four year usage.
+     * This is calculated as follows: (1000 (kg to g) / 4 (years) / 12 (months per year) / 30 (days per month) / 24 (hours per day).
+     *
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/embodied-emissions">...</a>
      */
     public static final double TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR = 0.0289;
 
     /**
      * Coefficient for calculating memory emissions in kWh per GB-hour.
-     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#memory">...</a>
+     *
+     * It is the same for all cloud providers.
+     *
+     * Source: https://www.cloudcarbonfootprint.org/docs/methodology/#appendix-i-energy-coefficients
      */
     public static final double MEMORY_KWH_PER_GB_HOUR = 0.000392;
 
@@ -82,7 +89,7 @@ public class EmissionCoefficients {
      * Coefficient for calculating network emissions in kWh per GB-hour.
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">...</a>
      */
-    public static final double NETWORK_EMISSIONS_PER_GB_HOUR =  0.001;
+    public static final double NETWORK_KWH_PER_GB_HOUR =  0.001;
 
     /**
      * Coefficient for Power Usage Effectiveness (PUE) for AWS.
