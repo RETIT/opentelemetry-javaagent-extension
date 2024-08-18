@@ -2,11 +2,9 @@ receivers:
   otlp:
     protocols:
       grpc:
+        endpoint: 0.0.0.0:4317
       http:
-        cors:
-          allowed_origins:
-            - "http://*"
-            - "https://*"
+        endpoint: 0.0.0.0:4318
 
 exporters:
   otlp:
@@ -16,34 +14,18 @@ exporters:
 
   prometheus:
     endpoint: "otelcol:9464"
-    resource_to_telemetry_conversion:
-      enabled: true
-    enable_open_metrics: true
-
 
 processors:
   batch:
-  transform:
-    metric_statements:
-      - context: metric
-        statements:
-          - set(description, "Measures the duration of inbound HTTP requests") where name == "http.server.duration"
-  filter:
-    metrics:
-      exclude:
-        match_type: strict
-        metric_names:
-          - queueSize
-
-connectors:
-  spanmetrics:
 
 service:
   pipelines:
+
     metrics:
       receivers: [otlp]
-      processors: [filter, transform, batch]
+      processors: [batch]
       exporters: [prometheus]
+
     traces:
       receivers: [otlp]
       processors: [batch]

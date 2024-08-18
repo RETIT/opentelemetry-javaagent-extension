@@ -67,24 +67,23 @@ services:
       - "9090:9090"
     logging: *logging
 
-  jaeger:
-    image: jaegertracing/all-in-one:1.60.0
-    container_name: jaeger
-    command:
-      - "--memory.max-traces"
-      - "10000"
-      - "--query.base-path"
-      - "/jaeger/ui"
-
-    deploy:
-      resources:
-        limits:
-          memory: 300M
-    restart: unless-stopped
-    ports:
-      - "16686:16686"                    # Jaeger UI
-      - "4317"                           # OTLP gRPC default port
-    environment:
-      - COLLECTOR_OTLP_ENABLED=true
-      - METRICS_STORAGE_TYPE=prometheus
-    logging: *logging
+  #jaeger:
+  #  image: jaegertracing/all-in-one:1.60.0
+  #  container_name: jaeger
+  #  command:
+  #    - "--memory.max-traces"
+  #    - "10000"
+  #    - "--query.base-path"
+  #    - "/jaeger/ui"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 300M
+  #  restart: unless-stopped
+  #  ports:
+  #    - "16686:16686"                    # Jaeger UI
+  #    - "4317"                           # OTLP gRPC default port
+  #  environment:
+  #    - COLLECTOR_OTLP_ENABLED=true
+  #    - METRICS_STORAGE_TYPE=prometheus
+  #  logging: *logging
