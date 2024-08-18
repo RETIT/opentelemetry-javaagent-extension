@@ -37,7 +37,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>2.6.0</version>
+                <version>2.7.0</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
@@ -73,7 +73,7 @@
             <dependency>
                 <groupId>io.opentelemetry.javaagent</groupId>
                 <artifactId>opentelemetry-javaagent</artifactId>
-                <version>2.6.0</version>
+                <version>2.7.0</version>
                 <scope>test</scope>
             </dependency>
 
