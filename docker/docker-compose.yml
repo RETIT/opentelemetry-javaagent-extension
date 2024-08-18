@@ -12,7 +12,7 @@ networks:
 services:
   # Grafana
   grafana:
-    image: grafana/grafana:10.4.2
+    image: grafana/grafana:11.1.4
     container_name: grafana
     deploy:
       resources:
@@ -27,7 +27,7 @@ services:
 
   # OpenTelemetry Collector
   otelcol:
-    image: otel/opentelemetry-collector-contrib:0.98.0
+    image: otel/opentelemetry-collector-contrib:0.107.0
     container_name: otel-col
     deploy:
       resources:
@@ -46,7 +46,7 @@ services:
 
   # Prometheus
   prometheus:
-    image: quay.io/prometheus/prometheus:v2.51.2
+    image: quay.io/prometheus/prometheus:v2.53.2
     container_name: prometheus
     command:
       - --web.console.templates=/etc/prometheus/consoles
@@ -68,7 +68,7 @@ services:
     logging: *logging
 
   jaeger:
-    image: jaegertracing/all-in-one
+    image: jaegertracing/all-in-one:1.60.0
     container_name: jaeger
     command:
       - "--memory.max-traces"
