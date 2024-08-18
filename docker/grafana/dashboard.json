@@ -191,6 +191,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
+          "exemplar": false,
           "expr": "delta(io_retit_java_process_cpu_time_total[$__interval])",
           "fullMetaSearch": false,
           "hide": false,
@@ -200,6 +201,17 @@
           "range": true,
           "refId": "processcpudemand",
           "useBackend": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$processcpudemand  /  $__interval_ms",
+          "hide": false,
+          "refId": "CPUutil",
+          "type": "math"
         },
         {
           "datasource": {
@@ -229,18 +241,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$processcpudemand / $__range",
-          "hide": false,
-          "refId": "CPUutil",
-          "type": "math"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "($Pcpu * $__range) / 1000",
+          "expression": "($Pcpu* $__interval_ms) / 1000",
           "hide": false,
           "refId": "Ecpu",
           "type": "math"
@@ -255,105 +256,6 @@
           "hide": false,
           "refId": "c_cpu",
           "type": "math"
-        }
-      ],
-      "title": "Panel Title",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "api-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 1,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "api-metrics"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "io_retit_java_process_cpu_time_total",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
         }
       ],
       "title": "Panel Title",
@@ -373,6 +275,6 @@
   "timezone": "browser",
   "title": "Carbon Emissions Transaction",
   "uid": "adv7vxmnrde68e",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
