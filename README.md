@@ -23,15 +23,16 @@ docker/docker-compose.yml file in this repository. file in this repository.
 To do this, run:
 
 ```bash 
-docker compose -f .\docker\docker-compose up
+docker compose -f ./docker/docker-compose up
 ```
-The sample Application can then be run with the OpenTelemetry Java agent attached.
+The sample Application can then be run with the OpenTelemetry Java agent attached from the root directory as follows.
     
 ```bash
-java -javaagent:"path_to_otel_java_agent_jar" ^
--Dotel.traces.exporter=otlp -Dotel.metrics.exporter=otlp -Dotel.logs.exporter=logging ^
--Dotel.javaagent.extensions="path_to_jar_of_this_opentelemetry_javaagent_extension" ^
--jar "path_to_jar_of_sampleApplication"
+java -javaagent:./sampleapplication/target/jib/opentelemetry-javaagent-all.jar \
+-Dotel.service.name=sampleapplication \
+-Dotel.logs.exporter=logging \
+-Dotel.javaagent.extensions=./sampleapplication/target/jib/io.retit.opentelemetry.javaagent.extension.jar \
+-jar ./sampleapplication/target/sampleapplication-0.0.1-SNAPSHOT.jar
 ```
 
 In order to collect the custom usage data, the SampleApplication has to be run with the following command:
