@@ -32,17 +32,8 @@ java -javaagent:./sampleapplication/target/jib/opentelemetry-javaagent-all.jar \
 -Dotel.service.name=sampleapplication \
 -Dotel.logs.exporter=logging \
 -Dotel.javaagent.extensions=./sampleapplication/target/jib/io.retit.opentelemetry.javaagent.extension.jar \
+-Dio.retit.emissions.cloud.provider=aws \
+-Dio.retit.emissions.cloud.provider.region=af-south-1 \
+-Dio.retit.emissions.cloud.provider.instance.type=a1.medium \
 -jar ./sampleapplication/target/sampleapplication-0.0.1-SNAPSHOT.jar
-```
-
-In order to collect the custom usage data, the SampleApplication has to be run with the following command:
-
-```bash
-java -javaagent:"path_to_otel_java_agent_jar" ^
--Dotel.javaagent.extensions="path_to_jar_of_this_opentelemetry_javaagent_extension" ^
--Dotel.javaagent.debug=true ^
--Dotel.traces.exporter=otlp -Dotel.metrics.exporter=otlp -Dotel.logs.exporter=logging ^
--Dde.retit.apm.log.total.disk.demand=true ^
--Dde.retit.apm.log.network.demand=true ^
--jar "path_to_jar_of_sampleApplication"
 ```
