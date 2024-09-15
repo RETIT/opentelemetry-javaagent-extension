@@ -8,7 +8,7 @@ import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
 import io.opentelemetry.api.metrics.ObservableLongMeasurement;
-import io.opentelemetry.sdk.trace.ReadableSpan;
+import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
@@ -126,16 +126,16 @@ public class MetricPublishingService {
                 AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CpuPowerData.getInstance().getInstanceType()));
     }
 
-    public void publishResourceDemandVectorOfTransaction(final ReadableSpan readableSpan, final Attributes spanAttributes, final boolean logCPUTime, final boolean logHeapConsumption, final boolean logDiskDemand) {
-        if (!TelemetryUtils.isExternalDatabaseCall(readableSpan)) {
-            Long startThread = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD));
-            Long endThread = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
+    public void publishResourceDemandVectorOfTransaction(final ReadWriteSpan readWriteSpan, final boolean logCPUTime, final boolean logHeapConsumption, final boolean logDiskDemand) {
+        if (!TelemetryUtils.isExternalDatabaseCall(readWriteSpan)) {
+            Long startThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD));
+            Long endThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
 
             if (startThread != null && startThread.equals(endThread)) {
                 // add resource demands to resource demand vector
-                publishCpuDemandMetricForTransaction(logCPUTime, spanAttributes);
-                publishMemoryDemandMetricForTransaction(logHeapConsumption, spanAttributes);
-                publishStorageDemandMetricForTransaction(logDiskDemand, spanAttributes);
+                publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes());
+                publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes());
+                publishStorageDemandMetricForTransaction(logDiskDemand, readWriteSpan.getAttributes());
                 // publishNetworkDemandMetricForTransaction()
             }
         }

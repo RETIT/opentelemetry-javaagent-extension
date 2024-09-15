@@ -22,7 +22,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.*;
 
 public class RETITSpanProcessorTest {
@@ -48,7 +47,7 @@ public class RETITSpanProcessorTest {
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY, true);
         retitSpanProcessor = new RETITSpanProcessor(BatchSpanProcessor.builder(SpanExporter.composite()));
         retitSpanProcessor.buildBatchSpanProcessor();
-        assertNotNull(retitSpanProcessor.getDelegateBatchSpanProcessor());
+        Assertions.assertNotNull(retitSpanProcessor.getDelegateBatchSpanProcessor());
         spanData = dummySpanData(Attributes.empty());
 
         readableSpan = mock(ReadableSpan.class);

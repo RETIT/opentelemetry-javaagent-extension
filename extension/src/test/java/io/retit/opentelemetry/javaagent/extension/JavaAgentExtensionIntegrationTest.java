@@ -414,7 +414,7 @@ class JavaAgentExtensionIntegrationTest {
     }
 
     private static String[] extractPropertiesFromLogOutput(String logOutput) {
-        return logOutput.substring(logOutput.indexOf('{') + 1, logOutput.lastIndexOf('}')).split(",");
+        return logOutput.substring(logOutput.indexOf('{') + 1, logOutput.lastIndexOf("},")).split(",");
     }
 
     private static class SpanDemand {
