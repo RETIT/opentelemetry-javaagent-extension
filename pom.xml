@@ -44,7 +44,7 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
-                <version>5.10.3</version>
+                <version>5.11.0</version>
                 <scope>test</scope>
             </dependency>
 
@@ -98,7 +98,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
             </plugin>
 
             <plugin>
@@ -110,7 +110,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>3.4.0</version>
+                <version>3.5.0</version>
                 <configuration>
                     <configLocation>etc/checkstyle-configuration.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
@@ -131,7 +131,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-pmd-plugin</artifactId>
-                <version>3.24.0</version>
+                <version>3.25.0</version>
                 <configuration>
                     <rulesets>
                         <ruleset>etc/pmd-configuration.xml</ruleset>
@@ -142,7 +142,7 @@
             <plugin>
                 <groupId>com.github.spotbugs</groupId>
                 <artifactId>spotbugs-maven-plugin</artifactId>
-                <version>4.8.6.2</version>
+                <version>4.8.6.3</version>
                 <configuration>
                     <excludeFilterFile>etc/spotbugs-exclusion-filter.xml</excludeFilterFile>
                 </configuration>
