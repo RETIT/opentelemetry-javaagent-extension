@@ -193,7 +193,7 @@ public class CloudCarbonFootprintData {
                 }
             }
         }
-        return cloudInstanceDetails;
+        return cloudVMInstanceDetails;
     }
 
     /**
