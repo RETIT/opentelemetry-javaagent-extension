@@ -1,5 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.commons;
 
+import io.opentelemetry.api.internal.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -9,20 +11,16 @@ import java.util.List;
 
 /**
  * Class for parsing <code>/proc/cpuinfo</code>.
- *
-
  */
 public class CpuInfoParser {
 
-    public static final String CPUINFO_FILE = "/proc/cpuinfo";
+    private static final String CPUINFO_FILE = "/proc/cpuinfo";
 
     private CpuInfoParser() {
-
     }
 
     /**
      * Returns the entire content of <code>/proc/cpuinfo</code>.
-     *
      */
     public static List<String> getCpuInfo() throws IOException {
         Path path = new File(CPUINFO_FILE).toPath();
@@ -34,9 +32,8 @@ public class CpuInfoParser {
      * <p>
      * This method takes the first entry with the specified name and ignores any
      * subsequent entries with the same name.
-     *
      */
-    public static String getEntry(String entryName) throws IOException {
+    public static String getEntry(final String entryName) throws IOException {
         List<String> cpuInfo = getCpuInfo();
         if (cpuInfo == null || cpuInfo.isEmpty()) {
             return null;
@@ -48,7 +45,7 @@ public class CpuInfoParser {
             if (line.startsWith(entryName)) {
                 int index = line.indexOf(':');
                 String substring = line.substring(entryName.length(), index);
-                if (substring == null || substring.trim().length() == 0) {
+                if (!StringUtils.isNullOrEmpty(substring)) {
                     return line.substring(index + 2);
                 }
             }

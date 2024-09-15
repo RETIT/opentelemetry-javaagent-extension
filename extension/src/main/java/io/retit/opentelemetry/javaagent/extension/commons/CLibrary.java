@@ -13,17 +13,15 @@ import com.sun.jna.Native;
  * If you need another method from the glibc API, just add the method
  * to the interface. However, please also add a generalized method
  * to {@link NativeFacade} if possible.
- *
-
  */
 public interface CLibrary extends Library {
 
     CLibrary INSTANCE = Native.loadLibrary("c", CLibrary.class);
 
     // Derived from Linux/arch/x86/include/asm/unistd_32.h
-    public static final int GETTID_X86_32 = 224;
+    int GETTID_X86_32 = 224;
     // Derived from Linux/arch/x86/include/asm/unistd_64.h
-    public static final int GETTID_X86_64 = 186;
+    int GETTID_X86_64 = 186;
 
     int getpid();
 

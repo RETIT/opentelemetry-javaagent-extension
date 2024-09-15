@@ -31,10 +31,6 @@
         </profile>
     </profiles>
 
-    <properties>
-        <auto-service.version>1.1.1</auto-service.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.opentelemetry</groupId>
@@ -90,6 +86,15 @@
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.semconv</groupId>
+            <artifactId>opentelemetry-semconv</artifactId>
+            <version>1.26.0-alpha</version>
+        </dependency>
+        <dependency>
+        <groupId>io.opentelemetry</groupId>
+        <artifactId>opentelemetry-exporter-otlp</artifactId>
+    </dependency>
     </dependencies>
 
     <build>
@@ -186,7 +191,6 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <!-- here the phase you need -->
                         <phase>verify</phase>
                         <goals>
                             <goal>copy-resources</goal>
@@ -219,7 +223,6 @@
                             <tag>${props.branch.dockertag}</tag>
                         </tags>
                     </to>
-                    <!-- Copies files from 'src/main/custom-extra-dir' and '/home/user/jib-extras' instead of 'src/main/jib' -->
                     <extraDirectories>
                         <paths>
                             <path>${project.build.directory}/jib</path>

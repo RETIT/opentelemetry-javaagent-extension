@@ -16,8 +16,6 @@ import java.util.logging.Logger;
  * necessary for collecting resource demands on a system. These resource demands
  * are generally measured twice for a specific method invocation. This is done
  * by the {@link TelemetryUtils}.
- *
-
  */
 public abstract class CommonResourceDemandDataCollector implements IResourceDemandDataCollector {
 
@@ -34,7 +32,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     private static final Logger LOGGER = Logger.getLogger(CommonResourceDemandDataCollector.class.getName());
 
-    private static ThreadMXBean threadmxBean;
+    private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
 
     private IResourceDemandDataCollector jvmCollector;
 
@@ -52,9 +50,9 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         String osName = System.getProperty(OS_NAME_PROPERTY);
 
         CommonResourceDemandDataCollector osCollector;
-        if (osName.trim().toLowerCase().contains(WINDOWS_NAME)) {
+        if (osName.trim().toLowerCase(Locale.ENGLISH).contains(WINDOWS_NAME)) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(WINDOWS_NAME);
-        } else if (osName.trim().toLowerCase().contains(LINUX_NAME)) {
+        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(LINUX_NAME)) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(LINUX_NAME);
         } else {
             throw new UnsupportedOperationException("Cannot collect Resource Demands for current OS: " + osName);
@@ -69,7 +67,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
             jvmCollector = getDataCollectorFromJVM(IBM_JVM_NAME);
         } else {
             throw new UnsupportedOperationException(
-                "Cannot collect Resource Demands for current JVM: " + System.getProperty(JVM_NAME_PROPERTY));
+                    "Cannot collect Resource Demands for current JVM: " + System.getProperty(JVM_NAME_PROPERTY));
         }
 
         osCollector.setJvmCollector(jvmCollector);
@@ -84,10 +82,10 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
      * @return the JVMDataCollector for the selected JVM
      */
     protected static IResourceDemandDataCollector getDataCollectorFromOS(final String osName) {
-        if (osName.equals(WINDOWS_NAME)) {
+        if (WINDOWS_NAME.equals(osName)) {
             return new WindowsDataCollector();
         }
-        if (osName.equals(LINUX_NAME)) {
+        if (LINUX_NAME.equals(osName)) {
             return new LinuxDataCollector();
         }
         throw new UnsupportedOperationException("Unsupported OS: " + osName);
@@ -104,7 +102,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources." + jvmName + "DataCollector");
     }
 
-    private static Object loadInstance(String className) {
+    private static Object loadInstance(final String className) {
         Class<?> collectorClass;
         Object collector = null;
         try {
@@ -117,10 +115,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     }
 
     protected static ThreadMXBean getThreadMXBean() {
-        if (threadmxBean == null) {
-            threadmxBean = ManagementFactory.getThreadMXBean();
-        }
-        return threadmxBean;
+        return THREAD_MX_BEAN;
     }
 
     @Override
@@ -136,17 +131,12 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     /**
      * Sets the JVM collector to the specified one.
      */
-    public void setJvmCollector(IResourceDemandDataCollector jvmCollector) {
+    public void setJvmCollector(final IResourceDemandDataCollector jvmCollector) {
         this.jvmCollector = jvmCollector;
     }
 
     private static boolean isIBMJVM() {
         return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains(IBM_VENDOR);
-    }
-
-    private static boolean isJRockitJVM() {
-        return System.getProperty("jrockit.version") != null
-            || System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).indexOf("jrockit") >= 0;
     }
 
     private static boolean isHotspotJVM() {

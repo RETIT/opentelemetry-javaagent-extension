@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +28,7 @@ class JavaAgentExtensionIntegrationTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaAgentExtensionIntegrationTest.class);
     private static GenericContainer<?> applicationContainer;
     private static Map<String, List<SpanDemand>> spanDemands;
+    private static List<MetricDemand> metricDemands;
 
     // Operations in SampleApplication
     private static final String SAMPLE_METHOD = "SampleApplication.method";
@@ -38,10 +41,11 @@ class JavaAgentExtensionIntegrationTest {
         LOGGER.info("Using image: " + image);
         applicationContainer = new GenericContainer<>(image)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")
-                .withEnv("OTEL_METRICS_EXPORTER", "none")
+                .withEnv("OTEL_METRICS_EXPORTER", "logging")
                 .withEnv("OTEL_TRACES_EXPORTER", "logging")
                 .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:opentelemetry-javaagent-all.jar -Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar");
         spanDemands = new HashMap<>();
+        metricDemands = new ArrayList<>();
     }
 
     @AfterEach
@@ -54,7 +58,11 @@ class JavaAgentExtensionIntegrationTest {
     private void executeContainer() {
         // Start container and attach parser to log output
         applicationContainer.start();
-        applicationContainer.followOutput(outputFrame -> addToSpanDemands(outputFrame.getUtf8String()));
+        applicationContainer.followOutput(outputFrame -> {
+            String logOutput = outputFrame.getUtf8String();
+            addToSpanDemands(logOutput);
+            addToMetricDemands(logOutput);
+        });
 
         // Wait until container has stopped running
         while (applicationContainer.isRunning()) {
@@ -73,6 +81,11 @@ class JavaAgentExtensionIntegrationTest {
      */
     @Test
     void testAllOperationsPresent() {
+        applicationContainer.withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         // Check that operations are there
@@ -104,11 +117,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testAllAttributes() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true");
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -133,15 +151,27 @@ class JavaAgentExtensionIntegrationTest {
                 assertNotEquals(0, spanDemandEntry.logSystemTime);
             }
         }
+        for (MetricDemand md : metricDemands) {
+            assertNotEquals(0.0, md.cpuEmissionsInMg);
+            assertNotEquals(0.0, md.memoryEmissionsInMg);
+            assertNotEquals(0.0, md.processCpuTime);
+            assertNotEquals(0.0, md.embodiedEmissionsInMg);
+        }
     }
+
 
     @Test
     void testOnlyCPUDemand() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -162,11 +192,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyLogSystem() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -190,11 +225,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyHeapDemand() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -215,11 +255,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyGCDemands() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "true");
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -247,11 +292,16 @@ class JavaAgentExtensionIntegrationTest {
 
     @Test
     void testOnlyDiskDemand() {
-        applicationContainer.withEnv("DE_RETIT_APM_LOG_CPU_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_DISK_DEMAND", "true")
-                .withEnv("DE_RETIT_APM_LOG_HEAP_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_NETWORK_DEMAND", "false")
-                .withEnv("DE_RETIT_APM_LOG_GC_EVENT", "false");
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
         executeContainer();
 
         Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
@@ -286,7 +336,46 @@ class JavaAgentExtensionIntegrationTest {
         }
     }
 
+    private static void addToMetricDemands(String logOutput) {
+        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter") && logOutput.contains("Servicecall")) {
+            MetricDemand demand = extractMetricValuesFromLog(logOutput);
+            metricDemands.add(demand);
+        }
+    }
+
+    private static MetricDemand extractMetricValuesFromLog(String logMessage) {
+        String[] keys = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "cpu_emissions", "memory_emissions", "embodied_emissions"};
+
+        MetricDemand metricDemand = new MetricDemand();
+        for (String key : keys) {
+            String regex = "name=" + key + ".*?getSum=(\\d+\\.\\d+E[+-]?\\d+)";
+            Pattern pattern = Pattern.compile(regex);
+            Matcher matcher = pattern.matcher(logMessage);
+
+            if (matcher.find()) {
+                double value = Double.parseDouble(matcher.group(1));
+                switch (key) {
+                    case Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME:
+                        metricDemand.processCpuTime = value;
+                        break;
+                    case "embodied_emissions":
+                        metricDemand.embodiedEmissionsInMg = value;
+                        break;
+                    case "memory_emissions":
+                        System.out.println("memory emissions hier: " + value);
+                        metricDemand.memoryEmissionsInMg = value;
+                        break;
+                    case "cpu_emissions":
+                        metricDemand.cpuEmissionsInMg = value;
+                        break;
+                }
+            }
+        }
+        return metricDemand;
+    }
+
     private static String extractOperationNameFromLogOutput(String logOutput) {
+        System.out.println("das ist der span " + logOutput);
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
     }
 
@@ -295,29 +384,29 @@ class JavaAgentExtensionIntegrationTest {
         String[] properties = extractPropertiesFromLogOutput(logOutput);
         for (String prop : properties) {
             String[] elems = prop.split("=");
-            if (elems[0].contains("de.retit.endcputime")) {
+            if (elems[0].contains("io.retit.endcputime")) {
                 spanDemand.endCpuTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.enddiskreaddemand")) {
+            } else if (elems[0].contains("io.retit.enddiskreaddemand")) {
                 spanDemand.endDiskReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.enddiskwritedemand")) {
+            } else if (elems[0].contains("io.retit.enddiskwritedemand")) {
                 spanDemand.endDiskWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.endheapbyteallocation")) {
+            } else if (elems[0].contains("io.retit.endheapbyteallocation")) {
                 spanDemand.endHeapDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.endsystemtime")) {
+            } else if (elems[0].contains("io.retit.endsystemtime")) {
                 spanDemand.endSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startcputime")) {
+            } else if (elems[0].contains("io.retit.startcputime")) {
                 spanDemand.startCpuTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startdiskreaddemand")) {
+            } else if (elems[0].contains("io.retit.startdiskreaddemand")) {
                 spanDemand.startDiskReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startdiskwritedemand")) {
+            } else if (elems[0].contains("io.retit.startdiskwritedemand")) {
                 spanDemand.startDiskWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startheapbyteallocation")) {
+            } else if (elems[0].contains("io.retit.startheapbyteallocation")) {
                 spanDemand.startHeapDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.startsystemtime")) {
+            } else if (elems[0].contains("io.retit.startsystemtime")) {
                 spanDemand.startSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.logsystemtime")) {
+            } else if (elems[0].contains("io.retit.logsystemtime")) {
                 spanDemand.logSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("de.retit.totalheapsize")) {
+            } else if (elems[0].contains("io.retit.totalheapsize")) {
                 spanDemand.totalHeapSize = Long.valueOf(elems[1]);
             }
         }
@@ -325,7 +414,7 @@ class JavaAgentExtensionIntegrationTest {
     }
 
     private static String[] extractPropertiesFromLogOutput(String logOutput) {
-        return logOutput.substring(logOutput.indexOf('{') + 1, logOutput.lastIndexOf('}')).split(",");
+        return logOutput.substring(logOutput.indexOf('{') + 1, logOutput.lastIndexOf("},")).split(",");
     }
 
     private static class SpanDemand {
@@ -341,5 +430,12 @@ class JavaAgentExtensionIntegrationTest {
         public Long endDiskWriteDemand = null;
         public Long logSystemTime = null;
         public Long totalHeapSize = null;
+    }
+
+    private static class MetricDemand {
+        public Double cpuEmissionsInMg = null;
+        public Double memoryEmissionsInMg = null;
+        public Double processCpuTime = null;
+        public Double embodiedEmissionsInMg = null;
     }
 }

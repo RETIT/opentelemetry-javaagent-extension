@@ -1,0 +1,89 @@
+x-default-logging: &logging
+  driver: "json-file"
+  options:
+    max-size: "5m"
+    max-file: "2"
+
+networks:
+  default:
+    name: apm-metrics
+    driver: bridge
+
+services:
+  # Grafana
+  grafana:
+    image: grafana/grafana:11.1.4
+    container_name: grafana
+    deploy:
+      resources:
+        limits:
+          memory: 100M
+    volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+    ports:
+      - "3000:3000"
+    logging: *logging
+
+  # OpenTelemetry Collector
+  otelcol:
+    image: otel/opentelemetry-collector-contrib:0.107.0
+    container_name: otel-col
+    deploy:
+      resources:
+        limits:
+          memory: 125M
+    restart: unless-stopped
+    command: [ "--config=/etc/otelcol-config.yml" ]
+    volumes:
+      - ./otelcollector/otelcol-config.yml:/etc/otelcol-config.yml
+    ports:
+      - "4317:4317"          # OTLP over gRPC receiver
+      - "4318:4318"          # OTLP over HTTP receiver
+      - "9464:9464"          # Prometheus exporter
+      - "8888:8888"          # metrics endpoint
+    logging: *logging
+
+  # Prometheus
+  prometheus:
+    image: quay.io/prometheus/prometheus:v2.53.2
+    container_name: prometheus
+    command:
+      - --web.console.templates=/etc/prometheus/consoles
+      - --web.console.libraries=/etc/prometheus/console_libraries
+      - --storage.tsdb.retention.time=1h
+      - --config.file=/etc/prometheus/prometheus-config.yaml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+      - --web.route-prefix=/
+      - --enable-feature=exemplar-storage
+    volumes:
+      - ./prometheus/prometheus-config.yaml:/etc/prometheus/prometheus-config.yaml
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+    ports:
+      - "9090:9090"
+    logging: *logging
+
+  #jaeger:
+  #  image: jaegertracing/all-in-one:1.60.0
+  #  container_name: jaeger
+  #  command:
+  #    - "--memory.max-traces"
+  #    - "10000"
+  #    - "--query.base-path"
+  #    - "/jaeger/ui"
+  #  deploy:
+  #    resources:
+  #      limits:
+  #        memory: 300M
+  #  restart: unless-stopped
+  #  ports:
+  #    - "16686:16686"                    # Jaeger UI
+  #    - "4317"                           # OTLP gRPC default port
+  #  environment:
+  #    - COLLECTOR_OTLP_ENABLED=true
+  #    - METRICS_STORAGE_TYPE=prometheus
+  #  logging: *logging
