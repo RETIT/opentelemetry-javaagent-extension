@@ -11,7 +11,7 @@ import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprint
  */
 public class EmbodiedEmissions {
 
-    private static EmbodiedEmissions instance;
+    private static final EmbodiedEmissions INSTANCE = new EmbodiedEmissions();
     private final CloudCarbonFootprintData configLoader;
 
     /**
@@ -29,10 +29,7 @@ public class EmbodiedEmissions {
      * @return The single instance of {@code EmbodiedEmissions}.
      */
     public static EmbodiedEmissions getInstance() {
-        if (instance == null) {
-            instance = new EmbodiedEmissions();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     /**

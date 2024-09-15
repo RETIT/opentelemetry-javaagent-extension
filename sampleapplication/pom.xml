@@ -144,7 +144,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>SampleApplication</mainClass>
+                            <mainClass>io.retit.opentelemetry.SampleApplication</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

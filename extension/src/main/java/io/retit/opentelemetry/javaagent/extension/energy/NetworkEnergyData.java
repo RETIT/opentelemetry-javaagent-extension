@@ -10,7 +10,7 @@ public class NetworkEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(NetworkEnergyData.class.getName());
 
-    private static NetworkEnergyData instance;
+    private static final NetworkEnergyData INSTANCE = new NetworkEnergyData();
 
     private final double kwhPerGBMinute;
     private final String instanceType;
@@ -36,10 +36,7 @@ public class NetworkEnergyData {
      * @return The single instance of {@code CpuEmissions}.
      */
     public static NetworkEnergyData getInstance() {
-        if (instance == null) {
-            instance = new NetworkEnergyData();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public double getKwhPerGBMinute() {

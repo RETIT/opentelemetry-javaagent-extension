@@ -1,5 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.commons;
 
+import io.opentelemetry.api.internal.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -43,7 +45,7 @@ public class CpuInfoParser {
             if (line.startsWith(entryName)) {
                 int index = line.indexOf(':');
                 String substring = line.substring(entryName.length(), index);
-                if (substring == null || substring.trim().length() == 0) {
+                if (!StringUtils.isNullOrEmpty(substring)) {
                     return line.substring(index + 2);
                 }
             }

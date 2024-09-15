@@ -10,7 +10,7 @@ public class MemoryEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(MemoryEnergyData.class.getName());
 
-    private static MemoryEnergyData instance;
+    private static final MemoryEnergyData INSTANCE = new MemoryEnergyData();
 
     private final double kwhPerGBMinute;
     private final String instanceType;
@@ -24,7 +24,7 @@ public class MemoryEnergyData {
         this.cloudProvider = InstanceConfiguration.getCloudProvider();
         this.instanceType = InstanceConfiguration.getCloudProviderInstanceType();
         // convert to one minute
-        this.kwhPerGBMinute = CloudCarbonFootprintCoefficients.MEMORY_KWH_PER_GB_HOUR  / 60;
+        this.kwhPerGBMinute = CloudCarbonFootprintCoefficients.MEMORY_KWH_PER_GB_HOUR / 60;
 
         LOGGER.info("Initialized MemoryEnergyData using following data: " + this);
     }
@@ -35,10 +35,7 @@ public class MemoryEnergyData {
      * @return The single instance of {@code CpuEmissions}.
      */
     public static MemoryEnergyData getInstance() {
-        if (instance == null) {
-            instance = new MemoryEnergyData();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public double getKwhPerGBMinute() {

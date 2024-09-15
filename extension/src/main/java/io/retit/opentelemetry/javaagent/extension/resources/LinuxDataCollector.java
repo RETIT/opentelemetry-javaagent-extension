@@ -3,13 +3,9 @@ package io.retit.opentelemetry.javaagent.extension.resources;
 import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.channels.Channels;
-import java.nio.channels.SeekableByteChannel;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -96,7 +92,7 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
         long[] result = null;
         try {
 
-            byte[] filearray = readAllBytes(getPath());
+            byte[] filearray = Files.readAllBytes(getPath());
             String text = new String(filearray, "UTF-8");
 
             int startIndex = text.indexOf(READ_BYTES);
@@ -125,69 +121,5 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
         }
         return result;
     }
-
-    /**
-     * Reads all the bytes from a file. The method ensures that the file is
-     * closed when all bytes have been read or an I/O error, or other runtime
-     * exception, is thrown.
-     * <p>
-     * This method has been taken from
-     * {@link java.nio.file.Files#readAllBytes(Path) Files.readAllBytes(Path)}.
-     * There was a reason why we copied it instead of calling it directly, but
-     * nobody documented it back then, so now it's unknown...
-     */
-    public static byte[] readAllBytes(final Path path) throws IOException {
-        byte[] result;
-        try (SeekableByteChannel sbc = Files.newByteChannel(path);
-             InputStream in = Channels.newInputStream(sbc)) {
-            result = read(in, 1024);
-        }
-        return result;
-    }
-
-    /**
-     * Reads all the bytes from an input stream. Uses {@code initialSize} as a
-     * hint about how many bytes the stream will have.
-     * <p>
-     * This method has been taken from
-     * {@link java.nio.file.Files#read(InputStream, int) Files.read(InputStream,
-     * int)}. There was a reason why we copied it instead of calling it
-     * directly, but nobody documented it back then, so now it's unknown...
-     */
-    private static byte[] read(final InputStream source, final int initialSize) throws IOException {
-        int capacity = initialSize;
-        byte[] buf = new byte[capacity];
-        int nread = 0;
-        int n;
-        for (; ; ) {
-            // read to EOF which may read more or less than initialSize (eg:
-            // file
-            // is truncated while we are reading)
-            while ((n = source.read(buf, nread, capacity - nread)) > 0) {
-                nread += n;
-            }
-
-            // if last call to source.read() returned -1, we are done
-            // otherwise, try to read one more byte; if that failed we're done
-            // too
-            if (n < 0 || (n = source.read()) < 0) {
-                break;
-            }
-
-            // one more byte was read; need to allocate a larger buffer
-            if (capacity <= 4096 - capacity) {
-                capacity = Math.max(capacity << 1, 4096);
-            } else {
-                if (capacity == 4096) {
-                    throw new OutOfMemoryError("Required array size too large");
-                }
-                capacity = 4096;
-            }
-            buf = Arrays.copyOf(buf, capacity);
-            buf[nread++] = (byte) n;
-        }
-        return (capacity == nread) ? buf : Arrays.copyOf(buf, nread);
-    }
-
 }
 

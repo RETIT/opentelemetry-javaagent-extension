@@ -11,7 +11,7 @@ public class StorageEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(StorageEnergyData.class.getName());
 
-    private static final StorageEnergyData instance = new StorageEnergyData();
+    private static final StorageEnergyData INSTANCE = new StorageEnergyData();
 
     private final double kwhPerGBMinute;
     private final String instanceType;
@@ -25,8 +25,8 @@ public class StorageEnergyData {
         this.cloudProvider = InstanceConfiguration.getCloudProvider();
         this.instanceType = InstanceConfiguration.getCloudProviderInstanceType();
         // convert to kWh and then to one minute
-        this.kwhPerGBMinute = (InstanceConfiguration.getStorageType()
-                .equalsIgnoreCase(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD) ?
+        this.kwhPerGBMinute = (Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD
+                .equalsIgnoreCase(InstanceConfiguration.getStorageType()) ?
                 CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR / 1_000 :
                 CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_HDD_PER_TB_HOUR / 1_000) / 60.0;
 
@@ -39,7 +39,7 @@ public class StorageEnergyData {
      * @return The single instance of {@code CpuEmissions}.
      */
     public static StorageEnergyData getInstance() {
-        return instance;
+        return INSTANCE;
     }
 
     public double getKwhPerGBMinute() {

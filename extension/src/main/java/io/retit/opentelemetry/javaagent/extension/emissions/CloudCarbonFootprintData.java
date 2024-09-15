@@ -3,15 +3,10 @@ package io.retit.opentelemetry.javaagent.extension.emissions;
 import io.opentelemetry.api.internal.StringUtils;
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
+import io.retit.opentelemetry.javaagent.extension.commons.CSVParser;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
-import java.util.logging.Logger;
 
 /**
  * ConfigLoader is responsible for loading configuration settings and instance details
@@ -19,22 +14,16 @@ import java.util.logging.Logger;
  */
 public class CloudCarbonFootprintData {
 
-    private static final Logger logger = Logger.getLogger(CloudCarbonFootprintData.class.getName());
     private static final CloudCarbonFootprintData CONFIG_INSTANCE = new CloudCarbonFootprintData();
     private static final double DOUBLE_ZERO = 0.0;
-    private static final char QUOTE_CHAR = '\"';
 
     private final String microarchitecture;
     private final Double gridEmissionsFactor;
     private final Double totalEmbodiedEmissions;
     private final Double pueValue;
-    private final Integer cpuCount;
-    private final Double cpuUtilization;
     private final CloudCarbonFootprintInstanceData cloudInstanceDetails;
 
     private CloudCarbonFootprintData() {
-        this.cpuCount = initializeCpuCount();
-        this.cpuUtilization = initializeCpuUtilization();
         this.microarchitecture = initializeMicroarchitecture();
         this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
         cloudInstanceDetails = initializeCloudInstanceDetails(InstanceConfiguration.getCloudProviderInstanceType());
@@ -63,40 +52,8 @@ public class CloudCarbonFootprintData {
         return pueValue;
     }
 
-    public Integer getCpuCount() {
-        return cpuCount;
-    }
-
-    public Double getCpuUtilization() {
-        return cpuUtilization;
-    }
-
     public CloudCarbonFootprintInstanceData getCloudInstanceDetails() {
         return cloudInstanceDetails;
-    }
-
-    private Integer initializeCpuCount() {
-        String envCpuCount = System.getenv("CPU_COUNT");
-        if (envCpuCount == null) {
-            return 1;
-        }
-        try {
-            return Integer.valueOf(envCpuCount);
-        } catch (NumberFormatException e) {
-            return 1;
-        }
-    }
-
-    private Double initializeCpuUtilization() {
-        String envCpuUtilization = System.getenv("CPU_UTILIZATION_IN_PERCENT");
-        if (envCpuUtilization == null) {
-            return 0.5;
-        }
-        try {
-            return Double.valueOf(envCpuUtilization);
-        } catch (NumberFormatException e) {
-            return 0.5;
-        }
     }
 
     private String initializeMicroarchitecture() {
@@ -127,7 +84,7 @@ public class CloudCarbonFootprintData {
 
     private double getDoubleValueFromCSVForRegionOrInstance(final String csvFile, final int instanceTypeOrRegionCsvField, final String instanceTypeOrRegion, final int csvField) {
 
-        List<String[]> csvLines = readAllCSVLinesExceptHeader(csvFile);
+        List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader(csvFile);
         for (String[] lineFields : csvLines) {
             String csvInstance = lineFields[instanceTypeOrRegionCsvField].trim();
             if (csvInstance.equalsIgnoreCase(instanceTypeOrRegion.trim())) {
@@ -149,7 +106,7 @@ public class CloudCarbonFootprintData {
      * @param vmInstanceType the type of the instance for which the details are to be initialized
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetails(final String vmInstanceType) {
-        CloudCarbonFootprintInstanceData cloudVMInstanceDetails = null;
+        CloudCarbonFootprintInstanceData cloudVMInstanceDetails;
 
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             cloudVMInstanceDetails = initializeCloudInstanceDetailsForAzure(vmInstanceType);
@@ -216,7 +173,7 @@ public class CloudCarbonFootprintData {
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsCommon(final String instanceFileName, final String coefficientsFileName, final String vmInstanceType) {
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
-        List<String[]> csvLines = readAllCSVLinesExceptHeader(instanceFileName);
+        List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader(instanceFileName);
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[1].trim();
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
@@ -227,7 +184,7 @@ public class CloudCarbonFootprintData {
         }
 
         if (microarchitecture != null) {
-            csvLines = readAllCSVLinesExceptHeader(coefficientsFileName);
+            csvLines = CSVParser.readAllCSVLinesExceptHeader(coefficientsFileName);
             for (String[] lineFields : csvLines) {
                 String csvMicroarchitecture = lineFields[1].trim();
                 if (csvMicroarchitecture.equals(microarchitecture)) {
@@ -250,7 +207,7 @@ public class CloudCarbonFootprintData {
 
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
 
-        List<String[]> csvLines = readAllCSVLinesExceptHeader("/instances/aws-instances.csv");
+        List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader("/instances/aws-instances.csv");
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[0];
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
@@ -298,58 +255,4 @@ public class CloudCarbonFootprintData {
         return returnValue;
     }
 
-    /**
-     * Utility method for reading a CSV file.
-     *
-     * @param fileName - the CSV file to read
-     * @return a list of String[] representing the lines of the CSV file.
-     */
-    private List<String[]> readAllCSVLinesExceptHeader(final String fileName) {
-        List<String[]> csvLinesWithoutHeader = new ArrayList<>();
-
-        try (BufferedReader reader = new BufferedReader(new
-                InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(fileName))))) {
-
-            String line = reader.readLine();
-            boolean firstLine = true;
-            while (line != null) {
-                if (!firstLine) {
-                    String[] fields = parseCSVLine(line);
-                    csvLinesWithoutHeader.add(fields);
-                }
-                line = reader.readLine();
-                if (firstLine) {
-                    firstLine = false;
-                }
-            }
-        } catch (IOException e) {
-            logger.warning("Failed to load instance details from CSV file");
-        }
-
-        return csvLinesWithoutHeader;
-    }
-
-    /**
-     * Parses a single line of a CSV file and ignores fields in quotes.
-     *
-     * @param line - the line to parse
-     * @return - the CSV attributes of the line.
-     */
-    private String[] parseCSVLine(final String line) {
-        boolean inQuotes = false;
-        StringBuilder field = new StringBuilder();
-        List<String> fields = new ArrayList<>();
-        for (char c : line.toCharArray()) {
-            if (c == QUOTE_CHAR) {
-                inQuotes = !inQuotes;
-            } else if (c == ',' && !inQuotes) {
-                fields.add(field.toString().trim());
-                field = new StringBuilder();
-            } else {
-                field.append(c);
-            }
-        }
-        fields.add(field.toString().trim());
-        return fields.toArray(new String[0]);
-    }
 }

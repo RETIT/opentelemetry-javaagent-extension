@@ -11,7 +11,7 @@ public class CpuPowerData {
 
     private static final Logger LOGGER = Logger.getLogger(CpuPowerData.class.getName());
 
-    private static CpuPowerData instance;
+    private static final CpuPowerData INSTANCE = new CpuPowerData();
 
     private final double minPowerCPU;
     private final double maxPowerCPU;
@@ -58,10 +58,7 @@ public class CpuPowerData {
      * @return The single instance of {@code CpuEmissions}.
      */
     public static CpuPowerData getInstance() {
-        if (instance == null) {
-            instance = new CpuPowerData();
-        }
-        return instance;
+        return INSTANCE;
     }
 
     public double getMinPowerCPU() {

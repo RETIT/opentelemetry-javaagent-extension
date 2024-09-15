@@ -182,20 +182,20 @@ public class MetricPublishingService {
         }
     }
 
-    private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
-        //if (logNetworkDemand) {
-        /**Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
-         Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
-         long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
+    //private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
+    //if (logNetworkDemand) {
+    /**Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+     Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
+     long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
 
-         Long startDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
-         Long endDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
-         long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
+     Long startDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
+     Long endDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
+     long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
-         long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+     long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
-         storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);**/
-        //}
-    }
+     storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);**/
+    //}
+    //}
 }
 

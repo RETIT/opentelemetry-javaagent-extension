@@ -72,6 +72,7 @@
         <exclude name="AvoidLiteralsInIfCondition"/>
         <exclude name="UseProperClassLoader"/>
         <exclude name="NonStaticInitializer"/>
+        <exclude name="AvoidAccessibilityAlteration"/>
     </rule>
     <rule ref="category/java/errorprone.xml/AvoidLiteralsInIfCondition">
         <properties>
