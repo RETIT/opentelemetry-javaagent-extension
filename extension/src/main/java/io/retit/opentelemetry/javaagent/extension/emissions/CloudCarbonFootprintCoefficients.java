@@ -83,7 +83,7 @@ public class CloudCarbonFootprintCoefficients {
      *
      * Source: https://www.cloudcarbonfootprint.org/docs/methodology/#appendix-i-energy-coefficients
      */
-    public static final double MEMORY_KWH_PER_GB_HOUR = 0.000392;
+    public static final double MEMORY_KWH_PER_GB_HOUR = 0.000_392;
 
     /**
      * Coefficient for calculating network emissions in kWh per GB-hour.

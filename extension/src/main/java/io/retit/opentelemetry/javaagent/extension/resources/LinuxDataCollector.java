@@ -137,8 +137,7 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      * nobody documented it back then, so now it's unknown...
      */
     public static byte[] readAllBytes(final Path path) throws IOException {
-
-        byte[] result = null;
+        byte[] result;
         try (SeekableByteChannel sbc = Files.newByteChannel(path);
              InputStream in = Channels.newInputStream(sbc)) {
             result = read(in, 1024);

@@ -82,7 +82,7 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
     }
 
     @Override
-    public void onEnding(ReadWriteSpan readWriteSpan) {
+    public void onEnding(final ReadWriteSpan readWriteSpan) {
         boolean logCPUDemand = InstanceConfiguration.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = InstanceConfiguration.isLogHeapDemandDefaultTrue();
         boolean logGCEvent = InstanceConfiguration.isLogGCEventDefaultTrue();

@@ -11,7 +11,7 @@ public class StorageEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(StorageEnergyData.class.getName());
 
-    private static StorageEnergyData instance;
+    private static final StorageEnergyData instance = new StorageEnergyData();
 
     private final double kwhPerGBMinute;
     private final String instanceType;
@@ -39,9 +39,6 @@ public class StorageEnergyData {
      * @return The single instance of {@code CpuEmissions}.
      */
     public static StorageEnergyData getInstance() {
-        if (instance == null) {
-            instance = new StorageEnergyData();
-        }
         return instance;
     }
 

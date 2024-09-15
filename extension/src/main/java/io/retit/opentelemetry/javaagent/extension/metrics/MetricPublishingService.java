@@ -30,11 +30,11 @@ public class MetricPublishingService {
 
     private static final Logger LOGGER = Logger.getLogger(MetricPublishingService.class.getName());
 
-    private static MetricPublishingService instance;
+    private static MetricPublishingService instance = new MetricPublishingService();
 
     private LongCounter storageDemandMetricPublisher;
     private LongCounter memoryDemandMetricPublisher;
-    private LongCounter networkDemandMetricPublisher;
+    //private LongCounter networkDemandMetricPublisher;
     private LongCounter cpuDemandMetricPublisher;
 
     /**
@@ -43,9 +43,6 @@ public class MetricPublishingService {
      * @return The singleton instance of MetricPublishingService.
      */
     public static MetricPublishingService getInstance() {
-        if (instance == null) {
-            instance = new MetricPublishingService();
-        }
         return instance;
     }
 
@@ -59,7 +56,7 @@ public class MetricPublishingService {
 
         // CPU time of the whole process
         meter.counterBuilder(Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME)
-                .buildWithCallback(measurement -> publishProcessCPUTime(measurement));
+                .buildWithCallback(this::publishProcessCPUTime);
 
         // minimum power consumption of the CPU in Idle
         meter.gaugeBuilder("io.retit.emissions.cpu.power.min")
@@ -105,8 +102,8 @@ public class MetricPublishingService {
         memoryDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.memory.bytes").setUnit("bytes")
                 .setDescription("Memory demand of a transaction in bytes").build();
 
-        networkDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.network.bytes").setUnit("bytes")
-                .setDescription("Memory demand of a transaction in bytes").build();
+        // networkDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.network.bytes").setUnit("bytes")
+        //        .setDescription("Memory demand of a transaction in bytes").build();
 
         cpuDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.cpu.ms").setUnit("ms")
                 .setDescription("CPU demand of a transaction in ms").build();
@@ -120,7 +117,7 @@ public class MetricPublishingService {
         }
     }
 
-    private void publishDoubleMeasurement(final ObservableDoubleMeasurement measurement, final String type, double value) {
+    private void publishDoubleMeasurement(final ObservableDoubleMeasurement measurement, final String type, final double value) {
         LOGGER.info("Publishing " + type + " with value " + value);
         measurement.record(value, Attributes.of(AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY), CpuPowerData.getInstance().getCloudProvider(),
                 AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CpuPowerData.getInstance().getInstanceType()));
@@ -186,19 +183,19 @@ public class MetricPublishingService {
     }
 
     private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
-        if (logNetworkDemand) {
-            /**Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
-             Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
-             long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
+        //if (logNetworkDemand) {
+        /**Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+         Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
+         long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
 
-             Long startDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
-             Long endDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
-             long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
+         Long startDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
+         Long endDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
+         long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
 
-             long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+         long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
-             storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);**/
-        }
+         storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);**/
+        //}
     }
 }
 

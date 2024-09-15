@@ -32,7 +32,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     private static final Logger LOGGER = Logger.getLogger(CommonResourceDemandDataCollector.class.getName());
 
-    private static ThreadMXBean threadmxBean;
+    private static final ThreadMXBean threadmxBean = ManagementFactory.getThreadMXBean();
 
     private IResourceDemandDataCollector jvmCollector;
 
@@ -115,9 +115,6 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     }
 
     protected static ThreadMXBean getThreadMXBean() {
-        if (threadmxBean == null) {
-            threadmxBean = ManagementFactory.getThreadMXBean();
-        }
         return threadmxBean;
     }
 
