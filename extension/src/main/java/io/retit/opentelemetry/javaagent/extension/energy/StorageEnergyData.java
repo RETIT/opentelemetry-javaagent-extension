@@ -14,16 +14,12 @@ public class StorageEnergyData {
     private static final StorageEnergyData INSTANCE = new StorageEnergyData();
 
     private final double kwhPerGBMinute;
-    private final String instanceType;
-    private final String cloudProvider;
 
     /**
      * Private constructor to prevent instantiation.
      * Initializes the {@link CloudCarbonFootprintData} to load necessary configuration.
      */
     private StorageEnergyData() {
-        this.cloudProvider = InstanceConfiguration.getCloudProvider();
-        this.instanceType = InstanceConfiguration.getCloudProviderInstanceType();
         // convert to kWh and then to one minute
         this.kwhPerGBMinute = (Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD
                 .equalsIgnoreCase(InstanceConfiguration.getStorageType()) ?
@@ -46,20 +42,10 @@ public class StorageEnergyData {
         return kwhPerGBMinute;
     }
 
-    public String getInstanceType() {
-        return instanceType;
-    }
-
-    public String getCloudProvider() {
-        return cloudProvider;
-    }
-
     @Override
     public String toString() {
         return "StorageEnergyData{" +
                 "kwhPerGBMinute=" + kwhPerGBMinute +
-                ", instanceType='" + instanceType + '\'' +
-                ", cloudProvider='" + cloudProvider + '\'' +
                 '}';
     }
 }
