@@ -4,25 +4,12 @@ import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
-import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
-import io.opentelemetry.sdk.trace.export.BatchSpanProcessorBuilder;
 import io.opentelemetry.sdk.trace.internal.ExtendedSpanProcessor;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.retit.opentelemetry.javaagent.extension.metrics.MetricPublishingService;
 
 public class RETITSpanProcessor implements ExtendedSpanProcessor {
-
-    private final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder;
-    private BatchSpanProcessor delegateBatchSpanProcessor;
-
-    public RETITSpanProcessor(final BatchSpanProcessorBuilder delegateBatchSpanProcessorBuilder) {
-        this.delegateBatchSpanProcessorBuilder = delegateBatchSpanProcessorBuilder;
-    }
-
-    public BatchSpanProcessorBuilder getDelegateBatchSpanProcessorBuilder() {
-        return delegateBatchSpanProcessorBuilder;
-    }
 
     @Override
     public void onStart(final Context parentContext, final ReadWriteSpan readWriteSpan) {
@@ -49,36 +36,26 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
 
     @Override
     public void onEnd(final ReadableSpan readableSpan) {
-        delegateBatchSpanProcessor.onEnd(readableSpan);
     }
 
     @Override
     public boolean isEndRequired() {
-        return delegateBatchSpanProcessor.isEndRequired();
+        return false;
     }
 
     @Override
     public CompletableResultCode shutdown() {
-        return delegateBatchSpanProcessor.shutdown();
+        return CompletableResultCode.ofSuccess();
     }
 
     @Override
     public CompletableResultCode forceFlush() {
-        return delegateBatchSpanProcessor.forceFlush();
+        return CompletableResultCode.ofSuccess();
     }
 
     @Override
     public void close() {
-        delegateBatchSpanProcessor.close();
-    }
-
-    public void buildBatchSpanProcessor() {
-        delegateBatchSpanProcessor = delegateBatchSpanProcessorBuilder.build();
-    }
-
-    // visible for testing
-    protected BatchSpanProcessor getDelegateBatchSpanProcessor() {
-        return delegateBatchSpanProcessor;
+        // nothing to do
     }
 
     @Override

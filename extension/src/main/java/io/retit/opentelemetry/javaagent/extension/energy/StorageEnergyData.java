@@ -7,6 +7,9 @@ import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprint
 
 import java.util.logging.Logger;
 
+/**
+ * Wrapper class to calculate the energy in kWh required to store one GB on storage (e.g., HDD/SSD).
+ */
 public class StorageEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(StorageEnergyData.class.getName());
@@ -22,9 +25,9 @@ public class StorageEnergyData {
     private StorageEnergyData() {
         // convert to kWh and then to one minute
         this.kwhPerGBMinute = (Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD
-                .equalsIgnoreCase(InstanceConfiguration.getStorageType()) ?
-                CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR / 1_000 :
-                CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_HDD_PER_TB_HOUR / 1_000) / 60.0;
+                .equalsIgnoreCase(InstanceConfiguration.getStorageType())
+                ? CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR / 1_000
+                : CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_HDD_PER_TB_HOUR / 1_000) / 60.0;
 
         LOGGER.info("Initialized StorageEnergyData using following data: " + this);
     }
@@ -44,8 +47,8 @@ public class StorageEnergyData {
 
     @Override
     public String toString() {
-        return "StorageEnergyData{" +
-                "kwhPerGBMinute=" + kwhPerGBMinute +
-                '}';
+        return "StorageEnergyData{"
+                + "kwhPerGBMinute=" + kwhPerGBMinute
+                + '}';
     }
 }

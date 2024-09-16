@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+/**
+ * Helper class to parse values from CSV files.
+ */
 public class CSVParser {
 
     private static final Logger LOGGER = Logger.getLogger(CSVParser.class.getName());

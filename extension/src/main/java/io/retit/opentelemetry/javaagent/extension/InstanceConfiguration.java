@@ -5,13 +5,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * General agent configuration class.
- * <p>
+ * General configuration class for the opentelemetry agent extension.
  * This class is used to configure which data is collected and where the collected data is persisted.
  * For this purpose, System properties are used. Such System properties can also
- * be passed in a property file called retitapm.properties. If this file is
- * present on the classpath, it is read by the <code>InstanceConfiguration</code>
- * and evaluated accordingly.
+ * be passed as environment variables.
  */
 public class InstanceConfiguration {
 
@@ -62,15 +59,34 @@ public class InstanceConfiguration {
                 String::valueOf, Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD);
     }
 
+    /**
+     * Returns the property of type String with the given propertyName.
+     *
+     * @param propertyName - the property to return.
+     * @return - the value of the property or the default defined in  Constants.RETIT_VALUE_NOT_SET.
+     */
     public static String getStringProperty(final String propertyName) {
         return getProperty(propertyName, String::valueOf, Constants.RETIT_VALUE_NOT_SET);
     }
 
-    public static boolean getBooleanProperty(final String propertyName) {
+    /**
+     * Returns the property of type boolean with the given propertyName.
+     *
+     * @param propertyName - the property to return.
+     * @return - the value of the property or false
+     */
+    private static boolean getBooleanProperty(final String propertyName) {
         return getProperty(propertyName, Boolean::valueOf, false);
     }
 
-    public static boolean getBooleanProperty(final String propertyName, final boolean defaultValue) {
+    /**
+     * Returns the property of type boolean with the given propertyName.
+     *
+     * @param propertyName - the property to return.
+     * @param defaultValue - the defaultValue to return if the property is not set
+     * @return - the value of the property or the provided defaultValue
+     */
+    private static boolean getBooleanProperty(final String propertyName, final boolean defaultValue) {
         return getProperty(propertyName, Boolean::valueOf, defaultValue);
     }
 
@@ -92,6 +108,12 @@ public class InstanceConfiguration {
         return defaultValue;
     }
 
+    /**
+     * Sets the given boolean property to the provided value.
+     *
+     * @param propertyName - the property name to set.
+     * @param value        - the valueof the property.
+     */
     public static void setBooleanProperty(final String propertyName, final boolean value) {
         System.setProperty(propertyName, Boolean.toString(value));
     }
@@ -103,6 +125,12 @@ public class InstanceConfiguration {
      * @param <T> Target type.
      */
     public interface Converter<S, T> {
+        /**
+         * Converts the given value of type S to type T.
+         *
+         * @param toConvert - the value to convert.
+         * @return - the converted value.
+         */
         T convert(S toConvert);
     }
 }

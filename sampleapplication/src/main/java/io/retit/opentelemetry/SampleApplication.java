@@ -5,20 +5,36 @@ import io.opentelemetry.instrumentation.annotations.WithSpan;
 
 import java.util.logging.Logger;
 
+/**
+ * The purpose of this class is to collect spans and metrics for a very simple use case.
+ * The class is used in the integration test called JavaAgentExtensionIntegrationTest.
+ */
 public class SampleApplication {
 
     private static final Logger LOGGER = Logger.getLogger(SampleApplication.class.getName());
 
+    /**
+     * Simple method annotated with @WithSpan to collect Otel data.
+     */
     @WithSpan
     public static void method1() {
         LOGGER.info("method1");
     }
 
+    /**
+     * Simple method annotated with @WithSpan to collect Otel data.
+     */
     @WithSpan
     public static void method2() {
         LOGGER.info("method2");
     }
 
+    /**
+     * Main method that calls the other method of the sample application.
+     *
+     * @param args - not used
+     * @throws InterruptedException - in case the application couldn't wait for the metric publishing.
+     */
     public static void main(String[] args) throws InterruptedException {
         // Call methods
         Span span = Span.current();

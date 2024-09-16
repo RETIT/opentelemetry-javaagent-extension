@@ -5,6 +5,9 @@ import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprint
 
 import java.util.logging.Logger;
 
+/**
+ * Wrapper class to calculate the energy in kWh required for one GB of main memory.
+ */
 public class MemoryEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(MemoryEnergyData.class.getName());
@@ -39,8 +42,8 @@ public class MemoryEnergyData {
 
     @Override
     public String toString() {
-        return "MemoryEnergyData{" +
-                "kwhPerGBMinute=" + kwhPerGBMinute +
-                '}';
+        return "MemoryEnergyData{"
+                + "kwhPerGBMinute=" + kwhPerGBMinute
+                + '}';
     }
 }

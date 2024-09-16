@@ -60,13 +60,13 @@ public class MetricPublishingService {
         // minimum power consumption of the CPU in Idle
         meter.gaugeBuilder("io.retit.emissions.cpu.power.min")
                 .buildWithCallback(measurement ->
-                        publishDoubleMeasurement(measurement, "Min CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceEnergyUsageIdle())
+                        publishDoubleMeasurement(measurement, "Min CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCpuPowerConsumptionIdle())
                 );
 
         // maximum power consumption of the CPU at 100% utilization
         meter.gaugeBuilder("io.retit.emissions.cpu.power.max")
                 .buildWithCallback(measurement ->
-                        publishDoubleMeasurement(measurement, "Max CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceEnergyUsageFull()));
+                        publishDoubleMeasurement(measurement, "Max CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCpuPowerConsumption100Percent()));
 
         // embodied emissions per minute in mg
         meter.gaugeBuilder("io.retit.emissions.embodied.emissions.minute.mg")
@@ -122,6 +122,14 @@ public class MetricPublishingService {
                 AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceType()));
     }
 
+    /**
+     * Publishes the resource demand vector for the current transaction.
+     *
+     * @param readWriteSpan      - the current span.
+     * @param logCPUTime         - configuration whether CPU time should be published.
+     * @param logHeapConsumption - configuration whether heap demand should be published.
+     * @param logDiskDemand      - configuration whether disk demand should be published.
+     */
     public void publishResourceDemandVectorOfTransaction(final ReadWriteSpan readWriteSpan, final boolean logCPUTime, final boolean logHeapConsumption, final boolean logDiskDemand) {
         if (!TelemetryUtils.isExternalDatabaseCall(readWriteSpan)) {
             Long startThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD));
@@ -183,7 +191,7 @@ public class MetricPublishingService {
 
     //private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
     //if (logNetworkDemand) {
-    /**Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
+    /*Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
      Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
      long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
 
@@ -193,7 +201,7 @@ public class MetricPublishingService {
 
      long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
-     storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);**/
+     storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);*/
     //}
     //}
 }

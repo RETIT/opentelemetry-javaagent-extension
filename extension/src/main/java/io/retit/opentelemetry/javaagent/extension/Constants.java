@@ -1,5 +1,9 @@
 package io.retit.opentelemetry.javaagent.extension;
 
+/**
+ * Constants class for configuration values.
+ */
+@SuppressWarnings("checkstyle:javadocVariable")
 public class Constants {
     public static final String RETIT_NAMESPACE = "io.retit";
     public static final String RETIT_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.response.time";
@@ -20,11 +24,7 @@ public class Constants {
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP = "GCP";
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE = "Azure";
 
-    public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_SERVERLESS_VALUE = "SERVERLESS";
-
     public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD = "SSD";
-    public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_HDD = "HDD";
-
     public static final String RETIT_VALUE_NOT_SET = "not-set";
 
     public static final String STARTCPUTIME_FIELD = "startcputime";

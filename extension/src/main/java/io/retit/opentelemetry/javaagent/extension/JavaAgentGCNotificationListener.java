@@ -9,11 +9,9 @@ import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 import java.lang.management.MemoryUsage;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * A {@link NotificationListener} which triggers on garbage collection invocations.
- * <p>
  * This notification listener is registered by the {@link JavaAgentGCHandler} and then waits for garbage collection notifications.
  * Once such a notification arrives, handleGCNotification(Notification) is called.
  */
@@ -22,20 +20,14 @@ public class JavaAgentGCNotificationListener implements NotificationListener {
     private static final String END_OF_MINOR_GC = "end of minor GC";
     private static final String END_OF_MAJOR_GC = "end of major GC";
 
-    private static final Logger LOGGER = Logger.getLogger(JavaAgentGCNotificationListener.class.getName());
-
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
         if (notification != null && GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION.equals(notification.getType())) {
-            try {
-                handleGCNotification(notification);
-            } catch (RuntimeException ex) {
-                LOGGER.severe("Java Agent could not handle the gc notification. " + ex.getMessage());
-            }
+            handleGCNotification(notification);
         }
     }
 
-    public void handleGCNotification(final Notification notification) {
+    private void handleGCNotification(final Notification notification) {
         GarbageCollectionNotificationInfo garbageCollectionInfo = GarbageCollectionNotificationInfo
                 .from((CompositeData) notification.getUserData());
 

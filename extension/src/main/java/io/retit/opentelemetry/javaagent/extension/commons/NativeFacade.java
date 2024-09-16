@@ -7,12 +7,10 @@ import io.retit.opentelemetry.javaagent.extension.commons.windows.Kernel32Librar
 /**
  * <code>NativeFacade</code> is a wrapper class which provides access to native
  * methods across platforms.
- * <p>
  * Some methods which we need for RETIT APM are not accessible through Java API,
  * but instead must be accessed using native libraries. This class bundles all
  * such methods and provides implementations across multiple platforms. For this
  * purpose, JNA is used to consume the native C libraries.
- * <p>
  * Currently, the only supported platforms are Windows and Linux. In addition,
  * some of the methods are only applicable on certain platforms, e.g.
  * <code>getCurrentThreadCpuTime()</code>.
@@ -39,7 +37,6 @@ public class NativeFacade {
 
     /**
      * Gets the id of the current thread (tid).
-     * <p>
      * On Linux, this method currently only works for x86 and x86_64 platforms
      * since the IDs for the syscall are architecture-specific. If support for
      * other platforms is desired, the respective syscall IDs need to be looked

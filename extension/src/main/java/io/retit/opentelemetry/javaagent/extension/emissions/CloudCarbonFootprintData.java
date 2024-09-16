@@ -102,6 +102,7 @@ public final class CloudCarbonFootprintData {
      * <a href="https://github.com/cloud-carbon-footprint/cloud-carbon-coefficients/tree/main/output">output</a>.
      *
      * @param vmInstanceType the type of the instance for which the details are to be initialized
+     * @return the CloudCarbonFootprintInstanceData of the given instance type
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetails(final String vmInstanceType) {
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails;
@@ -122,20 +123,21 @@ public final class CloudCarbonFootprintData {
     }
 
     /**
-     * Initializes the instance details (number of cpus and their power consumption) for GCP instances
+     * Initializes the instance details (number of cpus and their power consumption) for GCP instances.
      *
      * @param vmInstanceType - the VM instance type
+     * @return the CloudCarbonFootprintInstanceData of the given instance type
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForGcp(final String vmInstanceType) {
 
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/instances/gcp-instances.csv", "/instances/coefficients-gcp-use.csv", vmInstanceType);
         cloudVMInstanceDetails.setCloudProvider(CloudProvider.GCP);
-        if (cloudVMInstanceDetails.getInstanceEnergyUsageIdle() == DOUBLE_ZERO) {
-            cloudVMInstanceDetails.setInstanceEnergyUsageIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_GCP);
+        if (cloudVMInstanceDetails.getCpuPowerConsumptionIdle() == DOUBLE_ZERO) {
+            cloudVMInstanceDetails.setCpuPowerConsumptionIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_GCP);
         }
 
-        if (cloudVMInstanceDetails.getInstanceEnergyUsageFull() == DOUBLE_ZERO) {
-            cloudVMInstanceDetails.setInstanceEnergyUsageFull(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_GCP);
+        if (cloudVMInstanceDetails.getCpuPowerConsumption100Percent() == DOUBLE_ZERO) {
+            cloudVMInstanceDetails.setCpuPowerConsumption100Percent(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_GCP);
         }
 
         return cloudVMInstanceDetails;
@@ -145,18 +147,18 @@ public final class CloudCarbonFootprintData {
      * Initializes the instance details (number of cpus and their power consumption) for Azure instances.
      *
      * @param vmInstanceType - the VM instance type
-     * @return CloudVMInstanceDetails
+     * @return the CloudCarbonFootprintInstanceData of the given instance type
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForAzure(final String vmInstanceType) {
 
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/instances/azure-instances.csv", "/instances/coefficients-azure-use.csv", vmInstanceType);
         cloudVMInstanceDetails.setCloudProvider(CloudProvider.AZURE);
-        if (cloudVMInstanceDetails.getInstanceEnergyUsageIdle() == DOUBLE_ZERO) {
-            cloudVMInstanceDetails.setInstanceEnergyUsageIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE);
+        if (cloudVMInstanceDetails.getCpuPowerConsumptionIdle() == DOUBLE_ZERO) {
+            cloudVMInstanceDetails.setCpuPowerConsumptionIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE);
         }
 
-        if (cloudVMInstanceDetails.getInstanceEnergyUsageFull() == DOUBLE_ZERO) {
-            cloudVMInstanceDetails.setInstanceEnergyUsageFull(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AZURE);
+        if (cloudVMInstanceDetails.getCpuPowerConsumption100Percent() == DOUBLE_ZERO) {
+            cloudVMInstanceDetails.setCpuPowerConsumption100Percent(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AZURE);
         }
 
         return cloudVMInstanceDetails;
@@ -166,12 +168,12 @@ public final class CloudCarbonFootprintData {
      * Initializes the instance details (number of cpus and their power consumption) for Azure and GCP instances
      * as AWS has a different file format.
      *
-     * @param instanceFileName
-     * @param coefficientsFileName
-     * @param vmInstanceType
-     * @return CloudVMInstanceDetails
+     * @param instanceFileName                           - file name containing the instance details for the current cloud provider.
+     * @param microArchitecturePowerCoefficientsFileName - file name containing the power coefficients details for the given processor microarchitecture.
+     * @param vmInstanceType                             - the instance type.
+     * @return the CloudCarbonFootprintInstanceData of the given instance type
      */
-    private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsCommon(final String instanceFileName, final String coefficientsFileName, final String vmInstanceType) {
+    private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsCommon(final String instanceFileName, final String microArchitecturePowerCoefficientsFileName, final String vmInstanceType) {
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
         cloudVMInstanceDetails.setInstanceType(vmInstanceType);
         List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader(instanceFileName);
@@ -179,18 +181,18 @@ public final class CloudCarbonFootprintData {
             String csvInstanceType = lineFields[1].trim();
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
                 cloudVMInstanceDetails.setInstanceVCpuCount(Double.parseDouble(lineFields[3].trim())); // Number of Instance vCPU
-                cloudVMInstanceDetails.setPlatformTotalVcpu(Double.parseDouble(lineFields[5].trim())); // Number of Platform Total vCPU
+                cloudVMInstanceDetails.setPlatformTotalVCpuCount(Double.parseDouble(lineFields[5].trim())); // Number of Platform Total vCPU
                 break;
             }
         }
 
         if (microarchitecture != null) {
-            csvLines = CSVParser.readAllCSVLinesExceptHeader(coefficientsFileName);
+            csvLines = CSVParser.readAllCSVLinesExceptHeader(microArchitecturePowerCoefficientsFileName);
             for (String[] lineFields : csvLines) {
                 String csvMicroarchitecture = lineFields[1].trim();
                 if (csvMicroarchitecture.equals(microarchitecture)) {
-                    cloudVMInstanceDetails.setInstanceEnergyUsageIdle(Double.parseDouble(lineFields[2].trim())); // Instance Watt usage @ Idle
-                    cloudVMInstanceDetails.setInstanceEnergyUsageFull(Double.parseDouble(lineFields[3].trim())); // Instance Watt usage @ 100%
+                    cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[2].trim())); // Instance Watt usage @ Idle
+                    cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[3].trim())); // Instance Watt usage @ 100%
                 }
             }
         }
@@ -199,10 +201,10 @@ public final class CloudCarbonFootprintData {
 
     /**
      * Initializes the instance details (number of cpus and their power consumption) for AWS  instances.
-     * <p>
      * As power consumption is included in the aws instance file a seperate method is used compared to AWS and GCP.
      *
      * @param vmInstanceType - the VM instance type
+     * @return the CloudCarbonFootprintInstanceData of the given instance type
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForAws(final String vmInstanceType) {
 
@@ -214,9 +216,9 @@ public final class CloudCarbonFootprintData {
             String csvInstanceType = lineFields[0];
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
                 cloudVMInstanceDetails.setInstanceVCpuCount(Double.parseDouble(lineFields[2])); // Instance vCPU
-                cloudVMInstanceDetails.setPlatformTotalVcpu(Double.parseDouble(lineFields[3])); // Platform Total Number of vCPU
-                cloudVMInstanceDetails.setInstanceEnergyUsageIdle(Double.parseDouble(lineFields[27].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ Idle
-                cloudVMInstanceDetails.setInstanceEnergyUsageFull(Double.parseDouble(lineFields[30].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ 100%
+                cloudVMInstanceDetails.setPlatformTotalVCpuCount(Double.parseDouble(lineFields[3])); // Platform Total Number of vCPU
+                cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[27].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ Idle
+                cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[30].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ 100%
             }
         }
 

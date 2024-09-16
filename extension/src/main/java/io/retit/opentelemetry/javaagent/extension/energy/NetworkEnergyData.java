@@ -5,6 +5,9 @@ import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprint
 
 import java.util.logging.Logger;
 
+/**
+ * Wrapper class to calculate the energy in kWh required to process one GB over the network.
+ */
 public class NetworkEnergyData {
 
     private static final Logger LOGGER = Logger.getLogger(NetworkEnergyData.class.getName());
@@ -40,8 +43,8 @@ public class NetworkEnergyData {
 
     @Override
     public String toString() {
-        return "NetworkEnergyData{" +
-                "kwhPerGBMinute=" + kwhPerGBMinute +
-                '}';
+        return "NetworkEnergyData{"
+                + "kwhPerGBMinute=" + kwhPerGBMinute
+                + '}';
     }
 }

@@ -13,34 +13,26 @@ import java.util.logging.Logger;
  * An {@link IResourceDemandDataCollector
  * IResourceDemandDataCollector} which retrieves resource demands on Linux
  * systems.
- * <p>
  * Specifically, this class implements the method
  * {@link #getDiskBytesReadAndWritten()} to support disk monitoring. This is
  * accomplished by querying the respective files in /proc.
- * <p>
  * rchar: characters read The number of bytes which this task has caused to
  * be read from storage. This is simply the sum of bytes which this process
  * passed to read(2) and similar system calls. It includes things such as
  * terminal I/O and is unaffected by whether or not actual physical disk I/O
  * was required (the read might have been satisfied from pagecache).
- * <p>
  * wchar: characters written The number of bytes which this task has caused,
  * or shall cause to be written to disk. Similar caveats apply here as with
  * rchar.
- * <p>
  * syscr: read syscalls Attempt to count the number of read I/O
  * operations-that is, system calls such as read(2) and pread(2).
- * <p>
  * syscw: write syscalls Attempt to count the number of write I/O
  * operations- that is, system calls such as write(2) and pwrite(2).
- * <p>
  * read_bytes: bytes read Attempt to count the number of bytes which this
  * process really did cause to be fetched from the storage layer. This is
  * accurate for block-backed filesystems.
- * <p>
  * write_bytes: bytes written Attempt to count the number of bytes which
  * this process caused to be sent to the storage layer.
- * <p>
  * cancelled_write_bytes: The big inaccuracy here is truncate. If a process
  * writes 1MB to a file and then deletes the file, it will in fact perform
  * no writeout. But it will have been accounted as having caused 1MB of
@@ -59,12 +51,10 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     /**
      * Gets the path of the proc io file for the current thread.
-     * <p>
      * This method uses {@link NativeFacade#getProcessId()} to get the current
      * process id and {@link NativeFacade#getThreadId()} to get the current
      * thread id. With this information, the path to the proc io file can be
      * constructed, which is {@code /proc/PID/task/TID/io}.
-     * <p>
      * Once constructed, the path is saved in a thread local variable for
      * caching so that the number of native calls is minimized.
      *

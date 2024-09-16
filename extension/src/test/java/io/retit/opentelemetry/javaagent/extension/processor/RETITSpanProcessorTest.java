@@ -1,7 +1,5 @@
 package io.retit.opentelemetry.javaagent.extension.processor;
 
-import io.retit.opentelemetry.javaagent.extension.Constants;
-import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.SpanId;
@@ -15,8 +13,8 @@ import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
-import io.opentelemetry.sdk.trace.export.BatchSpanProcessor;
-import io.opentelemetry.sdk.trace.export.SpanExporter;
+import io.retit.opentelemetry.javaagent.extension.Constants;
+import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,9 +43,9 @@ public class RETITSpanProcessorTest {
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY, true);
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY, true);
-        retitSpanProcessor = new RETITSpanProcessor(BatchSpanProcessor.builder(SpanExporter.composite()));
-        retitSpanProcessor.buildBatchSpanProcessor();
-        Assertions.assertNotNull(retitSpanProcessor.getDelegateBatchSpanProcessor());
+        retitSpanProcessor = new RETITSpanProcessor();
+        //retitSpanProcessor.buildBatchSpanProcessor();
+        //Assertions.assertNotNull(retitSpanProcessor.getDelegateBatchSpanProcessor());
         spanData = dummySpanData(Attributes.empty());
 
         readableSpan = mock(ReadableSpan.class);
