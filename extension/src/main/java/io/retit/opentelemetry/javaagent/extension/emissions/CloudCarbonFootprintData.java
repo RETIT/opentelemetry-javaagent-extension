@@ -232,7 +232,7 @@ public final class CloudCarbonFootprintData {
      * @param instanceType the type of the instance for which the embodied emissions are to be initialized
      * @return the total embodied emissions in kilograms of CO2e
      */
-    public final Double getTotalEmbodiedEmissionsForInstanceType(final String instanceType) {
+    public Double getTotalEmbodiedEmissionsForInstanceType(final String instanceType) {
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-aws-embodied.csv", 1, instanceType, 6);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {

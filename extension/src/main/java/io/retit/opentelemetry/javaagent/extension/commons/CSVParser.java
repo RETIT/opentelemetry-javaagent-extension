@@ -3,9 +3,9 @@ package io.retit.opentelemetry.javaagent.extension.commons;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Logger;
 
 public class CSVParser {
@@ -23,7 +23,7 @@ public class CSVParser {
         List<String[]> csvLinesWithoutHeader = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new
-                InputStreamReader(Objects.requireNonNull(CSVParser.class.getResourceAsStream(fileName))))) {
+                InputStreamReader(CSVParser.class.getResourceAsStream(fileName), StandardCharsets.UTF_8))) {
 
             String line = reader.readLine();
             boolean firstLine = true;
