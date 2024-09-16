@@ -110,7 +110,7 @@
             <plugin>
                 <groupId>com.google.cloud.tools</groupId>
                 <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.3</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
+                <version>3.3.2</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
                 <configuration>
                     <from>
                         <image>openjdk:17-slim</image>
