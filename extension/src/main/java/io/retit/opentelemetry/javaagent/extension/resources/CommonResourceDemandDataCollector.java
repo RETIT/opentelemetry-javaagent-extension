@@ -1,5 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.resources;
 
+import io.opentelemetry.api.internal.StringUtils;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 
 import java.lang.management.ManagementFactory;
@@ -145,6 +146,14 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     private static boolean isOpenJDK() {
         return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("openjdk");
+    }
+
+    public static long getProcessID() {
+        String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        if (!StringUtils.isNullOrEmpty(jvmName) && jvmName.contains("@")) {
+            return Long.parseLong(jvmName.split("@")[0]);
+        }
+        return -1;
     }
 
 }

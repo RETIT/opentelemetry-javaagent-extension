@@ -11,12 +11,12 @@ import io.opentelemetry.api.metrics.ObservableLongMeasurement;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
-import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
 import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintData;
 import io.retit.opentelemetry.javaagent.extension.emissions.embodied.EmbodiedEmissions;
 import io.retit.opentelemetry.javaagent.extension.energy.MemoryEnergyData;
 import io.retit.opentelemetry.javaagent.extension.energy.NetworkEnergyData;
 import io.retit.opentelemetry.javaagent.extension.energy.StorageEnergyData;
+import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 
 import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
@@ -112,7 +112,8 @@ public class MetricPublishingService {
         LOGGER.info("Publishing CPU time");
         if (ManagementFactory.getOperatingSystemMXBean() instanceof OperatingSystemMXBean) {
             OperatingSystemMXBean sunOSBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-            measurement.record(sunOSBean.getProcessCpuTime(), Attributes.of(AttributeKey.stringKey("io.retit.java.process.id"), String.valueOf(NativeFacade.getProcessId())));
+
+            measurement.record(sunOSBean.getProcessCpuTime(), Attributes.of(AttributeKey.stringKey("io.retit.java.process.id"), String.valueOf(CommonResourceDemandDataCollector.getProcessID())));
         }
     }
 

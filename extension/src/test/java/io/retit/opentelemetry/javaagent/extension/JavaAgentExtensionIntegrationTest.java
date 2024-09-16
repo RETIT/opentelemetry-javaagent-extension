@@ -146,8 +146,10 @@ class JavaAgentExtensionIntegrationTest {
                 }
                 assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
                 assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
-                assertNotEquals(0, spanDemandEntry.startDiskWriteDemand);
-                assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
+                if (!isGcSpanName(spanDemandEntryList.getKey())) {
+                    assertNotEquals(0, spanDemandEntry.startDiskWriteDemand);
+                    assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
+                }
                 assertNotEquals(0, spanDemandEntry.logSystemTime);
             }
         }

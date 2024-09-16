@@ -1,7 +1,5 @@
 package io.retit.opentelemetry.javaagent.extension.resources;
 
-import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
-
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -46,28 +44,14 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     private static final Logger LOGGER = Logger.getLogger(LinuxDataCollector.class.getName());
 
-    private static final ThreadLocal<Path> THREAD_LOCAL_PATHHANDLE = new ThreadLocal<>();
     private static final ThreadLocal<Long> THREAD_LOCAL_PROC_FS_READ_OVERHEAD = ThreadLocal.withInitial(() -> 0L);
 
     /**
-     * Gets the path of the proc io file for the current thread.
-     * This method uses {@link NativeFacade#getProcessId()} to get the current
-     * process id and {@link NativeFacade#getThreadId()} to get the current
-     * thread id. With this information, the path to the proc io file can be
-     * constructed, which is {@code /proc/PID/task/TID/io}.
-     * Once constructed, the path is saved in a thread local variable for
-     * caching so that the number of native calls is minimized.
-     *
-     * @return
+     * Uses the symbolic link /proc/thread-self to avoid native calls for process and thread ID.
+     * <p>
+     * This symbolic link requires a linux kernel version higher than 3.14.
      */
-    public static Path getPath() {
-        if (THREAD_LOCAL_PATHHANDLE.get() == null) {
-            Path path = FileSystems.getDefault().getPath("/proc", Integer.toString(NativeFacade.getProcessId()), "task",
-                    Integer.toString(NativeFacade.getThreadId()), "io");
-            THREAD_LOCAL_PATHHANDLE.set(path);
-        }
-        return THREAD_LOCAL_PATHHANDLE.get();
-    }
+    private static final Path PROC_FS_THREAD_SELF_IO = FileSystems.getDefault().getPath("/proc/thread-self/io");
 
     private static final String READ_BYTES = "rchar";
     private static final String WRITE_BYTES = "write_bytes";
@@ -78,36 +62,40 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
          * rchar: 476726516 wchar: 450053132 syscr: 1145703 syscw: 461006
          * read_bytes: 933888 write_bytes: 26984448 cancelled_write_bytes: 0
          */
-
         long[] result = null;
-        try {
 
-            byte[] filearray = Files.readAllBytes(getPath());
-            String text = new String(filearray, "UTF-8");
+        if (Files.exists(PROC_FS_THREAD_SELF_IO)) {
+            try {
 
-            int startIndex = text.indexOf(READ_BYTES);
-            if (startIndex == -1) {
-                return new long[]{};
+                byte[] filearray = Files.readAllBytes(PROC_FS_THREAD_SELF_IO);
+                String text = new String(filearray, "UTF-8");
+
+                int startIndex = text.indexOf(READ_BYTES);
+                if (startIndex == -1) {
+                    return new long[]{};
+                }
+                startIndex += READ_BYTES.length() + 2;
+                int endIndex = text.indexOf('\n', startIndex);
+                long readBytes = Long.parseLong(text.substring(startIndex, endIndex)) - THREAD_LOCAL_PROC_FS_READ_OVERHEAD.get();
+
+                startIndex = text.indexOf(WRITE_BYTES);
+                if (startIndex == -1) {
+                    return new long[]{};
+                }
+                startIndex += WRITE_BYTES.length() + 2;
+                endIndex = text.indexOf('\n', startIndex);
+                long writeBytes = Long.parseLong(text.substring(startIndex, endIndex));
+
+                result = new long[2];
+                result[0] = readBytes;
+                result[1] = writeBytes;
+
+                THREAD_LOCAL_PROC_FS_READ_OVERHEAD.set(THREAD_LOCAL_PROC_FS_READ_OVERHEAD.get() + text.length());
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, e.getMessage(), e);
             }
-            startIndex += READ_BYTES.length() + 2;
-            int endIndex = text.indexOf('\n', startIndex);
-            long readBytes = Long.parseLong(text.substring(startIndex, endIndex)) - THREAD_LOCAL_PROC_FS_READ_OVERHEAD.get();
-
-            startIndex = text.indexOf(WRITE_BYTES);
-            if (startIndex == -1) {
-                return new long[]{};
-            }
-            startIndex += WRITE_BYTES.length() + 2;
-            endIndex = text.indexOf('\n', startIndex);
-            long writeBytes = Long.parseLong(text.substring(startIndex, endIndex));
-
-            result = new long[2];
-            result[0] = readBytes;
-            result[1] = writeBytes;
-
-            THREAD_LOCAL_PROC_FS_READ_OVERHEAD.set(THREAD_LOCAL_PROC_FS_READ_OVERHEAD.get() + text.length());
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, e.getMessage(), e);
+        } else {
+            result = new long[]{0, 0};
         }
         return result;
     }
