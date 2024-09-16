@@ -9,28 +9,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <profiles>
-        <profile>
-            <id>latest</id>
-            <activation><activeByDefault>true</activeByDefault></activation>
-            <properties>
-                <props.branch.dockertag>latest</props.branch.dockertag>
-            </properties>
-        </profile>
-        <profile>
-            <id>feature</id>
-            <properties>
-                <props.branch.dockertag>feature</props.branch.dockertag>
-            </properties>
-        </profile>
-        <profile>
-            <id>stable</id>
-            <properties>
-                <props.branch.dockertag>stable</props.branch.dockertag>
-            </properties>
-        </profile>
-    </profiles>
-
     <dependencies>
         <dependency>
             <groupId>io.opentelemetry</groupId>
@@ -47,11 +25,6 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -59,17 +32,16 @@
             <artifactId>mockito-core</artifactId>
             <!-- We need a Java 8 version of Mockito -->
             <version>5.13.0</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk-testing</artifactId>
         </dependency>
-
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
         </dependency>
-
         <!-- test dependencies -->
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -92,9 +64,9 @@
             <version>1.27.0-alpha</version>
         </dependency>
         <dependency>
-        <groupId>io.opentelemetry</groupId>
-        <artifactId>opentelemetry-exporter-otlp</artifactId>
-    </dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-otlp</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -157,83 +129,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.8.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-otel-agent</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>io.opentelemetry.javaagent</groupId>
-                                    <artifactId>opentelemetry-javaagent</artifactId>
-                                    <type>jar</type>
-                                    <destFileName>javaagent.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-                <configuration>
-                    <outputDirectory>${project.build.directory}/jib</outputDirectory>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/jib</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>de.retit.apm.javaagent.extension-${project.version}.jar</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>com.google.cloud.tools</groupId>
-                <artifactId>jib-maven-plugin</artifactId>
-                <version>3.4.3</version>
-                <configuration>
-                    <from>
-                        <image>busybox</image>
-                    </from>
-                    <to>
-                        <image>registry.retit-support.de/brunnert/docker/otel-k8s-instrumentation-java:${project.version}</image>
-                        <tags>
-                            <tag>${props.branch.dockertag}</tag>
-                        </tags>
-                    </to>
-                    <extraDirectories>
-                        <paths>
-                            <path>${project.build.directory}/jib</path>
-                        </paths>
-                    </extraDirectories>
-                    <container>
-                        <entrypoint>
-                            /bin/sh -c
-                        </entrypoint>
-                    </container>
-                </configuration>
             </plugin>
         </plugins>
     </build>
