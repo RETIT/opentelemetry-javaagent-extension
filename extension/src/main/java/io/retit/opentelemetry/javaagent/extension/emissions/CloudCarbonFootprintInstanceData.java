@@ -1,6 +1,10 @@
 package io.retit.opentelemetry.javaagent.extension.emissions;
 
 public class CloudCarbonFootprintInstanceData {
+    // cloud provider of the instance
+    private CloudProvider cloudProvider;
+    // instance type
+    private String instanceType;
     // Number of Instance vCPU
     private double instanceVCpuCount;
     // Number of Platform Total vCPU
@@ -63,7 +67,23 @@ public class CloudCarbonFootprintInstanceData {
         return totalEmbodiedEmissions;
     }
 
-    public void setTotalEmbodiedEmissions(double totalEmbodiedEmissions) {
+    public void setTotalEmbodiedEmissions(final double totalEmbodiedEmissions) {
         this.totalEmbodiedEmissions = totalEmbodiedEmissions;
+    }
+
+    public CloudProvider getCloudProvider() {
+        return cloudProvider;
+    }
+
+    public void setCloudProvider(final CloudProvider cloudProvider) {
+        this.cloudProvider = cloudProvider;
+    }
+
+    public String getInstanceType() {
+        return instanceType;
+    }
+
+    public void setInstanceType(final String instanceType) {
+        this.instanceType = instanceType;
     }
 }
