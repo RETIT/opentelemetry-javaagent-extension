@@ -1,12 +1,11 @@
 package io.retit.opentelemetry.javaagent.extension.emissions;
 
-import io.opentelemetry.api.internal.StringUtils;
 import io.retit.opentelemetry.javaagent.extension.Constants;
 import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.commons.CSVParser;
 
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * ConfigLoader is responsible for loading configuration settings and instance details
@@ -17,17 +16,19 @@ public final class CloudCarbonFootprintData {
     private static final CloudCarbonFootprintData CONFIG_INSTANCE = new CloudCarbonFootprintData();
     private static final double DOUBLE_ZERO = 0.0;
 
-    private final String microarchitecture;
-    private final Double gridEmissionsFactor;
-    private final Double totalEmbodiedEmissions;
-    private final Double pueValue;
-    private final CloudCarbonFootprintInstanceData cloudInstanceDetails;
+    private String microarchitecture;
+    private Double gridEmissionsFactor;
+    private Double pueValue;
+    private CloudCarbonFootprintInstanceData cloudInstanceDetails;
 
     private CloudCarbonFootprintData() {
-        this.microarchitecture = initializeMicroarchitecture();
+        init();
+    }
+
+    void init() {
+        this.microarchitecture = InstanceConfiguration.getMicroarchitecture();
         this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
         cloudInstanceDetails = initializeCloudInstanceDetails(InstanceConfiguration.getCloudProviderInstanceType());
-        this.totalEmbodiedEmissions = getTotalEmbodiedEmissionsForInstanceType(InstanceConfiguration.getCloudProviderInstanceType());
         this.pueValue = initializePueValue();
     }
 
@@ -44,21 +45,12 @@ public final class CloudCarbonFootprintData {
         return gridEmissionsFactor;
     }
 
-    public Double getTotalEmbodiedEmissions() {
-        return totalEmbodiedEmissions;
-    }
-
     public Double getPueValue() {
         return pueValue;
     }
 
     public CloudCarbonFootprintInstanceData getCloudInstanceDetails() {
         return cloudInstanceDetails;
-    }
-
-    private String initializeMicroarchitecture() {
-        String envMicroarchitecture = System.getenv("MICROARCHITECTURE");
-        return envMicroarchitecture == null || StringUtils.isNullOrEmpty(envMicroarchitecture) ? null : envMicroarchitecture.toUpperCase(Locale.ENGLISH);
     }
 
     /**
@@ -79,7 +71,13 @@ public final class CloudCarbonFootprintData {
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-gcp.csv", 0, envRegion, 2);
         }
-        return gridEmissionFactorMetricTonPerKwh * 1000; // Convert to kilogram per kWh
+
+        // we need to do the conversion using BigDecimal to avoid loosing precision
+        BigDecimal metricTonPerKwh = BigDecimal.valueOf(gridEmissionFactorMetricTonPerKwh);
+        BigDecimal conversionFactorToKKgperKwH = BigDecimal.valueOf(1_000.0);
+        BigDecimal result = metricTonPerKwh.multiply(conversionFactorToKKgperKwH);
+
+        return result.doubleValue(); // Convert to kilogram per kWh
     }
 
     private double getDoubleValueFromCSVForRegionOrInstance(final String csvFile, final int instanceTypeOrRegionCsvField, final String instanceTypeOrRegion, final int csvField) {
@@ -115,8 +113,10 @@ public final class CloudCarbonFootprintData {
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             cloudVMInstanceDetails = initializeCloudInstanceDetailsForGcp(vmInstanceType);
         } else {
-            cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData(0.0, 0.0, 0.0, 0.0);
+            cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData(0.0, 0.0, 0.0, 0.0, 0.0);
         }
+
+        cloudVMInstanceDetails.setTotalEmbodiedEmissions(getTotalEmbodiedEmissionsForInstanceType(vmInstanceType));
 
         return cloudVMInstanceDetails;
     }
@@ -129,7 +129,7 @@ public final class CloudCarbonFootprintData {
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForGcp(final String vmInstanceType) {
 
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/instances/gcp-instances.csv", "/instances/coefficients-gcp-use.csv", vmInstanceType);
-
+        cloudVMInstanceDetails.setCloudProvider(CloudProvider.GCP);
         if (cloudVMInstanceDetails.getInstanceEnergyUsageIdle() == DOUBLE_ZERO) {
             cloudVMInstanceDetails.setInstanceEnergyUsageIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_GCP);
         }
@@ -150,7 +150,7 @@ public final class CloudCarbonFootprintData {
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForAzure(final String vmInstanceType) {
 
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/instances/azure-instances.csv", "/instances/coefficients-azure-use.csv", vmInstanceType);
-
+        cloudVMInstanceDetails.setCloudProvider(CloudProvider.AZURE);
         if (cloudVMInstanceDetails.getInstanceEnergyUsageIdle() == DOUBLE_ZERO) {
             cloudVMInstanceDetails.setInstanceEnergyUsageIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE);
         }
@@ -173,6 +173,7 @@ public final class CloudCarbonFootprintData {
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsCommon(final String instanceFileName, final String coefficientsFileName, final String vmInstanceType) {
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
+        cloudVMInstanceDetails.setInstanceType(vmInstanceType);
         List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader(instanceFileName);
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[1].trim();
@@ -206,7 +207,8 @@ public final class CloudCarbonFootprintData {
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForAws(final String vmInstanceType) {
 
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
-
+        cloudVMInstanceDetails.setCloudProvider(CloudProvider.AWS);
+        cloudVMInstanceDetails.setInstanceType(vmInstanceType);
         List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader("/instances/aws-instances.csv");
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[0];

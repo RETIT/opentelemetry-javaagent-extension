@@ -14,6 +14,7 @@ public class Constants {
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider.region";
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider.instance.type";
     public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.storage.type";
+    public static final String RETIT_EMISSIONS_MICROARCHITECTURE_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".microarchitecture";
 
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS = "AWS";
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP = "GCP";

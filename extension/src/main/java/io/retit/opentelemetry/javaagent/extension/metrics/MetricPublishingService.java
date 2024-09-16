@@ -17,7 +17,6 @@ import io.retit.opentelemetry.javaagent.extension.emissions.embodied.EmbodiedEmi
 import io.retit.opentelemetry.javaagent.extension.energy.MemoryEnergyData;
 import io.retit.opentelemetry.javaagent.extension.energy.NetworkEnergyData;
 import io.retit.opentelemetry.javaagent.extension.energy.StorageEnergyData;
-import io.retit.opentelemetry.javaagent.extension.power.CpuPowerData;
 
 import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;
@@ -61,13 +60,13 @@ public class MetricPublishingService {
         // minimum power consumption of the CPU in Idle
         meter.gaugeBuilder("io.retit.emissions.cpu.power.min")
                 .buildWithCallback(measurement ->
-                        publishDoubleMeasurement(measurement, "Min CPU Power Consumption", CpuPowerData.getInstance().getMinPowerCPU())
+                        publishDoubleMeasurement(measurement, "Min CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceEnergyUsageIdle())
                 );
 
         // maximum power consumption of the CPU at 100% utilization
         meter.gaugeBuilder("io.retit.emissions.cpu.power.max")
                 .buildWithCallback(measurement ->
-                        publishDoubleMeasurement(measurement, "Max CPU Power Consumption", CpuPowerData.getInstance().getMaxPowerCPU()));
+                        publishDoubleMeasurement(measurement, "Max CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceEnergyUsageFull()));
 
         // embodied emissions per minute in mg
         meter.gaugeBuilder("io.retit.emissions.embodied.emissions.minute.mg")
@@ -119,8 +118,8 @@ public class MetricPublishingService {
 
     private void publishDoubleMeasurement(final ObservableDoubleMeasurement measurement, final String type, final double value) {
         LOGGER.info("Publishing " + type + " with value " + value);
-        measurement.record(value, Attributes.of(AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY), CpuPowerData.getInstance().getCloudProvider(),
-                AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CpuPowerData.getInstance().getInstanceType()));
+        measurement.record(value, Attributes.of(AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCloudProvider().name(),
+                AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceType()));
     }
 
     public void publishResourceDemandVectorOfTransaction(final ReadWriteSpan readWriteSpan, final boolean logCPUTime, final boolean logHeapConsumption, final boolean logDiskDemand) {

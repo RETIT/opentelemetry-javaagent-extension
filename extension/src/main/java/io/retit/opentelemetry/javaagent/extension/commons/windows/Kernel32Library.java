@@ -2,9 +2,6 @@ package io.retit.opentelemetry.javaagent.extension.commons.windows;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
-import com.sun.jna.Pointer;
-import com.sun.jna.PointerType;
-import com.sun.jna.ptr.LongByReference;
 import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
 
 /**
@@ -26,19 +23,5 @@ public interface Kernel32Library extends Library {
     int GetCurrentProcessId();
 
     int GetCurrentThreadId();
-
-    Handle GetCurrentThread();
-
-    boolean QueryThreadCycleTime(Handle threadHandle, LongByReference cycles);
     //CHECKSTYLE:ON
-
-    public static class Handle extends PointerType {
-        public Handle(Pointer address) {
-            super(address);
-        }
-
-        public Handle() {
-            super();
-        }
-    }
 }

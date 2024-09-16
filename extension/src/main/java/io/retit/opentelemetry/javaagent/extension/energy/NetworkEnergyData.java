@@ -1,6 +1,5 @@
 package io.retit.opentelemetry.javaagent.extension.energy;
 
-import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintCoefficients;
 import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintData;
 
@@ -13,16 +12,12 @@ public class NetworkEnergyData {
     private static final NetworkEnergyData INSTANCE = new NetworkEnergyData();
 
     private final double kwhPerGBMinute;
-    private final String instanceType;
-    private final String cloudProvider;
 
     /**
      * Private constructor to prevent instantiation.
      * Initializes the {@link CloudCarbonFootprintData} to load necessary configuration.
      */
     private NetworkEnergyData() {
-        this.cloudProvider = InstanceConfiguration.getCloudProvider();
-        this.instanceType = InstanceConfiguration.getCloudProviderInstanceType();
         // convert to kWh and then to one minute
 
         this.kwhPerGBMinute = CloudCarbonFootprintCoefficients.NETWORK_KWH_PER_GB_HOUR / 60;
@@ -43,20 +38,10 @@ public class NetworkEnergyData {
         return kwhPerGBMinute;
     }
 
-    public String getInstanceType() {
-        return instanceType;
-    }
-
-    public String getCloudProvider() {
-        return cloudProvider;
-    }
-
     @Override
     public String toString() {
         return "NetworkEnergyData{" +
                 "kwhPerGBMinute=" + kwhPerGBMinute +
-                ", instanceType='" + instanceType + '\'' +
-                ", cloudProvider='" + cloudProvider + '\'' +
                 '}';
     }
 }

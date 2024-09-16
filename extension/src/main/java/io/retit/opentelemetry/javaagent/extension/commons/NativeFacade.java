@@ -1,12 +1,8 @@
 package io.retit.opentelemetry.javaagent.extension.commons;
 
 import com.sun.jna.Platform;
-import com.sun.jna.ptr.LongByReference;
+import io.retit.opentelemetry.javaagent.extension.commons.linux.CLibrary;
 import io.retit.opentelemetry.javaagent.extension.commons.windows.Kernel32Library;
-
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * <code>NativeFacade</code> is a wrapper class which provides access to native
@@ -20,13 +16,8 @@ import java.util.logging.Logger;
  * Currently, the only supported platforms are Windows and Linux. In addition,
  * some of the methods are only applicable on certain platforms, e.g.
  * <code>getCurrentThreadCpuTime()</code>.
- *
-
  */
 public class NativeFacade {
-
-    private static final Logger LOGGER = Logger.getLogger(NativeFacade.class.getName());
-
     private NativeFacade() {
         // Utility class
     }
@@ -68,41 +59,5 @@ public class NativeFacade {
         }
 
         return 0;
-    }
-
-    /**
-     * Gets the amount of CPU cycles consumed by the current thread.
-     * <p>
-     * This method is only applicable on Windows platforms.
-     *
-     * @return
-     */
-    public static long getCurrentThreadCpuTime() {
-        if (Platform.isWindows()) {
-            Kernel32Library.Handle threadHandle = Kernel32Library.INSTANCE.GetCurrentThread();
-            LongByReference cycles = new LongByReference();
-            Kernel32Library.INSTANCE.QueryThreadCycleTime(threadHandle, cycles);
-            return cycles.getValue();
-        }
-
-        return 0L;
-    }
-
-    /**
-     * Gets the model name of this system's CPU.
-     * <p>
-     * Currently, this is only implemented for Linux.
-     *
-     * @return
-     */
-    public static String getCpuModel() {
-        if (Platform.isLinux()) {
-            try {
-                return CpuInfoParser.getEntry("model name");
-            } catch (IOException e) {
-                LOGGER.log(Level.WARNING, e.getMessage(), e);
-            }
-        }
-        return null;
     }
 }

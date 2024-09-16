@@ -42,7 +42,7 @@ public class EmbodiedEmissions {
         if (InstanceConfiguration.getCloudProviderInstanceType() == null || Constants.RETIT_VALUE_NOT_SET.equals(InstanceConfiguration.getCloudProviderInstanceType())) {
             return 0;
         } else {
-            return configLoader.getTotalEmbodiedEmissions() * (CloudCarbonFootprintCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR / 60)
+            return configLoader.getCloudInstanceDetails().getTotalEmbodiedEmissions() * (CloudCarbonFootprintCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR / 60)
                     * (configLoader.getCloudInstanceDetails().getInstanceVCpuCount() / configLoader.getCloudInstanceDetails().getPlatformTotalVcpu()) * 1_000;
         }
     }
