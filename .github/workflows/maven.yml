@@ -27,9 +27,11 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
           cache: maven
-      - name: Build with Maven
-        run: mvn -B checkstyle:check pmd:check package spotbugs:check --file pom.xml
-      - name: Integration Test with Maven
+      - name: Compile and run Checkstyle, PMD and Spotbugs checks
+        run: mvn -B checkstyle:check pmd:check compile spotbugs:check --file pom.xml
+      - name: Package Extension and create Docker Container for Sample Application
+        run: mvn -B package --file pom.xml
+      - name: Run Integration Test
         run: mvn -B test -Dtest=JavaAgentExtensionIntegrationTest --file ./extension/pom.xml
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
