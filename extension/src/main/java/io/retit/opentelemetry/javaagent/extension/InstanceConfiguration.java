@@ -53,6 +53,10 @@ public class InstanceConfiguration {
         return getStringProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY);
     }
 
+    public static String getMicroarchitecture() {
+        return getStringProperty(Constants.RETIT_EMISSIONS_MICROARCHITECTURE_CONFIGURATION_PROPERTY);
+    }
+
     public static String getStorageType() {
         return getProperty(Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY,
                 String::valueOf, Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD);

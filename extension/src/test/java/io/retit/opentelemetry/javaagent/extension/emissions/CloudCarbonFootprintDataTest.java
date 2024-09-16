@@ -1,0 +1,104 @@
+package io.retit.opentelemetry.javaagent.extension.emissions;
+
+import io.retit.opentelemetry.javaagent.extension.Constants;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class CloudCarbonFootprintDataTest {
+
+    @BeforeEach
+    public void clearProperties() {
+        System.clearProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_MICROARCHITECTURE_CONFIGURATION_PROPERTY);
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataAWS() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "AWS");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "eu-central-1");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY, "t2.xlarge");
+        CloudCarbonFootprintData instance = new CloudCarbonFootprintData();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.338, instance.getGridEmissionsFactor());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(72, cloudCarbonFootprintInstanceData.getPlatformTotalVcpu());
+        Assertions.assertEquals(8.4, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageIdle());
+        Assertions.assertEquals(28.4, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageFull());
+        Assertions.assertEquals(1477.54, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataGCP() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "GCP");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "europe-west3");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY, "e2-standard-4");
+        CloudCarbonFootprintData instance = new CloudCarbonFootprintData();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.319, instance.getGridEmissionsFactor());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(32, cloudCarbonFootprintInstanceData.getPlatformTotalVcpu());
+        Assertions.assertEquals(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_GCP, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageIdle());
+        Assertions.assertEquals(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_GCP, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageFull());
+        Assertions.assertEquals(1230.46, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataGCPWithMicroarchitecture() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "GCP");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "europe-west3");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY, "e2-standard-4");
+        System.setProperty(Constants.RETIT_EMISSIONS_MICROARCHITECTURE_CONFIGURATION_PROPERTY, "Haswell");
+        CloudCarbonFootprintData instance = new CloudCarbonFootprintData();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.319, instance.getGridEmissionsFactor());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(32, cloudCarbonFootprintInstanceData.getPlatformTotalVcpu());
+        Assertions.assertEquals(1.9005681818181814, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageIdle());
+        Assertions.assertEquals(5.9688982156043195, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageFull());
+        Assertions.assertEquals(1230.46, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataAzure() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "Azure");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "West Europe");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY, "A1 v2");
+        CloudCarbonFootprintData instance = new CloudCarbonFootprintData();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.39, instance.getGridEmissionsFactor());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(1, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(8, cloudCarbonFootprintInstanceData.getPlatformTotalVcpu());
+        Assertions.assertEquals(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageIdle());
+        Assertions.assertEquals(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AZURE, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageFull());
+        Assertions.assertEquals(1216.62, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataAzureWithMicroarchitecture() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "Azure");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "West Europe");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY, "HB120-96rs v3");
+        System.setProperty(Constants.RETIT_EMISSIONS_MICROARCHITECTURE_CONFIGURATION_PROPERTY, "EPYC 3rd Gen");
+        CloudCarbonFootprintData instance = new CloudCarbonFootprintData();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.39, instance.getGridEmissionsFactor());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(0.8, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(120, cloudCarbonFootprintInstanceData.getPlatformTotalVcpu());
+        Assertions.assertEquals(0.44538981119791665, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageIdle());
+        Assertions.assertEquals(2.0193277994791665, cloudCarbonFootprintInstanceData.getInstanceEnergyUsageFull());
+        Assertions.assertEquals(1699.62, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+    }
+}
