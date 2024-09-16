@@ -12,7 +12,7 @@ import java.util.Locale;
  * ConfigLoader is responsible for loading configuration settings and instance details
  * from environment variables and CSV files.
  */
-public class CloudCarbonFootprintData {
+public final class CloudCarbonFootprintData {
 
     private static final CloudCarbonFootprintData CONFIG_INSTANCE = new CloudCarbonFootprintData();
     private static final double DOUBLE_ZERO = 0.0;
