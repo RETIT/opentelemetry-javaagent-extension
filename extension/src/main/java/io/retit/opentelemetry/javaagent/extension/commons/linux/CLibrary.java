@@ -1,7 +1,8 @@
-package io.retit.opentelemetry.javaagent.extension.commons;
+package io.retit.opentelemetry.javaagent.extension.commons.linux;
 
 import com.sun.jna.Library;
 import com.sun.jna.Native;
+import io.retit.opentelemetry.javaagent.extension.commons.NativeFacade;
 
 /**
  * JNA Library which allows access to the native C API of Linux.
