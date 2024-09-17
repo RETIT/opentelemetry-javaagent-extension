@@ -36,6 +36,7 @@ public class OpenTelemetryCustomizer implements AutoConfigurationCustomizerProvi
      * Prepares the list of {@link SpanProcessor} in the {@link SdkTracerProviderBuilder} to include a {@link RETITSpanProcessor}.
      *
      * @param tracerProvider - preconfigured {@link SdkTracerProviderBuilder} from auto-configuration
+     * @param config         - preconfigured {@link ConfigProperties} from auto-configuration
      * @return {@link SdkTracerProviderBuilder} with adjusted SdkTracerProviderBuilder
      */
     private SdkTracerProviderBuilder configureSdkTracerProvider(

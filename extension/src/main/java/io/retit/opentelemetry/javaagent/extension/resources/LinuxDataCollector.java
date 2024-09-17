@@ -48,7 +48,6 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     /**
      * Uses the symbolic link /proc/thread-self to avoid native calls for process and thread ID.
-     * <p>
      * This symbolic link requires a linux kernel version higher than 3.14.
      */
     private static final Path PROC_FS_THREAD_SELF_IO = FileSystems.getDefault().getPath("/proc/thread-self/io");

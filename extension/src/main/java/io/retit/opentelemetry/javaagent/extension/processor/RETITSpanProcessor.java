@@ -9,6 +9,9 @@ import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
 import io.retit.opentelemetry.javaagent.extension.metrics.MetricPublishingService;
 
+/**
+ * This is the core of the RETIT OpenTelemetry Extension and measures resource demand at the start and end of each span.
+ */
 public class RETITSpanProcessor implements ExtendedSpanProcessor {
 
     @Override

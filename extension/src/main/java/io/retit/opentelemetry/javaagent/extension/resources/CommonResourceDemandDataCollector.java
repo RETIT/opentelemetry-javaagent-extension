@@ -11,7 +11,6 @@ import java.util.logging.Logger;
 
 /**
  * General-purpose implementation of an {@link IResourceDemandDataCollector}.
- * <p>
  * This class uses both JVM methods (via a <code>jvmCollector</code>) as well as
  * native methods (<code>osCollector</code>) in order to provide the methods
  * necessary for collecting resource demands on a system. These resource demands
@@ -38,13 +37,11 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     private IResourceDemandDataCollector jvmCollector;
 
     /**
-     * Gets an instance of {@link IResourceDemandDataCollector} which is
-     * applicable for this system.
-     * <p>
+     * Gets an instance of {@link IResourceDemandDataCollector} that is applicable for this system.
      * The returned instance will be a collector for the current OS which also
      * has a reference to a JVM-specific collector.
      *
-     * @return
+     * @return - an instance of {@link IResourceDemandDataCollector} that is applicable for the current OS and JVM.
      */
     public static IResourceDemandDataCollector getResourceDemandDataCollector() {
 
@@ -76,8 +73,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     }
 
     /**
-     * get the ResourceDemandDataCollector to be used from a string containing
-     * the OS's name
+     * get the ResourceDemandDataCollector to be used from a string containing the OS's name.
      *
      * @param osName the name of the OS to use
      * @return the JVMDataCollector for the selected JVM
@@ -93,8 +89,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     }
 
     /**
-     * get the ResourceDemandDataCollector to be used from a string containing
-     * the JVM's name
+     * get the ResourceDemandDataCollector to be used from a string containing the JVM's name.
      *
      * @param jvmName the name of the JVM to use
      * @return the JVMDataCollector for the selected JVM
@@ -109,7 +104,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         try {
             collectorClass = Class.forName(className);
             collector = collectorClass.newInstance();
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
             LOGGER.log(Level.SEVERE, "Could not initialize instance: " + className, e);
         }
         return collector;
@@ -131,8 +126,10 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     /**
      * Sets the JVM collector to the specified one.
+     *
+     * @param jvmCollector - the IResourceDemandDataCollector for the current JVM.
      */
-    public void setJvmCollector(final IResourceDemandDataCollector jvmCollector) {
+    private void setJvmCollector(final IResourceDemandDataCollector jvmCollector) {
         this.jvmCollector = jvmCollector;
     }
 
@@ -148,6 +145,11 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("openjdk");
     }
 
+    /**
+     * Returns the processID of the JVM process.
+     *
+     * @return - the process id of the JVM process.
+     */
     public static long getProcessID() {
         String jvmName = ManagementFactory.getRuntimeMXBean().getName();
         if (!StringUtils.isNullOrEmpty(jvmName) && jvmName.contains("@")) {
