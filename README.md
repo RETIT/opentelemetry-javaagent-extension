@@ -33,7 +33,11 @@ java -javaagent:<replace_with_path>/opentelemetry-javaagent-all.jar \
 
 # Demo
 
-To see the extension in action for a very simple java application you can build the repository by running:
+To see the extension in action for a very simple java application we will create the setup depicted in the following image. We will setup an Application that will be instrumented using the OpenTelemetry Java-Agent including our extension. This application will publish resource demand and carbon emission metrics. These metrics will be received by an OpenTelemetry collector which transforms the metrics into a format compatible to Prometheus. Prometheus will fetch the metrics from the collector and store them. Using Grafana, the metrics will be visualized in a preconfigured dashboard.
+
+![demo_architecture.png](img/demo_architecture.png)
+
+To build the Sample application you need to run the following maven command:
 
 ```bash
 ./mvnw clean package
