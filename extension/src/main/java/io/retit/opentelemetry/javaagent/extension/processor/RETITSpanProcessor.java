@@ -78,7 +78,7 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
 
         if (readWriteSpan.getParentSpanContext() != null && !readWriteSpan.getParentSpanContext().isValid()) {
             // publish resource demand vector for top level transactions as metric for SCI calculations in Grafana
-            MetricPublishingService.getInstance().publishResourceDemandVectorOfTransaction(readWriteSpan, logCPUDemand, logHeapDemand, logDiskDemand);
+            MetricPublishingService.getInstance().publishResourceDemandVectorOfTransaction(readWriteSpan, logCPUDemand, logHeapDemand, logDiskDemand, logNetworkDemand);
         }
     }
 

@@ -33,7 +33,7 @@ public class MetricPublishingService {
 
     private LongCounter storageDemandMetricPublisher;
     private LongCounter memoryDemandMetricPublisher;
-    //private LongCounter networkDemandMetricPublisher;
+    private LongCounter networkDemandMetricPublisher;
     private LongCounter cpuDemandMetricPublisher;
 
     /**
@@ -101,8 +101,8 @@ public class MetricPublishingService {
         memoryDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.memory.bytes").setUnit("bytes")
                 .setDescription("Memory demand of a transaction in bytes").build();
 
-        // networkDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.network.bytes").setUnit("bytes")
-        //        .setDescription("Memory demand of a transaction in bytes").build();
+        networkDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.network.bytes").setUnit("bytes")
+                .setDescription("Network demand of a transaction in bytes").build();
 
         cpuDemandMetricPublisher = meter.counterBuilder("io.retit.resource.demand.cpu.ms").setUnit("ms")
                 .setDescription("CPU demand of a transaction in ms").build();
@@ -130,8 +130,9 @@ public class MetricPublishingService {
      * @param logCPUTime         - configuration whether CPU time should be published.
      * @param logHeapConsumption - configuration whether heap demand should be published.
      * @param logDiskDemand      - configuration whether disk demand should be published.
+     * @param logNetworkDemand   - configuration whether network demand should be published.
      */
-    public void publishResourceDemandVectorOfTransaction(final ReadWriteSpan readWriteSpan, final boolean logCPUTime, final boolean logHeapConsumption, final boolean logDiskDemand) {
+    public void publishResourceDemandVectorOfTransaction(final ReadWriteSpan readWriteSpan, final boolean logCPUTime, final boolean logHeapConsumption, final boolean logDiskDemand, final boolean logNetworkDemand) {
         if (!TelemetryUtils.isExternalDatabaseCall(readWriteSpan)) {
             Long startThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD));
             Long endThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
@@ -141,7 +142,7 @@ public class MetricPublishingService {
                 publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes());
                 publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes());
                 publishStorageDemandMetricForTransaction(logDiskDemand, readWriteSpan.getAttributes());
-                // publishNetworkDemandMetricForTransaction()
+                publishNetworkDemandMetricForTransaction(logNetworkDemand, readWriteSpan.getAttributes());
             }
         }
     }
@@ -190,20 +191,20 @@ public class MetricPublishingService {
         }
     }
 
-    //private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
-    //if (logNetworkDemand) {
-    /*Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
-     Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
-     long totalDiskReadDemand = startDiskReadDemand != null && endDiskReadDemand != null ? endDiskReadDemand - startDiskReadDemand : 0;
+    private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
+        if (logNetworkDemand) {
+            Long startNetworkReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_NETWORK_READ_DEMAND));
+            Long endNetworkReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_NETWORK_READ_DEMAND));
+            long totalNetworkReadDemand = startNetworkReadDemand != null && endNetworkReadDemand != null ? endNetworkReadDemand - startNetworkReadDemand : 0;
 
-     Long startDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND));
-     Long endDiskWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND));
-     long totalDiskWriteDemand = startDiskWriteDemand != null && endDiskWriteDemand != null ? (endDiskWriteDemand - startDiskWriteDemand) : 0;
+            Long startNetworkWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_NETWORK_WRITE_DEMAND));
+            Long endNetworkWriteDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_NETWORK_WRITE_DEMAND));
+            long totalNetworkWriteDemand = startNetworkWriteDemand != null && endNetworkWriteDemand != null ? (endNetworkWriteDemand - startNetworkWriteDemand) : 0;
 
-     long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
+            long totalNetworkDemand = totalNetworkReadDemand + totalNetworkWriteDemand;
 
-     storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);*/
-    //}
-    //}
+            networkDemandMetricPublisher.add(totalNetworkDemand, spanAttributes);
+        }
+    }
 }
 
