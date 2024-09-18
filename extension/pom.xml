@@ -36,8 +36,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <!-- We need a Java 8 version of Mockito -->
-            <version>5.13.0</version>
             <scope>test</scope>
         </dependency>
         <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->

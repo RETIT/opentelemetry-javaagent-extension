@@ -59,6 +59,16 @@
                 <scope>test</scope>
             </dependency>
 
+
+            <!-- MIT License https://github.com/mockito/mockito?tab=MIT-1-ov-file -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <!-- We need a Java 8 version of Mockito -->
+                <version>5.13.0</version>
+                <scope>test</scope>
+            </dependency>
+
         </dependencies>
 
     </dependencyManagement>
