@@ -14,8 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,6 +31,16 @@ class JavaAgentExtensionIntegrationTest {
     private static final String SAMPLE_METHOD = "SampleApplication.method";
     private static final String SAMPLE_METHOD1 = "SampleApplication.method1";
     private static final String SAMPLE_METHOD2 = "SampleApplication.method2";
+
+    // Metrics to be tested
+
+    private static final String[] METRIC_NAMES = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "io.retit.emissions.cpu.power.min", "io.retit.emissions.cpu.power.max",
+            "io.retit.emissions.embodied.emissions.minute.mg", "io.retit.emissions.memory.energy.gb.minute",
+            "io.retit.emissions.storage.energy.gb.minute", "io.retit.emissions.network.energy.gb.minute",
+            "io.retit.emissions.pue", "io.retit.emissions.gef", "io.retit.resource.demand.storage.bytes",
+            "io.retit.resource.demand.memory.bytes", "io.retit.resource.demand.network.bytes",
+            "io.retit.resource.demand.cpu.ms"
+    };
 
     @BeforeEach
     public void setupApplication() {
@@ -124,10 +133,12 @@ class JavaAgentExtensionIntegrationTest {
                 .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
-                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS")
+                .withEnv("WAIT_FOR_ONE_MINUTE", "true"); // we need to wait for one minute for the metrics to be published
         executeContainer();
 
-        Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
+        Assertions.assertTrue(!spanDemands.isEmpty());
+
         for (Map.Entry<String, List<SpanDemand>> spanDemandEntryList : spanDemands.entrySet()) {
             if (!isGcSpanName(spanDemandEntryList.getKey())) {
                 assertEquals(1, spanDemandEntryList.getValue().size());
@@ -156,11 +167,22 @@ class JavaAgentExtensionIntegrationTest {
                 assertNotNull(spanDemandEntry.endNetworkWriteDemand);
             }
         }
-        for (MetricDemand md : metricDemands) {
-            assertNotEquals(0.0, md.cpuEmissionsInMg);
-            assertNotEquals(0.0, md.memoryEmissionsInMg);
-            assertNotEquals(0.0, md.processCpuTime);
-            assertNotEquals(0.0, md.embodiedEmissionsInMg);
+
+        Assertions.assertTrue(!metricDemands.isEmpty());
+
+        for (String metricName : METRIC_NAMES) {
+            LOGGER.info("Asserting metric {}", metricName);
+            Optional<MetricDemand> metricDemandResult = metricDemands.stream().filter(metricDemand -> metricName.equals(metricDemand.metricName)).findFirst();
+            LOGGER.info("Found metric {} with value {}", metricName, metricDemandResult.get().metricValue);
+            Assertions.assertTrue(metricDemandResult.isPresent());
+            Assertions.assertNotNull(metricDemandResult.get().metricValue);
+            if(!"io.retit.resource.demand.network.bytes".equals(metricDemandResult.get().metricName)) {
+                Assertions.assertNotEquals(0.0, metricDemandResult.get().metricValue);
+            } else {
+                // not network demand
+                Assertions.assertEquals(0.0, metricDemandResult.get().metricValue);
+            }
+
         }
     }
 
@@ -406,45 +428,38 @@ class JavaAgentExtensionIntegrationTest {
     }
 
     private static void addToMetricDemands(String logOutput) {
-        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter") && logOutput.contains("Servicecall")) {
+        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter")) {
+            LOGGER.info("Processing metric " + logOutput);
             MetricDemand demand = extractMetricValuesFromLog(logOutput);
-            metricDemands.add(demand);
+            if (demand != null) {
+                metricDemands.add(demand);
+            }
         }
     }
 
     private static MetricDemand extractMetricValuesFromLog(String logMessage) {
-        String[] keys = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "cpu_emissions", "memory_emissions", "embodied_emissions"};
 
-        MetricDemand metricDemand = new MetricDemand();
-        for (String key : keys) {
-            String regex = "name=" + key + ".*?getSum=(\\d+\\.\\d+E[+-]?\\d+)";
-            Pattern pattern = Pattern.compile(regex);
-            Matcher matcher = pattern.matcher(logMessage);
+        String valueAttributeInLog = "value=";
 
-            if (matcher.find()) {
-                double value = Double.parseDouble(matcher.group(1));
-                switch (key) {
-                    case Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME:
-                        metricDemand.processCpuTime = value;
-                        break;
-                    case "embodied_emissions":
-                        metricDemand.embodiedEmissionsInMg = value;
-                        break;
-                    case "memory_emissions":
-                        System.out.println("memory emissions hier: " + value);
-                        metricDemand.memoryEmissionsInMg = value;
-                        break;
-                    case "cpu_emissions":
-                        metricDemand.cpuEmissionsInMg = value;
-                        break;
-                }
+        for (String key : METRIC_NAMES) {
+            if (logMessage.contains(key) && logMessage.indexOf(valueAttributeInLog) != -1) {
+
+                MetricDemand metricDemand = new MetricDemand();
+                int valueIndex = logMessage.indexOf(valueAttributeInLog);
+
+                String valueString = logMessage.substring(valueIndex + valueAttributeInLog.length(), logMessage.indexOf(",", valueIndex));
+                double value = Double.parseDouble(valueString);
+
+                metricDemand.metricName = key;
+                metricDemand.metricValue = value;
+                return metricDemand;
             }
         }
-        return metricDemand;
+        return null;
     }
 
     private static String extractOperationNameFromLogOutput(String logOutput) {
-        System.out.println("das ist der span " + logOutput);
+        LOGGER.info("Processing span " + logOutput);
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
     }
 
@@ -514,9 +529,7 @@ class JavaAgentExtensionIntegrationTest {
     }
 
     private static class MetricDemand {
-        public Double cpuEmissionsInMg = null;
-        public Double memoryEmissionsInMg = null;
-        public Double processCpuTime = null;
-        public Double embodiedEmissionsInMg = null;
+        public String metricName;
+        public Double metricValue;
     }
 }
