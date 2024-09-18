@@ -13,6 +13,8 @@ public class SampleApplication {
 
     private static final Logger LOGGER = Logger.getLogger(SampleApplication.class.getName());
 
+    private static final String CONTINUOUS_RUN_MODE = "continuously";
+
     /**
      * Simple method annotated with @WithSpan to collect Otel data.
      */
@@ -37,7 +39,7 @@ public class SampleApplication {
      */
     public static void main(String[] args) throws InterruptedException {
         // Call methods
-        if ("continuously".equals(System.getProperty("RUN_MODE"))) {
+        if (CONTINUOUS_RUN_MODE.equals(System.getProperty("RUN_MODE"))) {
             while (true) {
                 businessMethod();
                 Thread.sleep(500);

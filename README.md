@@ -1,7 +1,5 @@
 # OpenTelemetry Java Agent Extension to Collect Resource Demand Data and Publish Carbon Emissions
 
-[!NOTE] 
-The documentation is currently under construction, in case you spot an error or have a question, please open a ticket. 
 
 This repository contains an **extension** for the [OpenTelemetry Java Auto-Instrumentation agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation) **to collect resource demand data and to publish carbon emissions**. The following readme assumes that you are already familiar with the basic concepts of [OpenTelemetry](https://opentelemetry.io/) [Traces](https://opentelemetry.io/docs/concepts/signals/traces/) and [Metrics](https://opentelemetry.io/docs/concepts/signals/metrics/), otherwise please read the corresponding documentation first before you continue. 
 
