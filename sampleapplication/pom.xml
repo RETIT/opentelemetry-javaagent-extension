@@ -15,10 +15,12 @@
             <artifactId>extension</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry.instrumentation</groupId>
             <artifactId>opentelemetry-instrumentation-annotations</artifactId>
         </dependency>
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
