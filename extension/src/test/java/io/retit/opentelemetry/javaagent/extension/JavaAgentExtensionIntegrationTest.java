@@ -1,5 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension;
 
+import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -17,10 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 class JavaAgentExtensionIntegrationTest {
@@ -151,6 +149,11 @@ class JavaAgentExtensionIntegrationTest {
                     assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
                 }
                 assertNotEquals(0, spanDemandEntry.logSystemTime);
+
+                assertNotNull(spanDemandEntry.startNetworkReadDemand);
+                assertNotNull(spanDemandEntry.endNetworkReadDemand);
+                assertNotNull(spanDemandEntry.startNetworkWriteDemand);
+                assertNotNull(spanDemandEntry.endNetworkWriteDemand);
             }
         }
         for (MetricDemand md : metricDemands) {
@@ -189,6 +192,10 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
+            assertNull(sd.startNetworkReadDemand);
+            assertNull(sd.endNetworkReadDemand);
+            assertNull(sd.startNetworkWriteDemand);
+            assertNull(sd.endNetworkWriteDemand);
         }
     }
 
@@ -197,8 +204,9 @@ class JavaAgentExtensionIntegrationTest {
         applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
                 .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
                 .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
-                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "false")
                 .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
+                .withEnv("IO_RETIT_LOG_RESPONSE_TIME", "true")
                 .withEnv("SERVICE_NAME", "testService")
                 .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
@@ -222,6 +230,10 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
+            assertNull(sd.startNetworkReadDemand);
+            assertNull(sd.endNetworkReadDemand);
+            assertNull(sd.startNetworkWriteDemand);
+            assertNull(sd.endNetworkWriteDemand);
         }
     }
 
@@ -245,6 +257,8 @@ class JavaAgentExtensionIntegrationTest {
             SpanDemand sd = sds.get(0);
             assertNull(sd.startCpuTime);
             assertNull(sd.endCpuTime);
+            assertNotNull(sd.startHeapDemand);
+            assertNotNull(sd.endHeapDemand);
             assertNotEquals(0, sd.startHeapDemand);
             assertNotEquals(0, sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
@@ -252,6 +266,10 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endDiskReadDemand);
             assertNull(sd.startDiskWriteDemand);
             assertNull(sd.endDiskWriteDemand);
+            assertNull(sd.startNetworkReadDemand);
+            assertNull(sd.endNetworkReadDemand);
+            assertNull(sd.startNetworkWriteDemand);
+            assertNull(sd.endNetworkWriteDemand);
         }
     }
 
@@ -280,6 +298,9 @@ class JavaAgentExtensionIntegrationTest {
                     assertNull(spanDemandEntry.endHeapDemand);
                     assertNull(spanDemandEntry.totalHeapSize);
                 } else {
+                    assertNotNull(spanDemandEntry.startHeapDemand);
+                    assertNotNull(spanDemandEntry.endHeapDemand);
+                    assertNotNull(spanDemandEntry.totalHeapSize);
                     assertNotEquals(0, spanDemandEntry.startHeapDemand);
                     assertNotEquals(0, spanDemandEntry.endHeapDemand);
                     assertNotEquals(0, spanDemandEntry.totalHeapSize);
@@ -288,6 +309,10 @@ class JavaAgentExtensionIntegrationTest {
                 assertNull(spanDemandEntry.endDiskReadDemand);
                 assertNull(spanDemandEntry.startDiskWriteDemand);
                 assertNull(spanDemandEntry.endDiskWriteDemand);
+                assertNull(spanDemandEntry.startNetworkReadDemand);
+                assertNull(spanDemandEntry.endNetworkReadDemand);
+                assertNull(spanDemandEntry.startNetworkWriteDemand);
+                assertNull(spanDemandEntry.endNetworkWriteDemand);
             }
         }
     }
@@ -315,10 +340,52 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
+            assertNotNull(sd.startDiskReadDemand);
+            assertNotNull(sd.endDiskReadDemand);
+            assertNotNull(sd.startDiskWriteDemand);
+            assertNotNull(sd.endDiskWriteDemand);
             assertNotEquals(0, sd.startDiskReadDemand);
             assertNotEquals(0, sd.endDiskReadDemand);
             assertNotEquals(0, sd.startDiskWriteDemand);
             assertNotEquals(0, sd.endDiskWriteDemand);
+            assertNull(sd.startNetworkReadDemand);
+            assertNull(sd.endNetworkReadDemand);
+            assertNull(sd.startNetworkWriteDemand);
+            assertNull(sd.endNetworkWriteDemand);
+        }
+    }
+
+    @Test
+    void testOnlyNetworkDemand() {
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "false")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "false")
+                .withEnv("SERVICE_NAME", "testService")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
+        executeContainer();
+
+        Assertions.assertTrue(!spanDemands.entrySet().isEmpty());
+        for (List<SpanDemand> sds : spanDemands.values()) {
+            assertEquals(1, sds.size());
+            SpanDemand sd = sds.get(0);
+            assertNull(sd.startCpuTime);
+            assertNull(sd.endCpuTime);
+            assertNull(sd.startHeapDemand);
+            assertNull(sd.endHeapDemand);
+            assertNull(sd.totalHeapSize);
+            assertNull(sd.startDiskReadDemand);
+            assertNull(sd.endDiskReadDemand);
+            assertNull(sd.startDiskWriteDemand);
+            assertNull(sd.endDiskWriteDemand);
+            assertNotNull(sd.startNetworkReadDemand);
+            assertNotNull(sd.endNetworkReadDemand);
+            assertNotNull(sd.startNetworkWriteDemand);
+            assertNotNull(sd.endNetworkWriteDemand);
         }
     }
 
@@ -392,6 +459,10 @@ class JavaAgentExtensionIntegrationTest {
                 spanDemand.endDiskReadDemand = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.enddiskwritedemand")) {
                 spanDemand.endDiskWriteDemand = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.endnetworkreaddemand")) {
+                spanDemand.endNetworkReadDemand = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.endnetworkwritedemand")) {
+                spanDemand.endNetworkWriteDemand = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.endheapbyteallocation")) {
                 spanDemand.endHeapDemand = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.endsystemtime")) {
@@ -402,6 +473,10 @@ class JavaAgentExtensionIntegrationTest {
                 spanDemand.startDiskReadDemand = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.startdiskwritedemand")) {
                 spanDemand.startDiskWriteDemand = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.startnetworkreaddemand")) {
+                spanDemand.startNetworkReadDemand = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.startnetworkwritedemand")) {
+                spanDemand.startNetworkWriteDemand = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.startheapbyteallocation")) {
                 spanDemand.startHeapDemand = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.startsystemtime")) {
@@ -416,7 +491,7 @@ class JavaAgentExtensionIntegrationTest {
     }
 
     private static String[] extractPropertiesFromLogOutput(String logOutput) {
-        return logOutput.substring(logOutput.indexOf('{') + 1, logOutput.lastIndexOf("},")).split(",");
+        return logOutput.substring(logOutput.indexOf("={") + 1, logOutput.lastIndexOf("},")).split(",");
     }
 
     private static class SpanDemand {
@@ -430,6 +505,10 @@ class JavaAgentExtensionIntegrationTest {
         public Long endDiskReadDemand = null;
         public Long startDiskWriteDemand = null;
         public Long endDiskWriteDemand = null;
+        public Long startNetworkReadDemand = null;
+        public Long endNetworkReadDemand = null;
+        public Long startNetworkWriteDemand = null;
+        public Long endNetworkWriteDemand = null;
         public Long logSystemTime = null;
         public Long totalHeapSize = null;
     }

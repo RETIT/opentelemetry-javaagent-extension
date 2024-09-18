@@ -20,4 +20,9 @@ public class HotSpotDataCollector extends CommonResourceDemandDataCollector {
     public long[] getDiskBytesReadAndWritten() {
         throw new UnsupportedOperationException("Disk IO demand cannot read for HotSpot JVMs");
     }
+
+    @Override
+    public long[] getNetworkBytesReadAndWritten() {
+        throw new UnsupportedOperationException("Network IO demand cannot read for HotSpot JVMs");
+    }
 }

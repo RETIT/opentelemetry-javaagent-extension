@@ -1,7 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.emissions;
 
-import io.retit.opentelemetry.javaagent.extension.Constants;
-import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
+import io.retit.opentelemetry.javaagent.extension.commons.Constants;
+import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.commons.CSVParser;
 
 import java.math.BigDecimal;

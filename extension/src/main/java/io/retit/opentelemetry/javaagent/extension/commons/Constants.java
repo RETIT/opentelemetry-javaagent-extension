@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.javaagent.extension;
+package io.retit.opentelemetry.javaagent.extension.commons;
 
 /**
  * Constants class for configuration values.
@@ -38,9 +38,13 @@ public class Constants {
 
     public static final String STARTDISKREADDEMAND_FIELD = "startdiskreaddemand";
     public static final String ENDDISKREADDEMAND_FIELD = "enddiskreaddemand";
+    public static final String STARTNETWORKREADDEMAND_FIELD = "startnetworkreaddemand";
+    public static final String ENDNETWORKREADDEMAND_FIELD = "endnetworkreaddemand";
 
     public static final String STARTDISKWRITEDEMAND_FIELD = "startdiskwritedemand";
     public static final String ENDDISKWRITEDEMAND_FIELD = "enddiskwritedemand";
+    public static final String STARTNETWORKWRITEDEMAND_FIELD = "startnetworkwritedemand";
+    public static final String ENDNETWORKWRITEDEMAND_FIELD = "endnetworkwritedemand";
     public static final String TOTAL_HEAP_SIZE_FIELD = "totalheapsize";
     public static final String START_THREAD_FIELD = "startthread";
     public static final String END_THREAD_FIELD = "endthread";
@@ -57,10 +61,14 @@ public class Constants {
     public static final String SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTHEAPBYTEALLOCATION_FIELD);
     public static final String SPAN_ATTRIBUTE_START_DISK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTDISKREADDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_START_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTDISKWRITEDEMAND_FIELD);
+    public static final String SPAN_ATTRIBUTE_START_NETWORK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTNETWORKREADDEMAND_FIELD);
+    public static final String SPAN_ATTRIBUTE_START_NETWORK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTNETWORKWRITEDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_START_CPU_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, STARTCPUTIME_FIELD);
     public static final String SPAN_ATTRIBUTE_END_CPU_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDCPUTIME_FIELD);
     public static final String SPAN_ATTRIBUTE_END_DISK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDDISKREADDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_END_DISK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDDISKWRITEDEMAND_FIELD);
+    public static final String SPAN_ATTRIBUTE_END_NETWORK_READ_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDNETWORKREADDEMAND_FIELD);
+    public static final String SPAN_ATTRIBUTE_END_NETWORK_WRITE_DEMAND = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDNETWORKWRITEDEMAND_FIELD);
     public static final String SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDHEAPBYTEALLOCATION_FIELD);
     public static final String SPAN_ATTRIBUTE_END_SYSTEM_TIME = String.format(STRING_DECIMAL_FORMAT, RETIT_NAMESPACE, ENDSYSTEMTIME_FIELD);
 

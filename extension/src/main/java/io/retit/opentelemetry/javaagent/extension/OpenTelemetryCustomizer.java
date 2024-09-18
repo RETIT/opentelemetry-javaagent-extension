@@ -6,7 +6,9 @@ import io.opentelemetry.sdk.autoconfigure.spi.AutoConfigurationCustomizerProvide
 import io.opentelemetry.sdk.autoconfigure.spi.ConfigProperties;
 import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
+import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.processor.RETITSpanProcessor;
+import io.retit.opentelemetry.javaagent.extension.resources.JavaAgentGCHandler;
 
 import java.util.logging.Logger;
 

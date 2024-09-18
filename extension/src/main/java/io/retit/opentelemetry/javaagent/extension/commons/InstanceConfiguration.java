@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.javaagent.extension;
+package io.retit.opentelemetry.javaagent.extension.commons;
 
 import java.util.Locale;
 import java.util.logging.Level;

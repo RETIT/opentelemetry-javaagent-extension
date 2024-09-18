@@ -1,8 +1,9 @@
-package io.retit.opentelemetry.javaagent.extension;
+package io.retit.opentelemetry.javaagent.extension.resources;
 
 import com.sun.management.GarbageCollectionNotificationInfo;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;

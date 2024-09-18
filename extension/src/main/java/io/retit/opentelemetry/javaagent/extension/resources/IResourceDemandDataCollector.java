@@ -20,10 +20,18 @@ public interface IResourceDemandDataCollector {
     long getCurrentThreadCpuTime();
 
     /**
-     * get the amount of bytes read and written to the disk by current thread.
+     * get the amount of bytes read and written to the storage by current thread.
      *
-     * @return an array were the first element depicts the amount of bytes read to the disk and
-     * the second element depicts the amount of bytes written
+     * @return an array were the first element depicts the amount of bytes read from the storage and
+     * the second element depicts the amount of bytes written to the storage.
      */
     long[] getDiskBytesReadAndWritten();
+
+    /**
+     * get the amount of bytes read and written to the network by current thread.
+     *
+     * @return an array were the first element depicts the amount of bytes read from the network and
+     * the second element depicts the amount of bytes written to the network.
+     */
+    long[] getNetworkBytesReadAndWritten();
 }

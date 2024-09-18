@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.javaagent.extension;
+package io.retit.opentelemetry.javaagent.extension.resources;
 
 import javax.management.ListenerNotFoundException;
 import javax.management.NotificationEmitter;

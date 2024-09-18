@@ -15,5 +15,10 @@ public class WindowsDataCollector extends CommonResourceDemandDataCollector {
         return new long[]{0, 0};
     }
 
+    @Override
+    public long[] getNetworkBytesReadAndWritten() {
+        return new long[]{0, 0};
+    }
+
 }
 

@@ -5,8 +5,8 @@ import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.opentelemetry.sdk.trace.internal.ExtendedSpanProcessor;
-import io.retit.opentelemetry.javaagent.extension.InstanceConfiguration;
-import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
+import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
+import io.retit.opentelemetry.javaagent.extension.commons.TelemetryUtils;
 import io.retit.opentelemetry.javaagent.extension.metrics.MetricPublishingService;
 
 /**
@@ -18,7 +18,6 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
     public void onStart(final Context parentContext, final ReadWriteSpan readWriteSpan) {
         boolean logCPUDemand = InstanceConfiguration.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = InstanceConfiguration.isLogHeapDemandDefaultTrue();
-        boolean logGCEvent = InstanceConfiguration.isLogGCEventDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
@@ -28,7 +27,7 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
                 logResponseTime,
                 logHeapDemand,
                 logDiskDemand,
-                logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
+                logNetworkDemand,
                 readWriteSpan);
     }
 
@@ -65,7 +64,6 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
     public void onEnding(final ReadWriteSpan readWriteSpan) {
         boolean logCPUDemand = InstanceConfiguration.isLogCpuDemandDefaultTrue();
         boolean logHeapDemand = InstanceConfiguration.isLogHeapDemandDefaultTrue();
-        boolean logGCEvent = InstanceConfiguration.isLogGCEventDefaultTrue();
         boolean logResponseTime = InstanceConfiguration.isLogResponseTime();
         boolean logDiskDemand = InstanceConfiguration.isLogDiskDemand();
         boolean logNetworkDemand = InstanceConfiguration.isLogNetworkDemand();
@@ -75,7 +73,7 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
                 logResponseTime,
                 logHeapDemand,
                 logDiskDemand,
-                logCPUDemand || logResponseTime || logHeapDemand || logDiskDemand || logGCEvent || logNetworkDemand,
+                logNetworkDemand,
                 readWriteSpan);
 
         if (readWriteSpan.getParentSpanContext() != null && !readWriteSpan.getParentSpanContext().isValid()) {

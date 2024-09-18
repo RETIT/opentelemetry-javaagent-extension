@@ -1,7 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.resources;
 
 import io.opentelemetry.api.internal.StringUtils;
-import io.retit.opentelemetry.javaagent.extension.TelemetryUtils;
+import io.retit.opentelemetry.javaagent.extension.commons.TelemetryUtils;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;

@@ -1,6 +1,6 @@
 package io.retit.opentelemetry.javaagent.extension.emissions;
 
-import io.retit.opentelemetry.javaagent.extension.Constants;
+import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import io.retit.opentelemetry.javaagent.extension.emissions.embodied.EmbodiedEmissions;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
