@@ -10,23 +10,29 @@
     </parent>
 
     <dependencies>
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk-extension-autoconfigure-spi</artifactId>
             <scope>compile</scope>
         </dependency>
+        <!-- Apache 2.0 License https://github.com/google/auto/blob/main/service/README.md -->
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
             <version>${auto-service.version}</version>
             <scope>compile</scope>
         </dependency>
+
         <!-- Test Dependencies -->
+
+        <!-- EPL v2.0 https://github.com/junit-team/junit5/blob/main/LICENSE.md -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- MIT License https://github.com/mockito/mockito?tab=MIT-1-ov-file -->
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -34,34 +40,29 @@
             <version>5.13.0</version>
             <scope>test</scope>
         </dependency>
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-sdk-testing</artifactId>
+            <scope>test</scope>
         </dependency>
-        <!-- test dependencies -->
+        <!-- MIT License https://github.com/testcontainers/testcontainers-java?tab=MIT-1-ov-file -->
         <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-exporters-logging</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- MIT License https://www.slf4j.org/license.html -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry.semconv</groupId>
-            <artifactId>opentelemetry-semconv</artifactId>
-            <version>1.27.0-alpha</version>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-exporter-otlp</artifactId>
         </dependency>
     </dependencies>
 

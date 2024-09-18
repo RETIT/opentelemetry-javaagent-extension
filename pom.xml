@@ -20,6 +20,7 @@
     <dependencyManagement>
         <dependencies>
 
+            <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-bom</artifactId>
@@ -27,14 +28,14 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/io.opentelemetry.instrumentation/opentelemetry-instrumentation-annotations -->
+            <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
                 <version>2.8.0</version>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-engine -->
+            <!-- EPL v2.0 https://github.com/junit-team/junit5/blob/main/LICENSE.md -->
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter</artifactId>
@@ -42,21 +43,21 @@
                 <scope>test</scope>
             </dependency>
 
-            <!-- https://mvnrepository.com/artifact/org.testcontainers/junit-jupiter -->
+            <!-- MIT License https://github.com/testcontainers/testcontainers-java?tab=MIT-1-ov-file -->
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>junit-jupiter</artifactId>
                 <version>1.20.1</version>
                 <scope>test</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-simple -->
+            <!-- MIT License https://www.slf4j.org/license.html -->
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-simple</artifactId>
                 <version>2.0.16</version>
                 <scope>test</scope>
             </dependency>
-            <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-exporters-logging -->
+            <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-exporters-logging</artifactId>
@@ -64,6 +65,7 @@
                 <scope>test</scope>
             </dependency>
 
+            <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
             <dependency>
                 <groupId>io.opentelemetry.javaagent</groupId>
                 <artifactId>opentelemetry-javaagent</artifactId>
