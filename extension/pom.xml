@@ -52,12 +52,6 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-exporters-logging</artifactId>
-            <scope>test</scope>
-        </dependency>
         <!-- MIT License https://www.slf4j.org/license.html -->
         <dependency>
             <groupId>org.slf4j</groupId>
