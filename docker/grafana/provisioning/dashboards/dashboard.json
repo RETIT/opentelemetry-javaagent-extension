@@ -18,11 +18,12 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 2,
   "links": [],
   "panels": [
     {
       "datasource": {
+        "default": true,
         "type": "prometheus",
         "uid": "api-metrics"
       },
@@ -38,6 +39,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -81,7 +83,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
+        "h": 9,
         "w": 12,
         "x": 0,
         "y": 0
@@ -107,8 +109,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "delta(io_retit_resource_demand_cpu_ms_milliseconds_total{code_function=\"method1\"}[$__interval])",
+          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total{code_function=\"method1\"}[$__rate_interval])",
           "fullMetaSearch": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -125,7 +128,7 @@
           "editorMode": "builder",
           "expr": "io_retit_emissions_gef",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -142,7 +145,7 @@
           "editorMode": "builder",
           "expr": "io_retit_emissions_pue",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -157,9 +160,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_cpu_power_min",
+          "expr": "io_retit_emissions_cpu_power_min",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -174,9 +177,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_cpu_power_max",
+          "expr": "io_retit_emissions_cpu_power_max",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -192,9 +195,9 @@
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "delta(io_retit_java_process_cpu_time_total[$__interval])",
+          "expr": "rate(io_retit_emissions_java_process_cpu_time_total[$__rate_interval])",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -209,7 +212,7 @@
             "uid": "__expr__"
           },
           "expression": "$processcpudemand  /  $__interval_ms",
-          "hide": false,
+          "hide": true,
           "refId": "CPUutil",
           "type": "math"
         },
@@ -220,7 +223,7 @@
             "uid": "__expr__"
           },
           "expression": "$dcpuSum / $processcpudemand",
-          "hide": false,
+          "hide": true,
           "refId": "CPUutilT",
           "type": "math"
         },
@@ -231,7 +234,7 @@
             "uid": "__expr__"
           },
           "expression": "$Pcpumin + ($CPUutil * ($Pcpumax-$Pcpumin))",
-          "hide": false,
+          "hide": true,
           "refId": "Pcpu",
           "type": "math"
         },
@@ -242,7 +245,7 @@
             "uid": "__expr__"
           },
           "expression": "($Pcpu* $__interval_ms) / 1000",
-          "hide": false,
+          "hide": true,
           "refId": "Ecpu",
           "type": "math"
         },
@@ -253,7 +256,7 @@
             "uid": "__expr__"
           },
           "expression": "$Ecpu * $GEF",
-          "hide": false,
+          "hide": true,
           "refId": "ccpu",
           "type": "math"
         },
@@ -266,7 +269,7 @@
           "editorMode": "builder",
           "expr": "io_retit_emissions_storage_energy_gb_minute",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -283,7 +286,7 @@
           "editorMode": "builder",
           "expr": "io_retit_emissions_network_energy_gb_minute",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -300,7 +303,7 @@
           "editorMode": "builder",
           "expr": "io_retit_emissions_memory_energy_gb_minute",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -315,9 +318,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "delta(io_retit_resource_demand_memory_bytes_total[$__interval])",
+          "expr": "rate(io_retit_resource_demand_memory_bytes_total{code_function=\"method1\"}[$__rate_interval])",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": false,
           "instant": false,
           "legendFormat": "__auto",
@@ -332,7 +335,7 @@
             "uid": "__expr__"
           },
           "expression": "$dmem*0.000000001*$Emem*$GEF",
-          "hide": false,
+          "hide": true,
           "refId": "cmem",
           "type": "math"
         },
@@ -343,7 +346,7 @@
             "uid": "__expr__"
           },
           "expression": "$ccpu+$cmem",
-          "hide": false,
+          "hide": true,
           "refId": "ct",
           "type": "math"
         },
@@ -356,7 +359,7 @@
           "editorMode": "builder",
           "expr": "io_retit_emissions_embodied_emissions_minute_mg",
           "fullMetaSearch": false,
-          "hide": false,
+          "hide": true,
           "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
@@ -371,7 +374,7 @@
             "uid": "__expr__"
           },
           "expression": "$M * $__interval_ms * $CPUutilT",
-          "hide": false,
+          "hide": true,
           "refId": "Mt",
           "type": "math"
         },
@@ -407,6 +410,7 @@
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
+            "barWidthFactor": 0.6,
             "drawStyle": "line",
             "fillOpacity": 0,
             "gradientMode": "none",
@@ -453,7 +457,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 9
       },
       "id": 1,
       "options": {
@@ -490,19 +494,20 @@
       "type": "timeseries"
     }
   ],
+  "refresh": "",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-3h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Carbon Emissions Transaction",
   "uid": "adv7vxmnrde68e",
-  "version": 3,
+  "version": 1,
   "weekStart": ""
 }
