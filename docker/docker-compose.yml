@@ -12,7 +12,7 @@ networks:
 services:
   # Grafana
   grafana:
-    image: grafana/grafana:11.1.4
+    image: grafana/grafana:11.2.0
     container_name: grafana
     deploy:
       resources:
@@ -20,7 +20,8 @@ services:
           memory: 100M
     volumes:
       - ./grafana/grafana.ini:/etc/grafana/grafana.ini
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./grafana/provisioning/datasources/:/etc/grafana/provisioning/datasources/
+      - ./grafana/provisioning/dashboards/:/etc/grafana/provisioning/dashboards/
     ports:
       - "3000:3000"
     logging: *logging

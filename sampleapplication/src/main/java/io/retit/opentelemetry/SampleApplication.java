@@ -37,15 +37,26 @@ public class SampleApplication {
      */
     public static void main(String[] args) throws InterruptedException {
         // Call methods
-        Span span = Span.current();
-        span.setAttribute("test", "some value");
-        method1();
-        method2();
-        span.end();
+        if ("continuously".equals(System.getProperty("RUN_MODE"))) {
+            while (true) {
+                businessMethod();
+                Thread.sleep(500);
+            }
+        } else {
+            businessMethod();
+        }
 
         if (System.getenv("WAIT_FOR_ONE_MINUTE") != null) {
             // we need to wait for 60 s so that the metrics are at least published once
             Thread.sleep(60_000);
         }
+    }
+
+    private static void businessMethod() {
+        Span span = Span.current();
+        span.setAttribute("test", "some value");
+        method1();
+        method2();
+        span.end();
     }
 }
