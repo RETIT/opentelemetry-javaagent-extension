@@ -30,6 +30,8 @@ public class MetricPublishingService {
 
     private static final Logger LOGGER = Logger.getLogger(MetricPublishingService.class.getName());
 
+    private static final long NANOSECOND_TO_MILLISECOND_CONVERSION = 1_000_000;
+
     private static MetricPublishingService instance = new MetricPublishingService();
 
     private LongCounter storageDemandMetricPublisher;
@@ -114,7 +116,7 @@ public class MetricPublishingService {
             OperatingSystemMXBean sunOSBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
             LOGGER.info("Publishing CPU time");
-            measurement.record(sunOSBean.getProcessCpuTime(), Attributes.of(AttributeKey.stringKey("io.retit.java.process.id"), String.valueOf(CommonResourceDemandDataCollector.getProcessID())));
+            measurement.record(sunOSBean.getProcessCpuTime() / NANOSECOND_TO_MILLISECOND_CONVERSION, Attributes.of(AttributeKey.stringKey("io.retit.java.process.id"), String.valueOf(CommonResourceDemandDataCollector.getProcessID())));
         }
     }
 
@@ -187,8 +189,10 @@ public class MetricPublishingService {
             Long endCpuTime = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
             long totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
 
+            long totalCpuTimeUsedInMs = totalCpuTimeUsed / NANOSECOND_TO_MILLISECOND_CONVERSION;
+
             if (totalCpuTimeUsed > 0) {
-                cpuDemandMetricPublisher.add(totalCpuTimeUsed, filteredAttributes);
+                cpuDemandMetricPublisher.add(totalCpuTimeUsedInMs, filteredAttributes);
             }
         }
     }
