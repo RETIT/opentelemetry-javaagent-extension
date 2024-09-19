@@ -69,11 +69,15 @@ This application will run until you stop it and generate data. While it is gener
 
     http://localhost:3000/grafana/dashboards
 
+After some time you can see the data produced by this application in the following dashboard. As an example the CPU and memory demands are shown as they are supported on most plattforms as well as the Emission Calculation Factors. Furthermore, we have integrated a [Software Carbon Intensity](https://sci.greensoftware.foundation/) calculation for each transaction based on this data. This calculation is based on our work presented at the [Workshop on Challenges in Performance Methods for Software Development (WOSP-C) 2024](https://www.retit.de/wp-content/uploads/2024/05/Green_Software_Metrics.pdf) and [EcoCompute](https://www.retit.de/wp-content/uploads/2024/04/2024-04-25_How_to_Measure_CO2-Emissions_For_Every_API_Call_Of_Your_Microservices.pdf) with the main difference that we are now using the [Cloud Carbon coefficients](https://github.com/cloud-carbon-footprint/ccf-coefficients) instead of an external datasource for the emission data.  
+
+![dashboard.png](img/dashboard.png)
+
 # Configuration Options
 
 As this extension relies on the [OpenTelemetry Java Auto-Instrumentation agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation), you can use all of their configuration options to configure the behaviour of the OpenTelemetry agent. 
 
-Configuration options specific to this extension are listed below. All configurations can be provided as system properties or environment variables, when using system properties they are written lower case with dots, if they are provided as environment variables they are written upper case with _.
+Configuration options specific to this extension are listed below. All configurations can be provided as system properties or environment variables, when using system properties they are written lower case with dots, if they are provided as environment variables they are written upper case with "_" as seperator.
 
 | Configuration Option     | Values                                                             | Default | Explanation                                                                                                                          |
 |--------------------------|--------------------------------------------------------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------|
@@ -107,9 +111,7 @@ If the cloud provider and its region is configured, also emission related metric
     io.retit.emissions.pue - Power Usage Effectiveness (PUE) value of the datacenter
     io.retit.emissions.gef - Grid Emissions Factor (GEF)
     
-This data can later be used to calculate the SCI value of each API call.
-
-
+This data can later be used to calculate the carbon intensity of the application or of each API call (e.g., using SCI as shown in our work presented at the [Workshop on Challenges in Performance Methods for Software Development (WOSP-C) 2024](https://www.retit.de/wp-content/uploads/2024/05/Green_Software_Metrics.pdf) and [EcoCompute](https://www.retit.de/wp-content/uploads/2024/04/2024-04-25_How_to_Measure_CO2-Emissions_For_Every_API_Call_Of_Your_Microservices.pdf)).
 
 # OpenTelemetry Tracing Span attributes added by this extension
 
