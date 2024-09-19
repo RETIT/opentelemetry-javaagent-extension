@@ -182,7 +182,6 @@ class JavaAgentExtensionIntegrationTest {
                 // no network demand
                 Assertions.assertEquals(0.0, metricDemandResult.get().metricValue);
             }
-
         }
     }
 
@@ -435,22 +434,31 @@ class JavaAgentExtensionIntegrationTest {
 
         List<MetricDemand> demands = new ArrayList<>();
         String valueAttributeInLog = "value=";
+        String sampleApplicationName = "io.retit.opentelemetry.SampleApplication";
 
-        String[] seperateMetrics = logMessage.split("ImmutableLongPointData");
+        String emissionMetricNotTransactionRelated = "io.retit.emissions";
+
         for (String key : METRIC_NAMES) {
-            for (String metricData : seperateMetrics) {
-                if (metricData.contains(key) && metricData.indexOf(valueAttributeInLog) != -1) {
+            if (logMessage.contains(key)) {
+                String dataForCurrentMetric = logMessage.substring(logMessage.indexOf(key) + 1);
+
+                if (!key.startsWith(emissionMetricNotTransactionRelated) && dataForCurrentMetric.contains(sampleApplicationName)) {
+                    dataForCurrentMetric = dataForCurrentMetric.substring(dataForCurrentMetric.indexOf(sampleApplicationName));
+                }
+
+                if (dataForCurrentMetric.indexOf(valueAttributeInLog) != -1) {
 
                     MetricDemand metricDemand = new MetricDemand();
-                    int valueIndex = metricData.indexOf(valueAttributeInLog);
+                    int valueIndex = dataForCurrentMetric.indexOf(valueAttributeInLog);
 
-                    String valueString = metricData.substring(valueIndex + valueAttributeInLog.length(), metricData.indexOf(",", valueIndex));
+                    String valueString = dataForCurrentMetric.substring(valueIndex + valueAttributeInLog.length(), dataForCurrentMetric.indexOf(",", valueIndex));
                     double value = Double.parseDouble(valueString);
 
                     metricDemand.metricName = key;
                     metricDemand.metricValue = value;
                     demands.add(metricDemand);
                 }
+
             }
 
         }
