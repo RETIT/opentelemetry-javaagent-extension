@@ -1,3 +1,19 @@
+/*
+ *   Copyright 2024 RETIT GmbH
+ *
+ *   Licensed under the Apache License, Version 2.0 (the "License");
+ *   you may not use this file except in compliance with the License.
+ *   You may obtain a copy of the License at
+ *
+ *       http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *   Unless required by applicable law or agreed to in writing, software
+ *   distributed under the License is distributed on an "AS IS" BASIS,
+ *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *   See the License for the specific language governing permissions and
+ *   limitations under the License.
+ */
+
 package io.retit.opentelemetry.javaagent.extension.resources;
 
 import java.io.IOException;
@@ -13,34 +29,6 @@ import java.util.logging.Logger;
  * An {@link IResourceDemandDataCollector
  * IResourceDemandDataCollector} which retrieves resource demands on Linux
  * systems.
- * Specifically, this class implements the method
- * {@link #getDiskBytesReadAndWritten()} to support disk monitoring. This is
- * accomplished by querying the respective files in /proc.
- * rchar: characters read The number of bytes which this task has caused to
- * be read from storage. This is simply the sum of bytes which this process
- * passed to read(2) and similar system calls. It includes things such as
- * terminal I/O and is unaffected by whether or not actual physical disk I/O
- * was required (the read might have been satisfied from pagecache).
- * wchar: characters written The number of bytes which this task has caused,
- * or shall cause to be written to disk. Similar caveats apply here as with
- * rchar.
- * syscr: read syscalls Attempt to count the number of read I/O
- * operations-that is, system calls such as read(2) and pread(2).
- * syscw: write syscalls Attempt to count the number of write I/O
- * operations- that is, system calls such as write(2) and pwrite(2).
- * read_bytes: bytes read Attempt to count the number of bytes which this
- * process really did cause to be fetched from the storage layer. This is
- * accurate for block-backed filesystems.
- * write_bytes: bytes written Attempt to count the number of bytes which
- * this process caused to be sent to the storage layer.
- * cancelled_write_bytes: The big inaccuracy here is truncate. If a process
- * writes 1MB to a file and then deletes the file, it will in fact perform
- * no writeout. But it will have been accounted as having caused 1MB of
- * write. In other words: this field represents the number of bytes which
- * this process caused to not happen, by truncating pagecache. A task can
- * cause "negative" I/O too. If this task truncates some dirty pagecache,
- * some I/O which another task has been accounted for (in its write_bytes)
- * will not be happening.
  */
 public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
