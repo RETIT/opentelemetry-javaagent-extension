@@ -3,6 +3,11 @@ package io.retit.opentelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.instrumentation.annotations.WithSpan;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 /**
@@ -19,7 +24,8 @@ public class SampleApplication {
      * Simple method annotated with @WithSpan to collect Otel data.
      */
     @WithSpan
-    public static void method1() {
+    public void method1() throws InterruptedException, IOException {
+        doWork("method1", 500, 16); // windows updates the CPU times only every 15ms
         LOGGER.info("method1");
     }
 
@@ -27,8 +33,25 @@ public class SampleApplication {
      * Simple method annotated with @WithSpan to collect Otel data.
      */
     @WithSpan
-    public static void method2() {
+    public void method2() throws InterruptedException, IOException {
+        doWork("method2", 1000, 16); // windows updates the CPU times only every 15ms
         LOGGER.info("method2");
+    }
+
+    private void doWork(final String method, final int amountOfWork, final long sleepTimeInMs) throws InterruptedException, IOException {
+
+        Path tempFile = Files.createTempFile("sampleapplication", method);
+
+        for (int i = 0; i < amountOfWork; i++) {
+            // Random requires work on the CPU and Memory
+            int randomNum = ThreadLocalRandom.current().nextInt(0, amountOfWork * 10);
+            // Writing data requires work on Storage and Memory
+            Files.write(tempFile, (method + randomNum).getBytes(StandardCharsets.UTF_8));
+            // TODO add network demand
+        }
+
+        Files.delete(tempFile);
+        Thread.sleep(sleepTimeInMs);
     }
 
     /**
@@ -37,15 +60,16 @@ public class SampleApplication {
      * @param args - not used
      * @throws InterruptedException - in case the application couldn't wait for the metric publishing.
      */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws InterruptedException, IOException {
+        SampleApplication sampleApplication = new SampleApplication();
         // Call methods
         if (CONTINUOUS_RUN_MODE.equals(System.getProperty("RUN_MODE"))) {
             while (true) {
-                businessMethod();
+                sampleApplication.businessMethod();
                 Thread.sleep(500);
             }
         } else {
-            businessMethod();
+            sampleApplication.businessMethod();
         }
 
         if (System.getenv("WAIT_FOR_ONE_MINUTE") != null) {
@@ -54,7 +78,7 @@ public class SampleApplication {
         }
     }
 
-    private static void businessMethod() {
+    private void businessMethod() throws InterruptedException, IOException {
         Span span = Span.current();
         span.setAttribute("test", "some value");
         method1();

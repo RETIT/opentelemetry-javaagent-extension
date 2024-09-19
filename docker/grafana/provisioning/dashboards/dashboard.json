@@ -390,7 +390,7 @@
           "type": "math"
         }
       ],
-      "title": "Panel Title",
+      "title": "Software Carbon Intensity (SCI) for one Transaction",
       "type": "timeseries"
     },
     {
@@ -508,6 +508,6 @@
   "timezone": "browser",
   "title": "Carbon Emissions Transaction",
   "uid": "adv7vxmnrde68e",
-  "version": 1,
+  "version": 3,
   "weekStart": ""
 }

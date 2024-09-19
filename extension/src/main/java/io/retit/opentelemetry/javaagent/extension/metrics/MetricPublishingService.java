@@ -4,6 +4,7 @@ import com.sun.management.OperatingSystemMXBean;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.api.common.Attributes;
+import io.opentelemetry.api.common.AttributesBuilder;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
 import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
@@ -109,10 +110,10 @@ public class MetricPublishingService {
     }
 
     private void publishProcessCPUTime(final ObservableLongMeasurement measurement) {
-        LOGGER.info("Publishing CPU time");
         if (ManagementFactory.getOperatingSystemMXBean() instanceof OperatingSystemMXBean) {
             OperatingSystemMXBean sunOSBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
+            LOGGER.info("Publishing CPU time");
             measurement.record(sunOSBean.getProcessCpuTime(), Attributes.of(AttributeKey.stringKey("io.retit.java.process.id"), String.valueOf(CommonResourceDemandDataCollector.getProcessID())));
         }
     }
@@ -138,16 +139,17 @@ public class MetricPublishingService {
             Long endThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
 
             if (startThread != null && startThread.equals(endThread)) {
+                Attributes filteredAttributes = getAttributesWithoutRETITSpanAttributes(readWriteSpan.getAttributes());
                 // add resource demands to resource demand vector
-                publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes());
-                publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes());
-                publishStorageDemandMetricForTransaction(logDiskDemand, readWriteSpan.getAttributes());
-                publishNetworkDemandMetricForTransaction(logNetworkDemand, readWriteSpan.getAttributes());
+                publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes(), filteredAttributes);
+                publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes(), filteredAttributes);
+                publishStorageDemandMetricForTransaction(logDiskDemand, readWriteSpan.getAttributes(), filteredAttributes);
+                publishNetworkDemandMetricForTransaction(logNetworkDemand, readWriteSpan.getAttributes(), filteredAttributes);
             }
         }
     }
 
-    private void publishStorageDemandMetricForTransaction(final boolean logDiskDemand, final Attributes spanAttributes) {
+    private void publishStorageDemandMetricForTransaction(final boolean logDiskDemand, final Attributes spanAttributes, final Attributes filteredAttributes) {
         if (logDiskDemand) {
             Long startDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_DISK_READ_DEMAND));
             Long endDiskReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_DISK_READ_DEMAND));
@@ -160,38 +162,38 @@ public class MetricPublishingService {
             long totalStorageDemand = totalDiskReadDemand + totalDiskWriteDemand;
 
             if (totalStorageDemand > 0) {
-                storageDemandMetricPublisher.add(totalStorageDemand, spanAttributes);
+                storageDemandMetricPublisher.add(totalStorageDemand, filteredAttributes);
             }
 
         }
     }
 
-    private void publishMemoryDemandMetricForTransaction(final boolean logHeapDemand, final Attributes spanAttributes) {
+    private void publishMemoryDemandMetricForTransaction(final boolean logHeapDemand, final Attributes spanAttributes, final Attributes filteredAttributes) {
         if (logHeapDemand) {
             Long startHeapByteAllocation = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION));
             Long endHeapByteAllocation = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION));
             long totalHeapDemand = startHeapByteAllocation != null && endHeapByteAllocation != null ? endHeapByteAllocation - startHeapByteAllocation : 0;
 
             if (totalHeapDemand > 0) {
-                memoryDemandMetricPublisher.add(totalHeapDemand, spanAttributes);
+                memoryDemandMetricPublisher.add(totalHeapDemand, filteredAttributes);
             }
 
         }
     }
 
-    private void publishCpuDemandMetricForTransaction(final boolean logCpuDemand, final Attributes spanAttributes) {
+    private void publishCpuDemandMetricForTransaction(final boolean logCpuDemand, final Attributes spanAttributes, final Attributes filteredAttributes) {
         if (logCpuDemand) {
             Long startCpuTime = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_CPU_TIME));
             Long endCpuTime = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_CPU_TIME));
             long totalCpuTimeUsed = startCpuTime != null && endCpuTime != null ? endCpuTime - startCpuTime : 0;
 
             if (totalCpuTimeUsed > 0) {
-                cpuDemandMetricPublisher.add(totalCpuTimeUsed, spanAttributes);
+                cpuDemandMetricPublisher.add(totalCpuTimeUsed, filteredAttributes);
             }
         }
     }
 
-    private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes) {
+    private void publishNetworkDemandMetricForTransaction(final boolean logNetworkDemand, final Attributes spanAttributes, final Attributes filteredAttributes) {
         if (logNetworkDemand) {
             Long startNetworkReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_START_NETWORK_READ_DEMAND));
             Long endNetworkReadDemand = spanAttributes.get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_END_NETWORK_READ_DEMAND));
@@ -203,8 +205,18 @@ public class MetricPublishingService {
 
             long totalNetworkDemand = totalNetworkReadDemand + totalNetworkWriteDemand;
 
-            networkDemandMetricPublisher.add(totalNetworkDemand, spanAttributes);
+            networkDemandMetricPublisher.add(totalNetworkDemand, filteredAttributes);
         }
+    }
+
+    private Attributes getAttributesWithoutRETITSpanAttributes(final Attributes spanAttributes) {
+        AttributesBuilder attributesBuilder = Attributes.builder();
+
+        attributesBuilder.putAll(spanAttributes);
+
+        attributesBuilder.removeIf(key -> key.getKey().startsWith(Constants.RETIT_NAMESPACE));
+
+        return attributesBuilder.build();
     }
 }
 
