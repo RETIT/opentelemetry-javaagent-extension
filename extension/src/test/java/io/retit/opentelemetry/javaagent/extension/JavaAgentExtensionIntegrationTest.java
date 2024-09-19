@@ -175,10 +175,11 @@ class JavaAgentExtensionIntegrationTest {
             LOGGER.info("Found metric {} with value {}", metricName, metricDemandResult.get().metricValue);
             Assertions.assertTrue(metricDemandResult.isPresent());
             Assertions.assertNotNull(metricDemandResult.get().metricValue);
-            if(!"io.retit.resource.demand.network.bytes".equals(metricDemandResult.get().metricName)) {
+            if (!"io.retit.resource.demand.network.bytes".equals(metricDemandResult.get().metricName)) {
+
                 Assertions.assertNotEquals(0.0, metricDemandResult.get().metricValue);
             } else {
-                // not network demand
+                // no network demand
                 Assertions.assertEquals(0.0, metricDemandResult.get().metricValue);
             }
 
@@ -423,32 +424,37 @@ class JavaAgentExtensionIntegrationTest {
     private static void addToMetricDemands(String logOutput) {
         if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter")) {
             LOGGER.info("Processing metric " + logOutput);
-            MetricDemand demand = extractMetricValuesFromLog(logOutput);
-            if (demand != null) {
-                metricDemands.add(demand);
+            List<MetricDemand> demands = extractMetricValuesFromLog(logOutput);
+            if (demands != null) {
+                metricDemands.addAll(demands);
             }
         }
     }
 
-    private static MetricDemand extractMetricValuesFromLog(String logMessage) {
+    private static List<MetricDemand> extractMetricValuesFromLog(String logMessage) {
 
+        List<MetricDemand> demands = new ArrayList<>();
         String valueAttributeInLog = "value=";
 
+        String[] seperateMetrics = logMessage.split("ImmutableLongPointData");
         for (String key : METRIC_NAMES) {
-            if (logMessage.contains(key) && logMessage.indexOf(valueAttributeInLog) != -1) {
+            for (String metricData : seperateMetrics) {
+                if (metricData.contains(key) && metricData.indexOf(valueAttributeInLog) != -1) {
 
-                MetricDemand metricDemand = new MetricDemand();
-                int valueIndex = logMessage.indexOf(valueAttributeInLog);
+                    MetricDemand metricDemand = new MetricDemand();
+                    int valueIndex = metricData.indexOf(valueAttributeInLog);
 
-                String valueString = logMessage.substring(valueIndex + valueAttributeInLog.length(), logMessage.indexOf(",", valueIndex));
-                double value = Double.parseDouble(valueString);
+                    String valueString = metricData.substring(valueIndex + valueAttributeInLog.length(), metricData.indexOf(",", valueIndex));
+                    double value = Double.parseDouble(valueString);
 
-                metricDemand.metricName = key;
-                metricDemand.metricValue = value;
-                return metricDemand;
+                    metricDemand.metricName = key;
+                    metricDemand.metricValue = value;
+                    demands.add(metricDemand);
+                }
             }
+
         }
-        return null;
+        return demands;
     }
 
     private static String extractOperationNameFromLogOutput(String logOutput) {
