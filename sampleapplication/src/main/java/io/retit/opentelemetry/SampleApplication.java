@@ -25,7 +25,7 @@ public class SampleApplication {
      */
     @WithSpan
     public void method1() throws InterruptedException, IOException {
-        doWork("method1", 500, 16); // windows updates the CPU times only every 15ms
+        doWork("method1", 5000, 16); // windows updates the CPU times only every 15ms
         LOGGER.info("method1");
     }
 
@@ -34,7 +34,7 @@ public class SampleApplication {
      */
     @WithSpan
     public void method2() throws InterruptedException, IOException {
-        doWork("method2", 1000, 16); // windows updates the CPU times only every 15ms
+        doWork("method2", 10000, 16); // windows updates the CPU times only every 15ms
         LOGGER.info("method2");
     }
 
