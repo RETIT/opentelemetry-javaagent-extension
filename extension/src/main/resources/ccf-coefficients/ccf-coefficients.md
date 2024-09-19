@@ -1,0 +1,1 @@
+The csv files in this repository are copied from the [CCF coefficients project](https://github.com/cloud-carbon-footprint/ccf-coefficients)  and are licensed under the [Apache 2.0 license](https://github.com/cloud-carbon-footprint/ccf-coefficients/blob/main/LICENSE). This LICENSE is also included in this directory. 

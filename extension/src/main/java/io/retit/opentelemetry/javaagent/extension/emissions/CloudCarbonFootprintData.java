@@ -81,11 +81,11 @@ public final class CloudCarbonFootprintData {
     private Double initializeGridEmissionFactor(final String envRegion) {
         double gridEmissionFactorMetricTonPerKwh = 0.0;
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-aws.csv", 0, envRegion, 3);
+            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/grid-emissions/grid-emissions-factors-aws.csv", 0, envRegion, 3);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-azure.csv", 0, envRegion, 3);
+            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/grid-emissions/grid-emissions-factors-azure.csv", 0, envRegion, 3);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/grid-emissions/grid-emissions-factors-gcp.csv", 0, envRegion, 2);
+            gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/grid-emissions/grid-emissions-factors-gcp.csv", 0, envRegion, 2);
         }
 
         // we need to do the conversion using BigDecimal to avoid loosing precision
@@ -146,7 +146,7 @@ public final class CloudCarbonFootprintData {
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForGcp(final String vmInstanceType) {
 
-        CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/instances/gcp-instances.csv", "/instances/coefficients-gcp-use.csv", vmInstanceType);
+        CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/ccf-coefficients/instances/gcp-instances.csv", "/ccf-coefficients/instances/coefficients-gcp-use.csv", vmInstanceType);
         cloudVMInstanceDetails.setCloudProvider(CloudProvider.GCP);
         if (cloudVMInstanceDetails.getCpuPowerConsumptionIdle() == DOUBLE_ZERO) {
             cloudVMInstanceDetails.setCpuPowerConsumptionIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_GCP);
@@ -167,7 +167,7 @@ public final class CloudCarbonFootprintData {
      */
     private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForAzure(final String vmInstanceType) {
 
-        CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/instances/azure-instances.csv", "/instances/coefficients-azure-use.csv", vmInstanceType);
+        CloudCarbonFootprintInstanceData cloudVMInstanceDetails = initializeCloudInstanceDetailsCommon("/ccf-coefficients/instances/azure-instances.csv", "/ccf-coefficients/instances/coefficients-azure-use.csv", vmInstanceType);
         cloudVMInstanceDetails.setCloudProvider(CloudProvider.AZURE);
         if (cloudVMInstanceDetails.getCpuPowerConsumptionIdle() == DOUBLE_ZERO) {
             cloudVMInstanceDetails.setCpuPowerConsumptionIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE);
@@ -227,7 +227,7 @@ public final class CloudCarbonFootprintData {
         CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
         cloudVMInstanceDetails.setCloudProvider(CloudProvider.AWS);
         cloudVMInstanceDetails.setInstanceType(vmInstanceType);
-        List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader("/instances/aws-instances.csv");
+        List<String[]> csvLines = CSVParser.readAllCSVLinesExceptHeader("/ccf-coefficients/instances/aws-instances.csv");
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[0];
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
@@ -254,11 +254,11 @@ public final class CloudCarbonFootprintData {
      */
     public Double getTotalEmbodiedEmissionsForInstanceType(final String instanceType) {
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-aws-embodied.csv", 1, instanceType, 6);
+            return getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/embodied-emissions/coefficients-aws-embodied.csv", 1, instanceType, 6);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-gcp-embodied-mean.csv", 1, instanceType, 2);
+            return getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/embodied-emissions/coefficients-gcp-embodied-mean.csv", 1, instanceType, 2);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            return getDoubleValueFromCSVForRegionOrInstance("/embodied-emissions/coefficients-azure-embodied.csv", 2, instanceType, 8);
+            return getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/embodied-emissions/coefficients-azure-embodied.csv", 2, instanceType, 8);
         }
         return 0.0;
     }
