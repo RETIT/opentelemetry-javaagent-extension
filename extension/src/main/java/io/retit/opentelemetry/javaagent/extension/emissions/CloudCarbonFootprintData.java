@@ -16,9 +16,9 @@
 
 package io.retit.opentelemetry.javaagent.extension.emissions;
 
+import io.retit.opentelemetry.javaagent.extension.commons.CSVParser;
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
-import io.retit.opentelemetry.javaagent.extension.commons.CSVParser;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -41,13 +41,6 @@ public final class CloudCarbonFootprintData {
         init();
     }
 
-    void init() {
-        this.microarchitecture = InstanceConfiguration.getMicroarchitecture();
-        this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
-        cloudInstanceDetails = initializeCloudInstanceDetails(InstanceConfiguration.getCloudProviderInstanceType());
-        this.pueValue = initializePueValue();
-    }
-
     /**
      * Returns the singleton instance of ConfigLoader.
      *
@@ -55,6 +48,13 @@ public final class CloudCarbonFootprintData {
      */
     public static CloudCarbonFootprintData getConfigInstance() {
         return CONFIG_INSTANCE;
+    }
+
+    void init() {
+        this.microarchitecture = InstanceConfiguration.getMicroarchitecture();
+        this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
+        cloudInstanceDetails = initializeCloudInstanceDetails(InstanceConfiguration.getCloudProviderInstanceType());
+        this.pueValue = initializePueValue();
     }
 
     public Double getGridEmissionsFactor() {
@@ -236,6 +236,14 @@ public final class CloudCarbonFootprintData {
                 cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[27].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ Idle
                 cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[30].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ 100%
             }
+        }
+
+        if (cloudVMInstanceDetails.getCpuPowerConsumptionIdle() == DOUBLE_ZERO) {
+            cloudVMInstanceDetails.setCpuPowerConsumptionIdle(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AWS);
+        }
+
+        if (cloudVMInstanceDetails.getCpuPowerConsumption100Percent() == DOUBLE_ZERO) {
+            cloudVMInstanceDetails.setCpuPowerConsumption100Percent(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AWS);
         }
 
         return cloudVMInstanceDetails;
