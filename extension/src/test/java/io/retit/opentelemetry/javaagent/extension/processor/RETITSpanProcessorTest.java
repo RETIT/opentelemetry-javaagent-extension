@@ -31,7 +31,6 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -53,7 +52,6 @@ public class RETITSpanProcessorTest {
 
     @BeforeEach
     public void setup() {
-        skipOnMacOS();
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_HEAP_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
         InstanceConfiguration.setBooleanProperty(Constants.RETIT_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY, true);
@@ -70,14 +68,12 @@ public class RETITSpanProcessorTest {
 
     @Test
     public void onStart() {
-        skipOnMacOS();
         retitSpanProcessor.onStart(Context.root(), readWriteSpan);
         verify(readWriteSpan, times(6)).setAttribute(Mockito.anyString(), Mockito.anyLong());
     }
 
     @Test
     public void onEnd() {
-        skipOnMacOS();
         when(readableSpan.getSpanContext()).thenReturn(SAMPLED_SPAN_CONTEXT);
         when(readableSpan.toSpanData()).thenReturn(spanData);
 
@@ -87,7 +83,6 @@ public class RETITSpanProcessorTest {
 
     @Test
     public void close() {
-        skipOnMacOS();
         retitSpanProcessor.close();
     }
 
@@ -104,12 +99,5 @@ public class RETITSpanProcessorTest {
                 .setTotalRecordedLinks(0)
                 .setTotalRecordedEvents(0)
                 .build();
-    }
-
-    /* Resource demand collection for macOS is not supported.
-     * Thus, all of the tests are skipped on macOS to be able to build the project locally.
-     */
-    private void skipOnMacOS() {
-        Assertions.assertFalse(System.getProperty("os.name").toLowerCase().contains("mac"));
     }
 }
