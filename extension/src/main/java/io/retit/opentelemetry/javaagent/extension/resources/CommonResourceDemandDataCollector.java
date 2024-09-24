@@ -37,6 +37,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     private static final String WINDOWS_NAME = "windows";
     private static final String LINUX_NAME = "linux";
+    private static final String MAC_NAME = "mac";
     private static final String HOTSPOT_NAME = "HotSpot";
     private static final String IBM_JVM_NAME = "IBM";
 
@@ -68,6 +69,8 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(WINDOWS_NAME);
         } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(LINUX_NAME)) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(LINUX_NAME);
+        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(MAC_NAME)) {
+            osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(MAC_NAME);
         } else {
             throw new UnsupportedOperationException("Cannot collect Resource Demands for current OS: " + osName);
         }
@@ -97,9 +100,10 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     protected static IResourceDemandDataCollector getDataCollectorFromOS(final String osName) {
         if (WINDOWS_NAME.equals(osName)) {
             return new WindowsDataCollector();
-        }
-        if (LINUX_NAME.equals(osName)) {
+        } else if (LINUX_NAME.equals(osName)) {
             return new LinuxDataCollector();
+        } else if (MAC_NAME.equals(osName)) {
+            return new MacDataCollector();
         }
         throw new UnsupportedOperationException("Unsupported OS: " + osName);
     }
@@ -174,4 +178,13 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         return -1;
     }
 
+    @Override
+    public long[] getDiskBytesReadAndWritten() {
+        return new long[]{0, 0};
+    }
+
+    @Override
+    public long[] getNetworkBytesReadAndWritten() {
+        return new long[]{0, 0};
+    }
 }

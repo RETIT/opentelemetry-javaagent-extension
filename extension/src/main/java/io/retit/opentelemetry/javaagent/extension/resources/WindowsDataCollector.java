@@ -23,15 +23,5 @@ package io.retit.opentelemetry.javaagent.extension.resources;
  */
 public class WindowsDataCollector extends CommonResourceDemandDataCollector {
 
-    @Override
-    public long[] getDiskBytesReadAndWritten() {
-        return new long[]{0, 0};
-    }
-
-    @Override
-    public long[] getNetworkBytesReadAndWritten() {
-        return new long[]{0, 0};
-    }
-
 }
 
