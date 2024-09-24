@@ -178,4 +178,13 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         return -1;
     }
 
+    @Override
+    public long[] getDiskBytesReadAndWritten() {
+        return new long[]{0, 0};
+    }
+
+    @Override
+    public long[] getNetworkBytesReadAndWritten() {
+        return new long[]{0, 0};
+    }
 }

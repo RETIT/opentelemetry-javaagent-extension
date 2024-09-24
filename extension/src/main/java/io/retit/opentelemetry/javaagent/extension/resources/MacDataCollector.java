@@ -5,5 +5,5 @@ package io.retit.opentelemetry.javaagent.extension.resources;
  * IResourceDemandDataCollector} which retrieves resource demands on Mac
  * systems.
  */
-public class MacDataCollector extends LinuxDataCollector {
+public class MacDataCollector extends CommonResourceDemandDataCollector {
 }
