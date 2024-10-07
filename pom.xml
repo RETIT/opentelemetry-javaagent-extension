@@ -65,7 +65,7 @@
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
                 <!-- We need a Java 8 version of Mockito -->
-                <version>5.14.0</version>
+                <version>5.14.1</version>
                 <scope>test</scope>
             </dependency>
 
