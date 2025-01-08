@@ -163,8 +163,6 @@ public class MetricPublishingService {
                 publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes(), filteredAttributes);
                 publishStorageDemandMetricForTransaction(logDiskDemand, readWriteSpan.getAttributes(), filteredAttributes);
                 publishNetworkDemandMetricForTransaction(logNetworkDemand, readWriteSpan.getAttributes(), filteredAttributes);
-            } else {
-                LOGGER.warning("START THREAD is not END THREAD");
             }
         }
     }
