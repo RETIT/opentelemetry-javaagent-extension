@@ -209,7 +209,6 @@ public class MetricPublishingService {
 
             long totalCpuTimeUsedInMs = totalCpuTimeUsed / NANOSECOND_TO_MILLISECOND_CONVERSION;
 
-            LOGGER.info("PUBLISH CPU DEMAND " + totalCpuTimeUsedInMs + " with attributes " + filteredAttributes);
             if (totalCpuTimeUsed > 0) {
                 cpuDemandMetricPublisher.add(totalCpuTimeUsedInMs, filteredAttributes);
             }
