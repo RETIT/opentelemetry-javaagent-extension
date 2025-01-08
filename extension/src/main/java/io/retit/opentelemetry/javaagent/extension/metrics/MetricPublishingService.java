@@ -157,12 +157,14 @@ public class MetricPublishingService {
             Long endThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
 
             if (startThread != null && startThread.equals(endThread)) {
-                Attributes filteredAttributes = getAttributesWithoutRETITSpanAttributes(readWriteSpan.getAttributes());
+                Attributes filteredAttributes = getAttributesWithoutRETITThreadUserAndNetworkClientAttributes(readWriteSpan.getAttributes());
                 // add resource demands to resource demand vector
                 publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes(), filteredAttributes);
                 publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes(), filteredAttributes);
                 publishStorageDemandMetricForTransaction(logDiskDemand, readWriteSpan.getAttributes(), filteredAttributes);
                 publishNetworkDemandMetricForTransaction(logNetworkDemand, readWriteSpan.getAttributes(), filteredAttributes);
+            } else {
+                LOGGER.warning("START THREAD is not END THREAD");
             }
         }
     }
@@ -207,6 +209,7 @@ public class MetricPublishingService {
 
             long totalCpuTimeUsedInMs = totalCpuTimeUsed / NANOSECOND_TO_MILLISECOND_CONVERSION;
 
+            LOGGER.info("PUBLISH CPU DEMAND " + totalCpuTimeUsedInMs + " with attributes " + filteredAttributes);
             if (totalCpuTimeUsed > 0) {
                 cpuDemandMetricPublisher.add(totalCpuTimeUsedInMs, filteredAttributes);
             }
@@ -229,12 +232,17 @@ public class MetricPublishingService {
         }
     }
 
-    private Attributes getAttributesWithoutRETITSpanAttributes(final Attributes spanAttributes) {
+    private Attributes getAttributesWithoutRETITThreadUserAndNetworkClientAttributes(final Attributes spanAttributes) {
         AttributesBuilder attributesBuilder = Attributes.builder();
 
         attributesBuilder.putAll(spanAttributes);
 
-        attributesBuilder.removeIf(key -> key.getKey().startsWith(Constants.RETIT_NAMESPACE));
+        attributesBuilder.removeIf(key -> key.getKey().startsWith(Constants.RETIT_NAMESPACE)
+                || key.getKey().startsWith(Constants.NETWORK_NAMESPACE)
+                || key.getKey().startsWith(Constants.THREAD_NAMESPACE)
+                || key.getKey().startsWith(Constants.USER_NAMESPACE)
+                || key.getKey().startsWith(Constants.CLIENT_NAMESPACE)
+                || key.getKey().startsWith(Constants.INSTANCE_NAMESPACE));
 
         return attributesBuilder.build();
     }

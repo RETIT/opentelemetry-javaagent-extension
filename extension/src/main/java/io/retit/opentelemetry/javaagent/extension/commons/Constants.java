@@ -21,6 +21,12 @@ package io.retit.opentelemetry.javaagent.extension.commons;
  */
 @SuppressWarnings("checkstyle:javadocVariable")
 public class Constants {
+    public static final String NETWORK_NAMESPACE = "network";
+    public static final String THREAD_NAMESPACE = "thread";
+    public static final String USER_NAMESPACE = "user";
+    public static final String CLIENT_NAMESPACE = "client";
+    public static final String INSTANCE_NAMESPACE = "instance";
+
     public static final String RETIT_NAMESPACE = "io.retit";
     public static final String RETIT_RESPONSE_TIME_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.response.time";
     public static final String RETIT_CPU_DEMAND_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.cpu.demand";
