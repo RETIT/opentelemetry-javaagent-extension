@@ -244,7 +244,18 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "($Pcpu* 60000) / 1000",
+          "expression": "$Pcpu * $CPUutilT",
+          "hide": true,
+          "refId": "Ptcpu",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($Ptcpu * 60000) / 1000",
           "hide": true,
           "refId": "Ecpu",
           "type": "math"
@@ -460,7 +471,7 @@
         "x": 12,
         "y": 0
       },
-      "id": 7,
+      "id": 8,
       "options": {
         "legend": {
           "calcs": [],
@@ -616,7 +627,18 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "($Pcpu* 60000) / 1000",
+          "expression": "$Pcpu * $CPUutilT",
+          "hide": true,
+          "refId": "Ptcpu",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($Ptcpu* 60000) / 1000",
           "hide": true,
           "refId": "Ecpu",
           "type": "math"
