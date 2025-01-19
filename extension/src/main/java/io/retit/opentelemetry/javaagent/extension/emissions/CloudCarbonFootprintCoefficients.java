@@ -33,7 +33,7 @@ public class CloudCarbonFootprintCoefficients {
      * SSD storage energy consumption in Wh per TB per hour.
      * Source: https://www.cloudcarbonfootprint.org/docs/methodology#appendix-i-energy-coefficients
      */
-    public static final double STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR = 0.12;
+    public static final double STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR = 1.2;
 
     /**
      * Average minimum watt consumption for AWS.
