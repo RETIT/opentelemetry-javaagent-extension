@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.*;
 abstract class JavaAgentExtensionIT {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaAgentExtensionIT.class);
-    private static GenericContainer<?> applicationContainer;
+    protected static GenericContainer<?> applicationContainer;
     private static Map<String, List<SpanDemand>> spanDemands;
     private static List<MetricDemand> metricDemands;
 

@@ -84,6 +84,17 @@ public class SampleApplication {
                 sampleApplication.businessMethod();
                 Thread.sleep(500);
             }
+        } else if ("VIRTUAL_THREAD".equals(System.getenv("RUN_MODE"))) {
+            LOGGER.info("RUNNING WITH VIRTUAL THREAD");
+            Thread.ofVirtual().start(() -> {
+                try {
+                    sampleApplication.businessMethod();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }).join();
         } else {
             sampleApplication.businessMethod();
         }
