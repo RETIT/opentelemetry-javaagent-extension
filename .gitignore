@@ -66,3 +66,4 @@ local.properties
 de.retit.apm/de.retit.apm.javaagent.sampleapplication/dependency-reduced-pom.xml
 /sampleapplication/dependency-reduced-pom.xml
 /examples/simple-jdk8-application/dependency-reduced-pom.xml
+/examples/simple-jdk21-application/dependency-reduced-pom.xml

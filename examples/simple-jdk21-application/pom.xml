@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>simple-jdk8-application</artifactId>
+    <artifactId>simple-jdk21-application</artifactId>
 
     <parent>
         <groupId>io.retit</groupId>
@@ -33,8 +33,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>8</source>
-                    <target>8</target>
+                    <source>21</source>
+                    <target>21</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -100,7 +100,7 @@
                                 <resource>
                                     <directory>${project.build.directory}</directory>
                                     <includes>
-                                        <include>simple-jdk8-application-${project.version}.jar
+                                        <include>simple-jdk21-application-${project.version}.jar
                                         </include>
                                     </includes>
                                 </resource>
@@ -115,10 +115,10 @@
                 <version>3.4.2</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
                 <configuration>
                     <from>
-                        <image>openjdk:8-slim</image>
+                        <image>openjdk:21-slim</image>
                     </from>
                     <to>
-                        <image>simple-jdk8-application:${project.version}</image>
+                        <image>simple-jdk21-application:${project.version}</image>
                         <tags>
                             <tag>feature</tag>
                         </tags>
