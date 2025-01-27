@@ -59,6 +59,7 @@
     </dependencies>
 
     <build>
+        <finalName>io.retit.opentelemetry.javaagent.extension</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

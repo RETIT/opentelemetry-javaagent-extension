@@ -60,7 +60,7 @@ class JavaAgentExtensionIntegrationTest {
 
     @BeforeEach
     public void setupApplication() {
-        String image = "otel-integration-test:feature";
+        String image = "simple-jdk8-application:feature";
         LOGGER.info("Using image: " + image);
         applicationContainer = new GenericContainer<>(image)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")

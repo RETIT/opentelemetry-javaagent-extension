@@ -46,7 +46,7 @@ To build the Sample application you need to run the following maven command:
 Afterwards, you can start OpenTelemetry compatible tracing and metrics backends using the following docker command: 
 
 ```bash 
-docker compose -f ./docker/docker-compose.yml up -d
+docker compose -f ./examples/docker/docker-compose.yml up -d
 ```
 
 This will start an [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector/tree/main) to which the metric and trace data is being sent. Furthermore, it starts [Prometheus](https://prometheus.io/) instance to store the metric data and a [Grafana](https://grafana.com/) instance to visualize the metrics stored in Prometheus. You can optionally also start a [Jaeger](https://www.jaegertracing.io/) instance by commenting out the corresponding section in the docker compose file to visualize the span attributes.
@@ -54,15 +54,15 @@ This will start an [OpenTelemetry Collector](https://github.com/open-telemetry/o
 Once the backend is up, the sample Application can then be run with the OpenTelemetry Java agent attached from the root directory as follows.
 
 ```bash
-java -javaagent:./sampleapplication/target/jib/opentelemetry-javaagent-all.jar \
+java -javaagent:./examples/simple-jdk8-application/target/jib/opentelemetry-javaagent-all.jar \
 -Dotel.service.name=sampleapplication \
 -Dotel.logs.exporter=logging \
--Dotel.javaagent.extensions=./sampleapplication/target/jib/io.retit.opentelemetry.javaagent.extension.jar \
+-Dotel.javaagent.extensions=./extension/target/io.retit.opentelemetry.javaagent.extension.jar \
 -Dio.retit.emissions.cloud.provider=aws \
 -Dio.retit.emissions.cloud.provider.region=af-south-1 \
 -Dio.retit.emissions.cloud.provider.instance.type=a1.medium \
 -DRUN_MODE=continuously \
--jar ./sampleapplication/target/sampleapplication-0.0.1-SNAPSHOT.jar
+-jar ./examples/simple-jdk8-application/target/simple-jdk8-application-0.0.1-SNAPSHOT.jar
 ```
 
 This application will run until you stop it and generate data. While it is generating data, you can look at the data in the backends. The easiest way is to check out the [Grafana dashboard](http://localhost:3000/grafana/dashboards) here:

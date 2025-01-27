@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>sampleapplication</artifactId>
+    <artifactId>simple-jdk8-application</artifactId>
 
     <parent>
         <groupId>io.retit</groupId>
-        <artifactId>opentelemetry-javaagent-extension</artifactId>
+        <artifactId>examples</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -115,10 +115,10 @@
                 <version>3.4.2</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
                 <configuration>
                     <from>
-                        <image>openjdk:17-slim</image>
+                        <image>openjdk:8-slim</image>
                     </from>
                     <to>
-                        <image>otel-integration-test:${project.version}</image>
+                        <image>simple-jdk8-application:${project.version}</image>
                         <tags>
                             <tag>feature</tag>
                         </tags>

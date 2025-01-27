@@ -14,7 +14,7 @@
 
     <modules>
         <module>extension</module>
-        <module>sampleapplication</module>
+        <module>examples</module>
     </modules>
 
     <dependencyManagement>

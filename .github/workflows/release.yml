@@ -28,4 +28,4 @@ jobs:
       - name: Create Release and Upload Artifact
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "sampleapplication/target/jib/io.retit.opentelemetry.javaagent.extension.jar"
+          artifacts: "extension/target/io.retit.opentelemetry.javaagent.extension.jar"
