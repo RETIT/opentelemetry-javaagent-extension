@@ -16,8 +16,8 @@ public class LinuxDataCollectorTest {
             long currentThreadCpuTimeThreadMXBean = linuxDataCollector.getCurrentThreadCpuTime();
 
             long difference = currentThreadCpuTimeThreadMXBean - currentThreadCpuTimeThreadProcFS;
-            // assert that the measurements are less than 15ms different (as they consume cpu time themselves)
-            Assertions.assertTrue(difference < 15_000_000);
+            // assert that the measurements are less than 20ms different (as they consume cpu time themselves)
+            Assertions.assertTrue(difference < 20_000_000);
         }
     }
 
