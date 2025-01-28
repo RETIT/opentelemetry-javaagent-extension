@@ -14,6 +14,7 @@ import com.sun.jna.Native;
  * to the interface. However, please also add a generalized method
  * to {@link io.retit.opentelemetry.javaagent.extension.resources.NativeFacade} if possible.
  */
+@SuppressWarnings("PMD")
 public interface CLibrary extends Library {
 
     CLibrary INSTANCE = Native.loadLibrary("c", CLibrary.class);
@@ -23,6 +24,7 @@ public interface CLibrary extends Library {
     // Derived from Linux/arch/x86/include/asm/unistd_64.h
     int GETTID_X86_64 = 186;
     // https://man7.org/linux/man-pages/man3/sysconf.3.html
+    @SuppressWarnings("checkstyle:ConstantName")
     int _SC_CLK_TCK = 2;
 
     int getpid();

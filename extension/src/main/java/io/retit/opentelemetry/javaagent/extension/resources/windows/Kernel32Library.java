@@ -18,6 +18,7 @@ import com.sun.jna.ptr.LongByReference;
  * to the interface. However, please also add a generalized method
  * to {@link io.retit.opentelemetry.javaagent.extension.resources.NativeFacade} if possible.
  */
+@SuppressWarnings("PMD")
 public interface Kernel32Library extends Library {
     Kernel32Library INSTANCE = Native.loadLibrary("kernel32", Kernel32Library.class);
 
@@ -37,7 +38,7 @@ public interface Kernel32Library extends Library {
     //CHECKSTYLE:ON
 
     class Handle extends PointerType {
-        public Handle(Pointer address) {
+        public Handle(final Pointer address) {
             super(address);
         }
 

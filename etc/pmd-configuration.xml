@@ -5,9 +5,6 @@
          xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
     <description>This PMD ruleset is applied to all Java code in the otel javaagent extension.</description>
     <rule ref="category/java/bestpractices.xml">
-        <exclude name="JUnitTestContainsTooManyAsserts"/>
-        <exclude name="JUnitTestsShouldIncludeAssert"/>
-        <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="GuardLogStatement"/>
         <exclude name="AccessorMethodGeneration"/>
         <exclude name="JUnit5TestShouldBePackagePrivate"/>

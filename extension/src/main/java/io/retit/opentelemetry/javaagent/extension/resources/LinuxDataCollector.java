@@ -17,7 +17,6 @@
 package io.retit.opentelemetry.javaagent.extension.resources;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -67,31 +66,38 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      */
     @Override
     protected long getPlatformSpecificThreadCpuTime() {
-        long cpuTime = 0;
         if (Files.exists(PROC_FS_THREAD_SELF_STAT)) {
-            try {
-                List<String> threadStatData = Files.readAllLines(PROC_FS_THREAD_SELF_STAT, StandardCharsets.UTF_8);
-                if (!threadStatData.isEmpty()) {
-                    String firstLine = threadStatData.get(0);
 
-                    long userAndSystemClockTicksForCurrentThread = getCombinedUserAndSystemClockTicks(firstLine);
+            long userAndSystemClockTicksForCurrentThread = getCombinedUserAndSystemClockTicksFromStatFile();
 
-                    if (userAndSystemClockTicksForCurrentThread != 0) {
+            if (userAndSystemClockTicksForCurrentThread == 0) {
+                return 0l;
+            } else {
+                long clockTicksPerSecond = NativeFacade.getClockTicks();
 
-                        long clockTicksPerSecond = NativeFacade.getClockTicks();
+                long nanoSecondsPerSecond = 1_000_000_000;
 
-                        long nanoSecondsPerSecond = 1_000_000_000;
+                long clockTicksPerNanoSecond = nanoSecondsPerSecond / clockTicksPerSecond;
 
-                        long clockTicksPerNanoSecond = nanoSecondsPerSecond / clockTicksPerSecond;
-
-                        cpuTime = userAndSystemClockTicksForCurrentThread * clockTicksPerNanoSecond;
-                    }
-                }
-            } catch (IOException e) {
-                LOGGER.log(Level.SEVERE, "Could not read cpu time from proc fs " + e.getMessage(), e);
+                return userAndSystemClockTicksForCurrentThread * clockTicksPerNanoSecond;
             }
+        } else {
+            return 0l;
         }
-        return cpuTime;
+    }
+
+    long getCombinedUserAndSystemClockTicksFromStatFile() {
+        try {
+            List<String> threadStatData = Files.readAllLines(PROC_FS_THREAD_SELF_STAT, StandardCharsets.UTF_8);
+            if (!threadStatData.isEmpty()) {
+                String firstLine = threadStatData.get(0);
+
+                return getCombinedUserAndSystemClockTicks(firstLine);
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Could not read cpu time from proc fs " + e.getMessage(), e);
+        }
+        return 0;
     }
 
     long getCombinedUserAndSystemClockTicks(final String statData) {
@@ -99,21 +105,25 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
         // However, on some systems there are spaces in the process description, so we start after position 2
         long utimeInClockTicks = 0;
         long stimeInClockTicks = 0;
-        int indexOfEndOfProcessName = statData.indexOf(")");
-        if (indexOfEndOfProcessName != -1) {
-            String statDataWithoutProcessName = statData.substring(indexOfEndOfProcessName + 1).trim(); // remove process name
-            String[] data = statDataWithoutProcessName.split(" ");
-            if (data.length >= 13) {
-                utimeInClockTicks = Long.parseLong(data[11]);
-                stimeInClockTicks = Long.parseLong(data[12]);
-            }
+        int indexOfEndOfProcessName = statData.indexOf(')');
 
-        } else {
-            String[] data = statData.split(" ");
-            if (data.length >= 15) {
-                utimeInClockTicks = Long.parseLong(data[13]);
-                stimeInClockTicks = Long.parseLong(data[14]);
-            }
+        int uTimeLocationInString = 13;
+        int sTimeLocationInString = 14;
+
+        String statDataLine = statData;
+
+        int indexIsBiggerThanZero = 0;
+
+        if (indexOfEndOfProcessName > indexIsBiggerThanZero) {
+            statDataLine = statDataLine.substring(indexOfEndOfProcessName + 1).trim(); // remove process name
+            uTimeLocationInString = 11;
+            sTimeLocationInString = 12;
+        }
+
+        String[] data = statDataLine.split(" ");
+        if (data.length > sTimeLocationInString) {
+            utimeInClockTicks = Long.parseLong(data[uTimeLocationInString]);
+            stimeInClockTicks = Long.parseLong(data[sTimeLocationInString]);
         }
 
         return utimeInClockTicks + stimeInClockTicks;

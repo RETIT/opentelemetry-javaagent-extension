@@ -36,6 +36,8 @@ public class SampleApplication {
 
     private static final String CONTINUOUS_RUN_MODE = "continuously";
 
+    private static final String VIRTUAL_THREAD = "VIRTUAL_THREAD";
+
     /**
      * Simple method annotated with @WithSpan to collect Otel data.
      */
@@ -84,15 +86,13 @@ public class SampleApplication {
                 sampleApplication.businessMethod();
                 Thread.sleep(500);
             }
-        } else if ("VIRTUAL_THREAD".equals(System.getenv("RUN_MODE"))) {
+        } else if (VIRTUAL_THREAD.equals(System.getenv("RUN_MODE"))) {
             LOGGER.info("RUNNING WITH VIRTUAL THREAD");
             Thread.ofVirtual().start(() -> {
                 try {
                     sampleApplication.businessMethod();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+                } catch (InterruptedException | IOException e) {
+                    LOGGER.severe("Business method invocation failed: " + e.getMessage());
                 }
 
             }).join();

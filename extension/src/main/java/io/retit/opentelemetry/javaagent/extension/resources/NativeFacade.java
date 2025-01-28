@@ -5,8 +5,6 @@ import com.sun.jna.platform.win32.WinBase;
 import io.retit.opentelemetry.javaagent.extension.resources.linux.CLibrary;
 import io.retit.opentelemetry.javaagent.extension.resources.windows.Kernel32Library;
 
-import java.util.logging.Logger;
-
 /**
  * <code>NativeFacade</code> is a wrapper class which provides access to native
  * methods across platforms.
@@ -22,6 +20,7 @@ import java.util.logging.Logger;
  */
 public class NativeFacade {
 
+    @SuppressWarnings("PMD")
     private static long CLOCK_TICKS_LINUX = -1;
 
     private NativeFacade() {

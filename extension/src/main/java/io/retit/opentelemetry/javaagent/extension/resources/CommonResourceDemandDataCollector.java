@@ -148,7 +148,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         // instead of relying on the JDK implementations
         //
         // However, this is not entirely correct, a better approach would be to account for the
-        // exact timings a virtual thread has spent on different platform threads by looking at the virtual scheduler:
+        // exact timings a virtual thread has spent on different platform threads by looking at the virtual thread scheduler:
         //
         // https://rockthejvm.com/articles/the-ultimate-guide-to-java-virtual-threads#the-scheduler-and-cooperative-scheduling
         //
