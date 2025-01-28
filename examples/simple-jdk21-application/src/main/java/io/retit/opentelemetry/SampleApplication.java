@@ -94,6 +94,7 @@ public class SampleApplication {
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
+
             }).join();
         } else {
             sampleApplication.businessMethod();

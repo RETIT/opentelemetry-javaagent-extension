@@ -17,6 +17,7 @@
 package io.retit.opentelemetry.javaagent.extension.resources;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -50,6 +51,73 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     private static final String READ_BYTES = "rchar";
     private static final String WRITE_BYTES = "write_bytes";
+
+    /**
+     * Uses the symbolic link /proc/thread-self to avoid native calls for process and thread ID.
+     * This symbolic link requires a linux kernel version higher than 3.14.
+     */
+    private static final Path PROC_FS_THREAD_SELF_STAT = FileSystems.getDefault().getPath("/proc/thread-self/stat");
+
+    /**
+     * This method uses direct access to the proc file system to read the time the current thread has spent on the CPU.
+     * <p>
+     * see https://www.man7.org/linux/man-pages/man5/proc.5.html
+     *
+     * @return the time in nanoseconds the current thread has spent on the CPU
+     */
+    @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        long cpuTime = 0;
+        if (Files.exists(PROC_FS_THREAD_SELF_STAT)) {
+            try {
+                List<String> threadStatData = Files.readAllLines(PROC_FS_THREAD_SELF_STAT, StandardCharsets.UTF_8);
+                if (!threadStatData.isEmpty()) {
+                    String firstLine = threadStatData.get(0);
+
+                    long userAndSystemClockTicksForCurrentThread = getCombinedUserAndSystemClockTicks(firstLine);
+
+                    if (userAndSystemClockTicksForCurrentThread != 0) {
+
+                        long clockTicksPerSecond = NativeFacade.getClockTicks();
+
+                        long nanoSecondsPerSecond = 1_000_000_000;
+
+                        long clockTicksPerNanoSecond = nanoSecondsPerSecond / clockTicksPerSecond;
+
+                        cpuTime = userAndSystemClockTicksForCurrentThread * clockTicksPerNanoSecond;
+                    }
+                }
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Could not read cpu time from proc fs " + e.getMessage(), e);
+            }
+        }
+        return cpuTime;
+    }
+
+    long getCombinedUserAndSystemClockTicks(final String statData) {
+        // utime is on position 14 and stime on position 15 https://man7.org/linux/man-pages/man5/proc_pid_stat.5.html
+        // However, on some systems there are spaces in the process description, so we start after position 2
+        long utimeInClockTicks = 0;
+        long stimeInClockTicks = 0;
+        int indexOfEndOfProcessName = statData.indexOf(")");
+        if (indexOfEndOfProcessName != -1) {
+            String statDataWithoutProcessName = statData.substring(indexOfEndOfProcessName + 1).trim(); // remove process name
+            String[] data = statDataWithoutProcessName.split(" ");
+            if (data.length >= 13) {
+                utimeInClockTicks = Long.parseLong(data[11]);
+                stimeInClockTicks = Long.parseLong(data[12]);
+            }
+
+        } else {
+            String[] data = statData.split(" ");
+            if (data.length >= 15) {
+                utimeInClockTicks = Long.parseLong(data[13]);
+                stimeInClockTicks = Long.parseLong(data[14]);
+            }
+        }
+
+        return utimeInClockTicks + stimeInClockTicks;
+    }
 
     @Override
     public long[] getDiskBytesReadAndWritten() {

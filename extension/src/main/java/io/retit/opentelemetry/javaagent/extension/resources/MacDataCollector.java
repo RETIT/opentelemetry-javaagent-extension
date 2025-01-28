@@ -6,4 +6,8 @@ package io.retit.opentelemetry.javaagent.extension.resources;
  * systems.
  */
 public class MacDataCollector extends CommonResourceDemandDataCollector {
+    @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        return 0;
+    }
 }

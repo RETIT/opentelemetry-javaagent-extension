@@ -16,6 +16,7 @@
 
 package io.retit.opentelemetry.javaagent.extension.resources;
 
+import com.sun.jna.Platform;
 import io.opentelemetry.api.internal.StringUtils;
 import io.retit.opentelemetry.javaagent.extension.commons.TelemetryUtils;
 
@@ -65,11 +66,11 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         String osName = System.getProperty(OS_NAME_PROPERTY);
 
         CommonResourceDemandDataCollector osCollector;
-        if (osName.trim().toLowerCase(Locale.ENGLISH).contains(WINDOWS_NAME)) {
+        if (Platform.isWindows()) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(WINDOWS_NAME);
-        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(LINUX_NAME)) {
+        } else if (Platform.isLinux()) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(LINUX_NAME);
-        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(MAC_NAME)) {
+        } else if (Platform.isMac()) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(MAC_NAME);
         } else {
             throw new UnsupportedOperationException("Cannot collect Resource Demands for current OS: " + osName);
@@ -136,8 +137,30 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     @Override
     public long getCurrentThreadCpuTime() {
-        return getThreadMXBean().getCurrentThreadCpuTime();
+        long cpuTime = getThreadMXBean().getCurrentThreadCpuTime();
+        // On JDK 21 with virtual threads enabled, the getCurrentThreadCpuTime always returns -1 if the
+        // current code runs in a virtual thread as the platform threads may change over time for a virtual thread:
+        // https://github.com/openjdk/jdk/blob/jdk-21-ga/src/java.management/share/classes/sun/management/ThreadImpl.java#L227
+        //
+        // As a first attempt to solve this issue, we just assume that if the virtual thread starts and ends on the
+        // same platform thread, we can account the whole cpu time spend on the platform thread to the virtual thread
+        // on the platform thread. In order to do this we are using the platform specific interfaces to fetch the cpuTime
+        // instead of relying on the JDK implementations
+        //
+        // However, this is not entirely correct, a better approach would be to account for the
+        // exact timings a virtual thread has spent on different platform threads by looking at the virtual scheduler:
+        //
+        // https://rockthejvm.com/articles/the-ultimate-guide-to-java-virtual-threads#the-scheduler-and-cooperative-scheduling
+        //
+        // but this might involve a lot more overhead.
+
+        if (cpuTime == -1) {
+            cpuTime = getPlatformSpecificThreadCpuTime();
+        }
+        return cpuTime;
     }
+
+    protected abstract long getPlatformSpecificThreadCpuTime();
 
     @Override
     public long getCurrentThreadAllocatedBytes() {

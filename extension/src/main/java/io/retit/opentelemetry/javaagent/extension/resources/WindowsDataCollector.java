@@ -23,5 +23,9 @@ package io.retit.opentelemetry.javaagent.extension.resources;
  */
 public class WindowsDataCollector extends CommonResourceDemandDataCollector {
 
+    @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        return NativeFacade.getCurrentThreadCpuTime();
+    }
 }
 

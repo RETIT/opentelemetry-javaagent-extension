@@ -10,11 +10,6 @@
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>io.retit</groupId>
-            <artifactId>extension</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry.instrumentation</groupId>
@@ -73,6 +68,7 @@
                                     <groupId>io.retit</groupId>
                                     <artifactId>extension</artifactId>
                                     <type>jar</type>
+                                    <version>${project.version}</version>
                                     <destFileName>io.retit.opentelemetry.javaagent.extension.jar</destFileName>
                                 </artifactItem>
                             </artifactItems>

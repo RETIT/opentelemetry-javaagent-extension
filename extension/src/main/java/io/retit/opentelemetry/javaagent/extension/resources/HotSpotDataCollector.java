@@ -22,6 +22,11 @@ package io.retit.opentelemetry.javaagent.extension.resources;
 public class HotSpotDataCollector extends CommonResourceDemandDataCollector {
 
     @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        return 0;
+    }
+
+    @Override
     public long getCurrentThreadAllocatedBytes() {
         long bytes = -1;
         if (getThreadMXBean() instanceof com.sun.management.ThreadMXBean) {
