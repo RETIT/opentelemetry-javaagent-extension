@@ -59,7 +59,6 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     /**
      * This method uses direct access to the proc file system to read the time the current thread has spent on the CPU.
-     * <p>
      * see https://www.man7.org/linux/man-pages/man5/proc.5.html
      *
      * @return the time in nanoseconds the current thread has spent on the CPU
@@ -71,18 +70,18 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
             long userAndSystemClockTicksForCurrentThread = getCombinedUserAndSystemClockTicksFromStatFile();
 
             if (userAndSystemClockTicksForCurrentThread == 0) {
-                return 0l;
+                return 0L;
             } else {
                 long clockTicksPerSecond = NativeFacade.getClockTicks();
 
-                long nanoSecondsPerSecond = 1_000_000_000;
+                long nanoSecondsPerSecond = 1_000_000_000L;
 
                 long clockTicksPerNanoSecond = nanoSecondsPerSecond / clockTicksPerSecond;
 
                 return userAndSystemClockTicksForCurrentThread * clockTicksPerNanoSecond;
             }
         } else {
-            return 0l;
+            return 0L;
         }
     }
 
