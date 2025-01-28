@@ -12,7 +12,7 @@ public class JDK21JavaAgentExtensionIT extends JavaAgentExtensionIT {
     }
 
     @Test
-    public void testWithVirtualThreads () {
+    public void testCPUDemandWithVirtualThreads() {
         applicationContainer.withEnv("RUN_MODE", "VIRTUAL_THREAD");
         testOnlyCPUDemand();
     }

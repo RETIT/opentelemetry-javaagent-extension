@@ -179,6 +179,8 @@ abstract class JavaAgentExtensionIT {
                 assertNotNull(spanDemandEntry.endNetworkReadDemand);
                 assertNotNull(spanDemandEntry.startNetworkWriteDemand);
                 assertNotNull(spanDemandEntry.endNetworkWriteDemand);
+                assertNotEquals(0, spanDemandEntry.startThreadId);
+                assertNotEquals(0, spanDemandEntry.endThreadId);
             }
         }
 
@@ -220,6 +222,8 @@ abstract class JavaAgentExtensionIT {
             SpanDemand sd = sds.get(0);
             assertNotEquals(0, sd.startCpuTime);
             assertNotEquals(0, sd.endCpuTime);
+            assertNotEquals(-1, sd.startCpuTime);
+            assertNotEquals(-1, sd.endCpuTime);
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
@@ -231,6 +235,8 @@ abstract class JavaAgentExtensionIT {
             assertNull(sd.endNetworkReadDemand);
             assertNull(sd.startNetworkWriteDemand);
             assertNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -294,6 +300,8 @@ abstract class JavaAgentExtensionIT {
             assertNotNull(sd.endHeapDemand);
             assertNotEquals(0, sd.startHeapDemand);
             assertNotEquals(0, sd.endHeapDemand);
+            assertNotEquals(-1, sd.startHeapDemand);
+            assertNotEquals(-1, sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
             assertNull(sd.startDiskReadDemand);
             assertNull(sd.endDiskReadDemand);
@@ -303,6 +311,8 @@ abstract class JavaAgentExtensionIT {
             assertNull(sd.endNetworkReadDemand);
             assertNull(sd.startNetworkWriteDemand);
             assertNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -336,6 +346,8 @@ abstract class JavaAgentExtensionIT {
                     assertNotEquals(0, spanDemandEntry.startHeapDemand);
                     assertNotEquals(0, spanDemandEntry.endHeapDemand);
                     assertNotEquals(0, spanDemandEntry.totalHeapSize);
+                    assertNotEquals(0, spanDemandEntry.startThreadId);
+                    assertNotEquals(0, spanDemandEntry.endThreadId);
                 }
                 assertNull(spanDemandEntry.startDiskReadDemand);
                 assertNull(spanDemandEntry.endDiskReadDemand);
@@ -383,6 +395,8 @@ abstract class JavaAgentExtensionIT {
             assertNull(sd.endNetworkReadDemand);
             assertNull(sd.startNetworkWriteDemand);
             assertNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -416,6 +430,8 @@ abstract class JavaAgentExtensionIT {
             assertNotNull(sd.endNetworkReadDemand);
             assertNotNull(sd.startNetworkWriteDemand);
             assertNotNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -522,6 +538,10 @@ abstract class JavaAgentExtensionIT {
                 spanDemand.logSystemTime = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.totalheapsize")) {
                 spanDemand.totalHeapSize = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.startthread")) {
+                spanDemand.startThreadId = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.endthread")) {
+                spanDemand.endThreadId = Long.valueOf(elems[1]);
             }
         }
         return spanDemand;
@@ -548,6 +568,8 @@ abstract class JavaAgentExtensionIT {
         public Long endNetworkWriteDemand = null;
         public Long logSystemTime = null;
         public Long totalHeapSize = null;
+        public Long startThreadId = null;
+        public Long endThreadId = null;
     }
 
     private static class MetricDemand {

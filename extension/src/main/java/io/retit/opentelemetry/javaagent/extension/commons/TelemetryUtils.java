@@ -21,6 +21,7 @@ import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
 import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
 import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.NativeFacade;
 
 /**
  * Utility class to add resource demand data to OpenTelemetry span.
@@ -76,7 +77,7 @@ public class TelemetryUtils {
             }
 
             if (threadNameRequired) {
-                readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD, Thread.currentThread().getId());
+                readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_SPAN_START_THREAD, NativeFacade.getThreadId());
             }
         }
     }
@@ -121,7 +122,7 @@ public class TelemetryUtils {
                 threadNameRequired = true;
             }
             if (threadNameRequired) {
-                readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD, Thread.currentThread().getId());
+                readWriteSpan.setAttribute(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD, NativeFacade.getThreadId());
             }
         }
     }

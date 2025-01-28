@@ -34,7 +34,7 @@ public class NativeFacade {
      *
      * @return the tid of the thread
      */
-    public static int getThreadId() {
+    public static long getThreadId() {
         if (Platform.isWindows()) {
             return Kernel32Library.INSTANCE.GetCurrentThreadId();
         } else if (Platform.isLinux() && Platform.isIntel()) {
@@ -43,9 +43,9 @@ public class NativeFacade {
             } else {
                 return CLibrary.INSTANCE.syscall(CLibrary.GETTID_X86_32);
             }
+        } else {
+            return Thread.currentThread().getId();
         }
-
-        return 0;
     }
 
     /**
