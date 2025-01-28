@@ -164,7 +164,16 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     @Override
     public long getCurrentThreadAllocatedBytes() {
-        return jvmCollector.getCurrentThreadAllocatedBytes();
+        // On JDK 21 with virtual threads enabled, the getCurrentThreadAllocatedBytes always returns -1 if the
+        // current code runs in a virtual thread as the platform threads may change over time for a virtual thread:
+        // https://github.com/openjdk/jdk/blob/jdk-21-ga/src/java.management/share/classes/sun/management/ThreadImpl.java#L353
+        // in order to avoid calculation issues in the backend, we are setting this value to 0.
+        long allocatedBytes = jvmCollector.getCurrentThreadAllocatedBytes();
+        if (allocatedBytes >= 0) {
+            return allocatedBytes;
+        } else {
+            return 0L;
+        }
     }
 
     /**
