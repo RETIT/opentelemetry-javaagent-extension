@@ -33,7 +33,7 @@ import io.retit.opentelemetry.javaagent.extension.emissions.embodied.EmbodiedEmi
 import io.retit.opentelemetry.javaagent.extension.energy.MemoryEnergyData;
 import io.retit.opentelemetry.javaagent.extension.energy.NetworkEnergyData;
 import io.retit.opentelemetry.javaagent.extension.energy.StorageEnergyData;
-import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourceDemandDataCollector;
 
 import java.lang.management.ManagementFactory;
 import java.util.logging.Logger;

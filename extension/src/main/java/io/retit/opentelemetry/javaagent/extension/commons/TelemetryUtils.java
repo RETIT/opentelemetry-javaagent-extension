@@ -19,9 +19,9 @@ package io.retit.opentelemetry.javaagent.extension.commons;
 import io.opentelemetry.api.common.AttributeKey;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.opentelemetry.sdk.trace.ReadableSpan;
-import io.retit.opentelemetry.javaagent.extension.resources.CommonResourceDemandDataCollector;
-import io.retit.opentelemetry.javaagent.extension.resources.IResourceDemandDataCollector;
-import io.retit.opentelemetry.javaagent.extension.resources.NativeFacade;
+import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourceDemandDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.common.IResourceDemandDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
 
 /**
  * Utility class to add resource demand data to OpenTelemetry span.

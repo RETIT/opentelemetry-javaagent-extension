@@ -1,9 +1,10 @@
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.common;
 
 import com.sun.jna.Platform;
 import com.sun.jna.platform.win32.WinBase;
-import io.retit.opentelemetry.javaagent.extension.resources.linux.CLibrary;
-import io.retit.opentelemetry.javaagent.extension.resources.windows.Kernel32Library;
+import io.retit.opentelemetry.javaagent.extension.resources.linux.LinuxCLibrary;
+import io.retit.opentelemetry.javaagent.extension.resources.macos.MacOSSystemLibrary;
+import io.retit.opentelemetry.javaagent.extension.resources.windows.WindowsKernel32Library;
 
 /**
  * <code>NativeFacade</code> is a wrapper class which provides access to native
@@ -18,48 +19,30 @@ import io.retit.opentelemetry.javaagent.extension.resources.windows.Kernel32Libr
  */
 public class NativeFacade {
 
-    @SuppressWarnings("PMD")
-    private static long CLOCK_TICKS_LINUX = -1;
-
     private NativeFacade() {
         // Utility class
     }
 
     /**
      * Gets the id of the current thread (tid).
-     * On Linux, this method currently only works for x86 and x86_64 platforms
-     * since the IDs for the syscall are architecture-specific. If support for
-     * other platforms is desired, the respective syscall IDs need to be looked
-     * up and added to {@link CLibrary}.
+     * This method only provides platform specific tids for Windows, Linux and Mac.
+     * For other platforms it falls back on the Java tid.
      *
      * @return the tid of the thread
      */
     public static long getThreadId() {
         if (Platform.isWindows()) {
-            return Kernel32Library.INSTANCE.GetCurrentThreadId();
+            return WindowsKernel32Library.INSTANCE.GetCurrentThreadId();
         } else if (Platform.isLinux() && Platform.isIntel()) {
-            if (Platform.is64Bit()) {
-                return CLibrary.INSTANCE.syscall(CLibrary.GETTID_X86_64);
-            } else {
-                return CLibrary.INSTANCE.syscall(CLibrary.GETTID_X86_32);
-            }
+            return LinuxCLibrary.INSTANCE.gettid();
+        } else if (Platform.isMac()) {
+            Long threadId = -1l;
+            ThreadHandle handle = MacOSSystemLibrary.INSTANCE.pthread_self();
+            MacOSSystemLibrary.INSTANCE.pthread_threadid_np(handle, threadId);
+            return threadId;
         } else {
             return Thread.currentThread().getId();
         }
-    }
-
-    /**
-     * Returns the clock ticks configured on linux.
-     *
-     * @return clock ticks configured on linux
-     */
-    public static long getClockTicks() {
-
-        if (CLOCK_TICKS_LINUX == -1 && Platform.isLinux()) {
-            CLOCK_TICKS_LINUX = CLibrary.INSTANCE.sysconf(CLibrary._SC_CLK_TCK);
-        }
-
-        return CLOCK_TICKS_LINUX;
     }
 
     /**
@@ -69,13 +52,13 @@ public class NativeFacade {
      */
     public static long getCurrentThreadCpuTime() {
         if (Platform.isWindows()) {
-            Kernel32Library.Handle threadHandle = Kernel32Library.INSTANCE.GetCurrentThread();
+            ThreadHandle threadHandle = WindowsKernel32Library.INSTANCE.GetCurrentThread();
             WinBase.FILETIME lpCreationTime = new WinBase.FILETIME();
             WinBase.FILETIME lpExitTime = new WinBase.FILETIME();
             WinBase.FILETIME lpKernelTime = new WinBase.FILETIME();
             WinBase.FILETIME lpUserTime = new WinBase.FILETIME();
 
-            Kernel32Library.INSTANCE.GetThreadTimes(threadHandle, lpCreationTime, lpExitTime, lpKernelTime, lpUserTime);
+            WindowsKernel32Library.INSTANCE.GetThreadTimes(threadHandle, lpCreationTime, lpExitTime, lpKernelTime, lpUserTime);
 
             long cpuTime = lpKernelTime.toDWordLong().longValue() + lpUserTime.toDWordLong().longValue();
             /**
@@ -84,8 +67,18 @@ public class NativeFacade {
              * https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadtimes
              */
             return cpuTime * 100;
+        } else if (Platform.isLinux()) {
+            return getTotalClockTime(LinuxCLibrary.INSTANCE);
+        } else if (Platform.isMac()) {
+            return getTotalClockTime(MacOSSystemLibrary.INSTANCE);
         }
 
         return 0L;
+    }
+
+    private static long getTotalClockTime(final CLibrary cLibrary) {
+        CLibrary.TimeSpec timeSpecBefore = new CLibrary.TimeSpec();
+        cLibrary.clock_gettime(CLibrary.CLOCK_THREAD_CPUTIME_ID, timeSpecBefore);
+        return (timeSpecBefore.tv_sec.longValue() * 1_000_000_000l) + timeSpecBefore.tv_nsec;
     }
 }

@@ -14,11 +14,14 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.common;
 
 import com.sun.jna.Platform;
 import io.opentelemetry.api.internal.StringUtils;
 import io.retit.opentelemetry.javaagent.extension.commons.TelemetryUtils;
+import io.retit.opentelemetry.javaagent.extension.resources.linux.LinuxDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.macos.MacOSDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.windows.WindowsDataCollector;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -104,7 +107,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         } else if (LINUX_NAME.equals(osName)) {
             return new LinuxDataCollector();
         } else if (MAC_NAME.equals(osName)) {
-            return new MacDataCollector();
+            return new MacOSDataCollector();
         }
         throw new UnsupportedOperationException("Unsupported OS: " + osName);
     }
@@ -116,7 +119,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
      * @return the JVMDataCollector for the selected JVM
      */
     protected static IResourceDemandDataCollector getDataCollectorFromJVM(final String jvmName) {
-        return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources." + jvmName + "DataCollector");
+        return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources.jvm." + jvmName + "DataCollector");
     }
 
     private static Object loadInstance(final String className) {

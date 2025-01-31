@@ -24,7 +24,7 @@ import io.opentelemetry.sdk.trace.SdkTracerProviderBuilder;
 import io.opentelemetry.sdk.trace.SpanProcessor;
 import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.processor.RETITSpanProcessor;
-import io.retit.opentelemetry.javaagent.extension.resources.JavaAgentGCHandler;
+import io.retit.opentelemetry.javaagent.extension.resources.jvm.JavaAgentGCHandler;
 
 import java.util.logging.Logger;
 
