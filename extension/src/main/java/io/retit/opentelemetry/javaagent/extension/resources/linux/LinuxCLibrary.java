@@ -15,6 +15,11 @@ import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
  */
 @SuppressWarnings("PMD")
 public interface LinuxCLibrary extends CLibrary {
+    /**
+     * This is a clock that measures CPU time consumed by this
+     * thread.
+     */
+    int CLOCK_THREAD_CPUTIME_ID = 3;
 
     /**
      * The instance provided by the JNA library to interact with the native c library.

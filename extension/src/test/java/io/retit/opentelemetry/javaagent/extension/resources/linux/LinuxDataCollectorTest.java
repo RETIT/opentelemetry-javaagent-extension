@@ -12,6 +12,7 @@ public class LinuxDataCollectorTest {
         if(Platform.isLinux()) {
             long javaThreadId = Thread.currentThread().getId();
             long nativeThreadId = NativeFacade.getThreadId();
+            Assertions.assertNotEquals(0, nativeThreadId);
             Assertions.assertNotEquals(javaThreadId, nativeThreadId);
         }
     }
@@ -24,7 +25,6 @@ public class LinuxDataCollectorTest {
             linuxDataCollector.getPlatformSpecificThreadCpuTime();
             long currentThreadCpuTimeThreadProcFS = linuxDataCollector.getPlatformSpecificThreadCpuTime();
             long currentThreadCpuTimeThreadMXBean = linuxDataCollector.getCurrentThreadCpuTime();
-
             long difference = currentThreadCpuTimeThreadMXBean - currentThreadCpuTimeThreadProcFS;
             // assert that the measurements are less than 2ms different (as they consume cpu time themselves)
             Assertions.assertTrue(difference < 2_000_000);

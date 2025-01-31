@@ -36,10 +36,8 @@ public class NativeFacade {
         } else if (Platform.isLinux() && Platform.isIntel()) {
             return LinuxCLibrary.INSTANCE.gettid();
         } else if (Platform.isMac()) {
-            Long threadId = -1l;
             ThreadHandle handle = MacOSSystemLibrary.INSTANCE.pthread_self();
-            MacOSSystemLibrary.INSTANCE.pthread_threadid_np(handle, threadId);
-            return threadId;
+            return MacOSSystemLibrary.INSTANCE.pthread_mach_thread_np(handle);
         } else {
             return Thread.currentThread().getId();
         }
@@ -68,17 +66,17 @@ public class NativeFacade {
              */
             return cpuTime * 100;
         } else if (Platform.isLinux()) {
-            return getTotalClockTime(LinuxCLibrary.INSTANCE);
+            return getTotalClockTime(LinuxCLibrary.INSTANCE, LinuxCLibrary.CLOCK_THREAD_CPUTIME_ID);
         } else if (Platform.isMac()) {
-            return getTotalClockTime(MacOSSystemLibrary.INSTANCE);
+            return getTotalClockTime(MacOSSystemLibrary.INSTANCE, MacOSSystemLibrary.CLOCK_THREAD_CPUTIME_ID);
         }
 
         return 0L;
     }
 
-    private static long getTotalClockTime(final CLibrary cLibrary) {
+    private static long getTotalClockTime(final CLibrary cLibrary, int clockId) {
         CLibrary.TimeSpec timeSpecBefore = new CLibrary.TimeSpec();
-        cLibrary.clock_gettime(CLibrary.CLOCK_THREAD_CPUTIME_ID, timeSpecBefore);
+        cLibrary.clock_gettime(clockId, timeSpecBefore);
         return (timeSpecBefore.tv_sec.longValue() * 1_000_000_000l) + timeSpecBefore.tv_nsec;
     }
 }

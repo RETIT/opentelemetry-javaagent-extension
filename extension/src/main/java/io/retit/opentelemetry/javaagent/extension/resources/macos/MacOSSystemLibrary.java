@@ -16,10 +16,15 @@ import io.retit.opentelemetry.javaagent.extension.resources.common.ThreadHandle;
  */
 @SuppressWarnings("PMD")
 public interface MacOSSystemLibrary extends CLibrary {
+    /**
+     * This is a clock that measures CPU time consumed by this
+     * thread.
+     */
+    int CLOCK_THREAD_CPUTIME_ID = 16;
 
     MacOSSystemLibrary INSTANCE = Native.load("System", MacOSSystemLibrary.class);
 
     ThreadHandle pthread_self();
 
-    int pthread_threadid_np(ThreadHandle threadHandle, Long thread_id);
+    int pthread_mach_thread_np(ThreadHandle threadHandle);
 }

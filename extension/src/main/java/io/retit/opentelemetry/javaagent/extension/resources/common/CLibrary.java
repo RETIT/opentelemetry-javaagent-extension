@@ -11,11 +11,6 @@ import com.sun.jna.Structure;
  */
 @SuppressWarnings("PMD")
 public interface CLibrary extends Library {
-    /**
-     * This is a clock that measures CPU time consumed by this
-     * thread.
-     */
-    int CLOCK_THREAD_CPUTIME_ID = 3;
 
     /**
      * Retrievs the time specified by the clock id.

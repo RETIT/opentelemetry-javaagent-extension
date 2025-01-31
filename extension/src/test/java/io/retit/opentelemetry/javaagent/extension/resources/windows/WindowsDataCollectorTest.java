@@ -12,6 +12,7 @@ public class WindowsDataCollectorTest {
         if (Platform.isWindows()) {
             long javaThreadId = Thread.currentThread().getId();
             long nativeThreadId = NativeFacade.getThreadId();
+            Assertions.assertNotEquals(0, nativeThreadId);
             Assertions.assertNotEquals(javaThreadId, nativeThreadId);
         }
     }
