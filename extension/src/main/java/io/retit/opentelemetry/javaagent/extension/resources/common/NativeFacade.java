@@ -74,7 +74,7 @@ public class NativeFacade {
         return 0L;
     }
 
-    private static long getTotalClockTime(final CLibrary cLibrary, int clockId) {
+    private static long getTotalClockTime(final CLibrary cLibrary, final int clockId) {
         CLibrary.TimeSpec timeSpecBefore = new CLibrary.TimeSpec();
         cLibrary.clock_gettime(clockId, timeSpecBefore);
         return (timeSpecBefore.tv_sec.longValue() * 1_000_000_000l) + timeSpecBefore.tv_nsec;
