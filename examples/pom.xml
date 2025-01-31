@@ -16,6 +16,5 @@
     <modules>
         <module>simple-jdk8-application</module>
         <module>simple-jdk21-application</module>
-        <module>macos-test</module>
     </modules>
 </project>
