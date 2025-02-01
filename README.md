@@ -156,9 +156,7 @@ The thread id of the thread processing the Span...
 
 All resource demand measurements performed by this OpenTelemetry agent extension should only be considered valid, when 
 the thread id starting a span (io.retit.startthread) is equivalent to the thread id ending a span (io.retit.endthread). 
-In case the thread ids do not match, you cannot use the values for resource demand calculations as the values originate from different sources. This is especially important when running reactive applications or using virtual threads. 
-In such a scenario, the extension will only collect spans but will not publish metrics about such measurements. 
+In case the thread ids do not match, you cannot use the values for resource demand calculations as the values originate from different sources. This is especially important when running reactive applications or using virtual threads. In such a scenario, the extension will only attach data to spans but will not publish metrics about such measurements. 
 
 When using virtual threads, we are also not able to capture the memory demand of a span at the moment, as this data is
-not provided by the JVM yet. Furthermore, for the CPU demand of virtual threads, we are currently working with the assumption that  if a virtual thread was running on the same platform (carrier) thread at span start and end time, we  
-can allocate the whole cpu time of the platform thread to the virtual thread (see https://github.com/RETIT/opentelemetry-javaagent-extension/pull/87). 
+not provided by the JVM yet. Furthermore, for the CPU demand of virtual threads, we are currently working with the assumption that  if a virtual thread was running on the same platform (carrier) thread at span start and end time, we can allocate the whole cpu time of the platform thread to the virtual thread (see https://github.com/RETIT/opentelemetry-javaagent-extension/pull/87). 
