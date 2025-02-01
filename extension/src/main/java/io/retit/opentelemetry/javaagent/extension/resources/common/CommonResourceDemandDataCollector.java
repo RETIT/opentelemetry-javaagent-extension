@@ -14,10 +14,14 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.common;
 
+import com.sun.jna.Platform;
 import io.opentelemetry.api.internal.StringUtils;
 import io.retit.opentelemetry.javaagent.extension.commons.TelemetryUtils;
+import io.retit.opentelemetry.javaagent.extension.resources.linux.LinuxDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.macos.MacOSDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.windows.WindowsDataCollector;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
@@ -65,11 +69,11 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         String osName = System.getProperty(OS_NAME_PROPERTY);
 
         CommonResourceDemandDataCollector osCollector;
-        if (osName.trim().toLowerCase(Locale.ENGLISH).contains(WINDOWS_NAME)) {
+        if (Platform.isWindows()) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(WINDOWS_NAME);
-        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(LINUX_NAME)) {
+        } else if (Platform.isLinux()) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(LINUX_NAME);
-        } else if (osName.trim().toLowerCase(Locale.ENGLISH).contains(MAC_NAME)) {
+        } else if (Platform.isMac()) {
             osCollector = (CommonResourceDemandDataCollector) getDataCollectorFromOS(MAC_NAME);
         } else {
             throw new UnsupportedOperationException("Cannot collect Resource Demands for current OS: " + osName);
@@ -103,7 +107,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
         } else if (LINUX_NAME.equals(osName)) {
             return new LinuxDataCollector();
         } else if (MAC_NAME.equals(osName)) {
-            return new MacDataCollector();
+            return new MacOSDataCollector();
         }
         throw new UnsupportedOperationException("Unsupported OS: " + osName);
     }
@@ -115,7 +119,7 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
      * @return the JVMDataCollector for the selected JVM
      */
     protected static IResourceDemandDataCollector getDataCollectorFromJVM(final String jvmName) {
-        return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources." + jvmName + "DataCollector");
+        return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources.jvm." + jvmName + "DataCollector");
     }
 
     private static Object loadInstance(final String className) {
@@ -136,12 +140,43 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
 
     @Override
     public long getCurrentThreadCpuTime() {
-        return getThreadMXBean().getCurrentThreadCpuTime();
+        long cpuTime = getThreadMXBean().getCurrentThreadCpuTime();
+        // On JDK 21 with virtual threads enabled, the getCurrentThreadCpuTime always returns -1 if the
+        // current code runs in a virtual thread as the platform threads may change over time for a virtual thread:
+        // https://github.com/openjdk/jdk/blob/jdk-21-ga/src/java.management/share/classes/sun/management/ThreadImpl.java#L227
+        //
+        // As a first attempt to solve this issue, we just assume that if the virtual thread starts and ends on the
+        // same platform thread, we can account the whole cpu time spend on the platform thread to the virtual thread
+        // on the platform thread. In order to do this we are using the platform specific interfaces to fetch the cpuTime
+        // instead of relying on the JDK implementations
+        //
+        // However, this is not entirely correct, a better approach would be to account for the
+        // exact timings a virtual thread has spent on different platform threads by looking at the virtual thread scheduler:
+        //
+        // https://rockthejvm.com/articles/the-ultimate-guide-to-java-virtual-threads#the-scheduler-and-cooperative-scheduling
+        //
+        // but this might involve a lot more overhead.
+
+        if (cpuTime == -1) {
+            cpuTime = getPlatformSpecificThreadCpuTime();
+        }
+        return cpuTime;
     }
+
+    protected abstract long getPlatformSpecificThreadCpuTime();
 
     @Override
     public long getCurrentThreadAllocatedBytes() {
-        return jvmCollector.getCurrentThreadAllocatedBytes();
+        // On JDK 21 with virtual threads enabled, the getCurrentThreadAllocatedBytes always returns -1 if the
+        // current code runs in a virtual thread as the platform threads may change over time for a virtual thread:
+        // https://github.com/openjdk/jdk/blob/jdk-21-ga/src/java.management/share/classes/sun/management/ThreadImpl.java#L353
+        // in order to avoid calculation issues in the backend, we are setting this value to 0.
+        long allocatedBytes = jvmCollector.getCurrentThreadAllocatedBytes();
+        if (allocatedBytes >= 0) {
+            return allocatedBytes;
+        } else {
+            return 0L;
+        }
     }
 
     /**

@@ -14,7 +14,11 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.windows;
+
+import io.retit.opentelemetry.javaagent.extension.resources.common.IResourceDemandDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
+import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourceDemandDataCollector;
 
 /**
  * An {@link IResourceDemandDataCollector
@@ -23,5 +27,9 @@ package io.retit.opentelemetry.javaagent.extension.resources;
  */
 public class WindowsDataCollector extends CommonResourceDemandDataCollector {
 
+    @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        return NativeFacade.getCurrentThreadCpuTime();
+    }
 }
 

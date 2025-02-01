@@ -14,12 +14,19 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.jvm;
+
+import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourceDemandDataCollector;
 
 /**
  * A JVM data collector used for both Oracle's HotSpot as well as OpenJDK JVMs.
  */
 public class HotSpotDataCollector extends CommonResourceDemandDataCollector {
+
+    @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        return 0;
+    }
 
     @Override
     public long getCurrentThreadAllocatedBytes() {

@@ -20,7 +20,6 @@ import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +35,10 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-class JavaAgentExtensionIntegrationTest {
+abstract class JavaAgentExtensionIT {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(JavaAgentExtensionIntegrationTest.class);
-    private static GenericContainer<?> applicationContainer;
+    private static final Logger LOGGER = LoggerFactory.getLogger(JavaAgentExtensionIT.class);
+    protected static GenericContainer<?> applicationContainer;
     private static Map<String, List<SpanDemand>> spanDemands;
     private static List<MetricDemand> metricDemands;
 
@@ -58,24 +57,22 @@ class JavaAgentExtensionIntegrationTest {
             "io.retit.resource.demand.cpu.ms"
     };
 
-    @BeforeEach
-    public void setupApplication() {
-        String image = "otel-integration-test:feature";
-        LOGGER.info("Using image: " + image);
-        applicationContainer = new GenericContainer<>(image)
+    @AfterEach
+    public void removeApplication() {
+        LOGGER.info(applicationContainer.getLogs());
+        applicationContainer.stop();
+        LOGGER.info(spanDemands.toString());
+    }
+
+    protected void commonSetup(final String imageName) {
+        LOGGER.info("Using image: " + imageName);
+        applicationContainer = new GenericContainer<>(imageName)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")
                 .withEnv("OTEL_METRICS_EXPORTER", "logging")
                 .withEnv("OTEL_TRACES_EXPORTER", "logging")
                 .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:opentelemetry-javaagent-all.jar -Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar");
         spanDemands = new HashMap<>();
         metricDemands = new ArrayList<>();
-    }
-
-    @AfterEach
-    public void removeApplication() {
-        LOGGER.info(applicationContainer.getLogs());
-        applicationContainer.stop();
-        LOGGER.info(spanDemands.toString());
     }
 
     private void executeContainer() {
@@ -126,7 +123,7 @@ class JavaAgentExtensionIntegrationTest {
 
         // GC events are recorded by default. Assert that any other spans belog to GC events
         Map<String, List<SpanDemand>> gcSpans = spanDemands.entrySet().stream().filter(
-                        e -> !SAMPLE_METHOD1.equals(e.getKey()) && !SAMPLE_METHOD2.equals(e.getKey()))
+                        e -> !SAMPLE_METHOD1.equals(e.getKey()) && !SAMPLE_METHOD2.equals(e.getKey()) && !"<unspecified span name>".equals(e.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         assertTrue(gcSpans.keySet().stream()
                 .allMatch(s -> isGcSpanName(s)));
@@ -155,7 +152,9 @@ class JavaAgentExtensionIntegrationTest {
         Assertions.assertTrue(!spanDemands.isEmpty());
 
         for (Map.Entry<String, List<SpanDemand>> spanDemandEntryList : spanDemands.entrySet()) {
-            if (!isGcSpanName(spanDemandEntryList.getKey())) {
+            if ("<unspecified span name>".equals(spanDemandEntryList.getKey())) {
+                continue;
+            } else if (!isGcSpanName(spanDemandEntryList.getKey())) {
                 assertEquals(1, spanDemandEntryList.getValue().size());
             }
             for (SpanDemand spanDemandEntry : spanDemandEntryList.getValue()) {
@@ -180,6 +179,8 @@ class JavaAgentExtensionIntegrationTest {
                 assertNotNull(spanDemandEntry.endNetworkReadDemand);
                 assertNotNull(spanDemandEntry.startNetworkWriteDemand);
                 assertNotNull(spanDemandEntry.endNetworkWriteDemand);
+                assertNotEquals(0, spanDemandEntry.startThreadId);
+                assertNotEquals(0, spanDemandEntry.endThreadId);
             }
         }
 
@@ -221,6 +222,8 @@ class JavaAgentExtensionIntegrationTest {
             SpanDemand sd = sds.get(0);
             assertNotEquals(0, sd.startCpuTime);
             assertNotEquals(0, sd.endCpuTime);
+            assertNotEquals(-1, sd.startCpuTime);
+            assertNotEquals(-1, sd.endCpuTime);
             assertNull(sd.startHeapDemand);
             assertNull(sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
@@ -232,6 +235,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endNetworkReadDemand);
             assertNull(sd.startNetworkWriteDemand);
             assertNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -295,6 +300,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNotNull(sd.endHeapDemand);
             assertNotEquals(0, sd.startHeapDemand);
             assertNotEquals(0, sd.endHeapDemand);
+            assertNotEquals(-1, sd.startHeapDemand);
+            assertNotEquals(-1, sd.endHeapDemand);
             assertNull(sd.totalHeapSize);
             assertNull(sd.startDiskReadDemand);
             assertNull(sd.endDiskReadDemand);
@@ -304,6 +311,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endNetworkReadDemand);
             assertNull(sd.startNetworkWriteDemand);
             assertNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -337,6 +346,8 @@ class JavaAgentExtensionIntegrationTest {
                     assertNotEquals(0, spanDemandEntry.startHeapDemand);
                     assertNotEquals(0, spanDemandEntry.endHeapDemand);
                     assertNotEquals(0, spanDemandEntry.totalHeapSize);
+                    assertNotEquals(0, spanDemandEntry.startThreadId);
+                    assertNotEquals(0, spanDemandEntry.endThreadId);
                 }
                 assertNull(spanDemandEntry.startDiskReadDemand);
                 assertNull(spanDemandEntry.endDiskReadDemand);
@@ -384,6 +395,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNull(sd.endNetworkReadDemand);
             assertNull(sd.startNetworkWriteDemand);
             assertNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -417,6 +430,8 @@ class JavaAgentExtensionIntegrationTest {
             assertNotNull(sd.endNetworkReadDemand);
             assertNotNull(sd.startNetworkWriteDemand);
             assertNotNull(sd.endNetworkWriteDemand);
+            assertNotEquals(0, sd.startThreadId);
+            assertNotEquals(0, sd.endThreadId);
         }
     }
 
@@ -523,6 +538,10 @@ class JavaAgentExtensionIntegrationTest {
                 spanDemand.logSystemTime = Long.valueOf(elems[1]);
             } else if (elems[0].contains("io.retit.totalheapsize")) {
                 spanDemand.totalHeapSize = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.startthread")) {
+                spanDemand.startThreadId = Long.valueOf(elems[1]);
+            } else if (elems[0].contains("io.retit.endthread")) {
+                spanDemand.endThreadId = Long.valueOf(elems[1]);
             }
         }
         return spanDemand;
@@ -549,6 +568,8 @@ class JavaAgentExtensionIntegrationTest {
         public Long endNetworkWriteDemand = null;
         public Long logSystemTime = null;
         public Long totalHeapSize = null;
+        public Long startThreadId = null;
+        public Long endThreadId = null;
     }
 
     private static class MetricDemand {

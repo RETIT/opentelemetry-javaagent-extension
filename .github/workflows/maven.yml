@@ -21,10 +21,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 17
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
-          java-version: '17'
+          java-version: '21'
           distribution: 'temurin'
           cache: maven
       - name: Compile and run Checkstyle, PMD and Spotbugs checks
@@ -32,7 +32,7 @@ jobs:
       - name: Package Extension and create Docker Container for Sample Application
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
-        run: mvn -B test -Dtest=JavaAgentExtensionIntegrationTest --file ./extension/pom.xml
+        run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT --file ./extension/pom.xml
 
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       #- name: Update dependency graph

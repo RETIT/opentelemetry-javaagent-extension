@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
   "links": [],
   "panels": [
     {
@@ -1289,8 +1288,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Carbon Emissions Transaction",
+  "title": "Carbon Emissions Transaction - Simple JDK 8 Application",
   "uid": "adv7vxmnrde68e",
-  "version": 5,
+  "version": 1,
   "weekStart": ""
 }

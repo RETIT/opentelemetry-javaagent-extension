@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.common;
 
 /**
  * Interface which defines methods for retrieving resource demands.

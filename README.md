@@ -46,7 +46,7 @@ To build the Sample application you need to run the following maven command:
 Afterwards, you can start OpenTelemetry compatible tracing and metrics backends using the following docker command: 
 
 ```bash 
-docker compose -f ./docker/docker-compose.yml up -d
+docker compose -f ./examples/docker/docker-compose.yml up -d
 ```
 
 This will start an [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector/tree/main) to which the metric and trace data is being sent. Furthermore, it starts [Prometheus](https://prometheus.io/) instance to store the metric data and a [Grafana](https://grafana.com/) instance to visualize the metrics stored in Prometheus. You can optionally also start a [Jaeger](https://www.jaegertracing.io/) instance by commenting out the corresponding section in the docker compose file to visualize the span attributes.
@@ -54,22 +54,22 @@ This will start an [OpenTelemetry Collector](https://github.com/open-telemetry/o
 Once the backend is up, the sample Application can then be run with the OpenTelemetry Java agent attached from the root directory as follows.
 
 ```bash
-java -javaagent:./sampleapplication/target/jib/opentelemetry-javaagent-all.jar \
+java -javaagent:./examples/simple-jdk8-application/target/jib/opentelemetry-javaagent-all.jar \
 -Dotel.service.name=sampleapplication \
 -Dotel.logs.exporter=logging \
--Dotel.javaagent.extensions=./sampleapplication/target/jib/io.retit.opentelemetry.javaagent.extension.jar \
+-Dotel.javaagent.extensions=./extension/target/io.retit.opentelemetry.javaagent.extension.jar \
 -Dio.retit.emissions.cloud.provider=aws \
 -Dio.retit.emissions.cloud.provider.region=af-south-1 \
 -Dio.retit.emissions.cloud.provider.instance.type=a1.medium \
 -DRUN_MODE=continuously \
--jar ./sampleapplication/target/sampleapplication-0.0.1-SNAPSHOT.jar
+-jar ./examples/simple-jdk8-application/target/simple-jdk8-application-0.0.1-SNAPSHOT.jar
 ```
 
 This application will run until you stop it and generate data. While it is generating data, you can look at the data in the backends. The easiest way is to check out the [Grafana dashboard](http://localhost:3000/grafana/dashboards) here:
 
     http://localhost:3000/grafana/dashboards
 
-After some time you can see the data produced by this application in the following dashboard. As an example the CPU and memory demands are shown as they are supported on most plattforms as well as the Emission Calculation Factors. Furthermore, we have integrated a [Software Carbon Intensity](https://sci.greensoftware.foundation/) calculation for each transaction based on this data. This calculation is based on our work presented at the [Workshop on Challenges in Performance Methods for Software Development (WOSP-C) 2024](https://www.retit.de/wp-content/uploads/2024/05/Green_Software_Metrics.pdf) and [EcoCompute](https://www.retit.de/wp-content/uploads/2024/04/2024-04-25_How_to_Measure_CO2-Emissions_For_Every_API_Call_Of_Your_Microservices.pdf) with the main difference that we are now using the [Cloud Carbon coefficients](https://github.com/cloud-carbon-footprint/ccf-coefficients) instead of an external datasource for the emission data. The current state of the calculation using the CCF data has been presented at the [Symposium on Software Performance 2024](https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_44_Heft_4/SSP24_16_camera-ready_5255.pdf).
+After some time you can see the data produced by this application in the following dashboard. As an example the CPU and memory demands are shown as they are supported on most plattforms as well as the Emission Calculation Factors. Furthermore, we have integrated a [Software Carbon Intensity](https://sci.greensoftware.foundation/) calculation for each transaction based on this data. This calculation is based on our work presented at the [Symposium on Software Performance 2024](https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_44_Heft_4/SSP24_16_camera-ready_5255.pdf).
 
 ![dashboard.png](img/dashboard.png)
 
@@ -89,7 +89,7 @@ Configuration options specific to this extension are listed below. All configura
 | IO_RETIT_EMISSIONS_CLOUD_PROVIDER | AWS/Azure/GCP                                                      | -       | Specifies the cloud provider for this process.                                                                                       |
 | IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION | regions of the corresponding cloud provider                        | -       | Specifies the cloud provider region for this process.                                                                                |
 | IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE | virtual machine instance types of the corresponding cloud provider | -       | Specifies the cloud provider virtual machine instance type for this process.                                                         |
-| IO_RETIT_EMISSIONS_STORAGE_TYPE | HDD/SSD                                                            | SSD     | Specifies the storage type for this process.                                                                |
+| IO_RETIT_EMISSIONS_STORAGE_TYPE | HDD/SSD                                                            | SSD     | Specifies the storage type for this process.                                                                                         |
 
 # OpenTelemetry Metrics published by this extension
 
@@ -111,7 +111,7 @@ If the cloud provider and its region is configured, also emission related metric
     io.retit.emissions.pue - Power Usage Effectiveness (PUE) value of the datacenter
     io.retit.emissions.gef - Grid Emissions Factor (GEF)
     
-This data can later be used to calculate the carbon intensity of the application or of each API call (e.g., using SCI as shown in our work presented at the [Workshop on Challenges in Performance Methods for Software Development (WOSP-C) 2024](https://www.retit.de/wp-content/uploads/2024/05/Green_Software_Metrics.pdf) and [EcoCompute](https://www.retit.de/wp-content/uploads/2024/04/2024-04-25_How_to_Measure_CO2-Emissions_For_Every_API_Call_Of_Your_Microservices.pdf)).
+This data can later be used to calculate the carbon intensity of the application or of each API call (e.g., using SCI as shown in our work presented at the [Symposium on Software Performance 2024](https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_44_Heft_4/SSP24_16_camera-ready_5255.pdf)).
 
 # OpenTelemetry Tracing Span attributes added by this extension
 
@@ -147,3 +147,18 @@ Bytes allocated in memory by the thread processing the Span...
     io.retit.startheapbyteallocation-  ...at Span start time
     io.retit.endheapbyteallocation  -  ...at Span end time
 
+The thread id of the thread processing the Span...
+
+    io.retit.startthread            -  ...at Span start time
+    io.retit.endthread              -  ...at Span end time
+
+# Limitations
+
+All resource demand measurements performed by this OpenTelemetry agent extension should only be considered valid, when 
+the thread id starting a span (io.retit.startthread) is equivalent to the thread id ending a span (io.retit.endthread). 
+In case the thread ids do not match, you cannot use the values for resource demand calculations as the values originate from different sources. This is especially important when running reactive applications or using virtual threads. 
+In such a scenario, the extension will only collect spans but will not publish metrics about such measurements. 
+
+When using virtual threads, we are also not able to capture the memory demand of a span at the moment, as this data is
+not provided by the JVM yet. Furthermore, for the CPU demand of virtual threads, we are currently working with the assumption that  if a virtual thread was running on the same platform (carrier) thread at span start and end time, we  
+can allocate the whole cpu time of the platform thread to the virtual thread (see https://github.com/RETIT/opentelemetry-javaagent-extension/pull/87). 

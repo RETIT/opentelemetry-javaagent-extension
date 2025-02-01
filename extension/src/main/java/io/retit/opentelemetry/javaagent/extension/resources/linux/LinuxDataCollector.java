@@ -14,7 +14,11 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.linux;
+
+import io.retit.opentelemetry.javaagent.extension.resources.common.IResourceDemandDataCollector;
+import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
+import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourceDemandDataCollector;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -50,6 +54,11 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     private static final String READ_BYTES = "rchar";
     private static final String WRITE_BYTES = "write_bytes";
+
+    @Override
+    protected long getPlatformSpecificThreadCpuTime() {
+        return NativeFacade.getCurrentThreadCpuTime();
+    }
 
     @Override
     public long[] getDiskBytesReadAndWritten() {

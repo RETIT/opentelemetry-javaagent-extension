@@ -14,7 +14,7 @@
 
     <modules>
         <module>extension</module>
-        <module>sampleapplication</module>
+        <module>examples</module>
     </modules>
 
     <dependencyManagement>
@@ -75,6 +75,14 @@
                 <artifactId>slf4j-simple</artifactId>
                 <version>2.0.16</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!--Java Native Access (JNA) is licensed under the LGPL, version 2.1 or later, or (from version 4.0 onward) the Apache License,version 2.0.-->
+            <!-- https://github.com/java-native-access/jna/blob/master/LICENSE -->
+            <dependency>
+                <groupId>net.java.dev.jna</groupId>
+                <artifactId>jna</artifactId>
+                <version>5.16.0</version>
             </dependency>
         </dependencies>
 

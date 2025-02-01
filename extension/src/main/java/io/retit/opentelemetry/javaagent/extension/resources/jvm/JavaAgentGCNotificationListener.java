@@ -14,7 +14,7 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension.resources;
+package io.retit.opentelemetry.javaagent.extension.resources.jvm;
 
 import com.sun.management.GarbageCollectionNotificationInfo;
 import io.opentelemetry.api.GlobalOpenTelemetry;
