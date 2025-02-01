@@ -81,7 +81,7 @@
             <!-- https://github.com/java-native-access/jna/blob/master/LICENSE -->
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
-                <artifactId>jna-platform</artifactId>
+                <artifactId>jna</artifactId>
                 <version>5.16.0</version>
             </dependency>
         </dependencies>

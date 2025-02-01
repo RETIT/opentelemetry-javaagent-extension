@@ -1,8 +1,9 @@
 package io.retit.opentelemetry.javaagent.extension.resources.windows;
 
+import com.sun.jna.IntegerType;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
-import com.sun.jna.platform.win32.WinBase;
+import com.sun.jna.Structure;
 import com.sun.jna.ptr.LongByReference;
 import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
 import io.retit.opentelemetry.javaagent.extension.resources.common.ThreadHandle;
@@ -68,6 +69,48 @@ public interface WindowsKernel32Library extends Library {
      * @param lpUserTime     - A pointer to a FILETIME structure that receives the amount of time that the thread has executed in user mode.
      * @return - a boolean indicator if the call was successful.
      */
-    boolean GetThreadTimes(ThreadHandle threadHandle, WinBase.FILETIME lpCreationTime, WinBase.FILETIME lpExitTime, WinBase.FILETIME lpKernelTime, WinBase.FILETIME lpUserTime);
+    boolean GetThreadTimes(ThreadHandle threadHandle, FILETIME lpCreationTime, FILETIME lpExitTime, FILETIME lpKernelTime, FILETIME lpUserTime);
 
+    /**
+     * Simplified version of the FILETIME datastructure.
+     * <p>
+     * See https://github.com/java-native-access/jna/blob/5.16.0/contrib/platform/src/com/sun/jna/platform/win32/WinBase.java#L811
+     */
+    @Structure.FieldOrder({"dwLowDateTime", "dwHighDateTime"})
+    class FILETIME extends Structure {
+        public int dwLowDateTime;
+        public int dwHighDateTime;
+
+        /**
+         * <p>Converts the two 32-bit unsigned integer parts of this filetime
+         * into a 64-bit unsigned integer representing the number of
+         * 100-nanosecond intervals since January 1, 1601 (UTC).</p>
+         *
+         * @return This filetime as a 64-bit unsigned integer number of
+         * 100-nanosecond intervals since January 1, 1601 (UTC).
+         */
+        public DWORDLONG toDWordLong() {
+            return new DWORDLONG((long) dwHighDateTime << 32 | dwLowDateTime & 0xffffffffL);
+        }
+    }
+
+    /**
+     * 64-bit unsigned integer.
+     */
+    class DWORDLONG extends IntegerType {
+
+        /**
+         * The Constant SIZE.
+         */
+        public static final int SIZE = 8;
+
+        /**
+         * Instantiates a new dwordlong.
+         *
+         * @param value the value
+         */
+        public DWORDLONG(long value) {
+            super(SIZE, value, true);
+        }
+    }
 }

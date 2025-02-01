@@ -1,7 +1,7 @@
 package io.retit.opentelemetry.javaagent.extension.resources.common;
 
 import com.sun.jna.Platform;
-import com.sun.jna.platform.win32.WinBase;
+//import com.sun.jna.platform.win32.WinBase;
 import io.retit.opentelemetry.javaagent.extension.resources.linux.LinuxCLibrary;
 import io.retit.opentelemetry.javaagent.extension.resources.macos.MacOSSystemLibrary;
 import io.retit.opentelemetry.javaagent.extension.resources.windows.WindowsKernel32Library;
@@ -51,10 +51,10 @@ public class NativeFacade {
     public static long getCurrentThreadCpuTime() {
         if (Platform.isWindows()) {
             ThreadHandle threadHandle = WindowsKernel32Library.INSTANCE.GetCurrentThread();
-            WinBase.FILETIME lpCreationTime = new WinBase.FILETIME();
-            WinBase.FILETIME lpExitTime = new WinBase.FILETIME();
-            WinBase.FILETIME lpKernelTime = new WinBase.FILETIME();
-            WinBase.FILETIME lpUserTime = new WinBase.FILETIME();
+            WindowsKernel32Library.FILETIME lpCreationTime = new WindowsKernel32Library.FILETIME();
+            WindowsKernel32Library.FILETIME lpExitTime = new WindowsKernel32Library.FILETIME();
+            WindowsKernel32Library.FILETIME lpKernelTime = new WindowsKernel32Library.FILETIME();
+            WindowsKernel32Library.FILETIME lpUserTime = new WindowsKernel32Library.FILETIME();
 
             WindowsKernel32Library.INSTANCE.GetThreadTimes(threadHandle, lpCreationTime, lpExitTime, lpKernelTime, lpUserTime);
 
