@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.quarkus;
+package io.retit.opentelemetry.javaagent.extension.frameworks.quarkus;
 
 import org.junit.jupiter.api.AfterEach;
 import org.slf4j.Logger;

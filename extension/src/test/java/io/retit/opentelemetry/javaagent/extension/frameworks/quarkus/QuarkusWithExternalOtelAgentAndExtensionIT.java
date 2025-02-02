@@ -1,4 +1,4 @@
-package io.retit.opentelemetry.quarkus;
+package io.retit.opentelemetry.javaagent.extension.frameworks.quarkus;
 
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
