@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>io.retit</groupId>
+		<artifactId>examples</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+
+	<groupId>io.retit</groupId>
+	<artifactId>spring-rest-service</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>spring-rest-service</name>
+	<description>Demo on how to publish carbon emissions for Spring-based microservices.</description>
+
+	<properties>
+		<java.version>21</java.version>
+		<spring.version>3.3.3</spring.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-validation</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>3.8.1</version>
+				<executions>
+					<execution>
+						<id>copy-opentelemetry</id>
+						<phase>package</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>io.opentelemetry.javaagent</groupId>
+									<artifactId>opentelemetry-javaagent</artifactId>
+									<type>jar</type>
+									<destFileName>opentelemetry-javaagent-all.jar</destFileName>
+								</artifactItem>
+								<artifactItem>
+									<groupId>io.retit</groupId>
+									<artifactId>extension</artifactId>
+									<type>jar</type>
+									<version>${project.version}</version>
+									<destFileName>io.retit.opentelemetry.javaagent.extension.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<outputDirectory>${project.build.directory}/jib/otel</outputDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.4.2</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
+				<configuration>
+					<from>
+						<image>openjdk:21-slim</image>
+					</from>
+					<to>
+						<image>spring-rest-service:${project.version}</image>
+						<tags>
+							<tag>feature</tag>
+						</tags>
+					</to>
+					<!-- Copies files from 'src/main/custom-extra-dir' and '/home/user/jib-extras' instead of 'src/main/jib' -->
+					<extraDirectories>
+						<paths>
+							<path>${project.build.directory}/jib</path>
+						</paths>
+					</extraDirectories>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>dockerBuild</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>3.4.2</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>io.retit.spring.carbon.SpringCarbonEmissionsApplication</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
