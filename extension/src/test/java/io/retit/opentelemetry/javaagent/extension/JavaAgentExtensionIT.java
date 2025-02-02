@@ -68,8 +68,8 @@ abstract class JavaAgentExtensionIT {
         LOGGER.info("Using image: " + imageName);
         applicationContainer = new GenericContainer<>(imageName)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")
-                .withEnv("OTEL_METRICS_EXPORTER", "logging")
-                .withEnv("OTEL_TRACES_EXPORTER", "logging")
+                .withEnv("OTEL_METRICS_EXPORTER", "console")
+                .withEnv("OTEL_TRACES_EXPORTER", "console")
                 .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:opentelemetry-javaagent-all.jar -Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar");
         spanDemands = new HashMap<>();
         metricDemands = new ArrayList<>();
