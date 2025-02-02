@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,15 +23,15 @@ public abstract class ContainerLogMetricAndSpanExtractingTest {
     };
 
     protected GenericContainer<?> applicationContainer;
-    protected Map<String, List<SpanDemand>> spanDemands;
-    protected List<MetricDemand> metricDemands;
+    protected Map<String, List<SpanDemand>> spanDemands = new HashMap<>();
+    protected List<MetricDemand> metricDemands = new ArrayList<>();
     protected String CONTAINER_URL = "http://localhost:";
 
-    protected void executeContainer() {
+    protected void executeContainer(final int portToOpen) {
         // Start container and attach parser to log output
         applicationContainer.start();
-        if (!applicationContainer.getExposedPorts().isEmpty()) {
-            CONTAINER_URL = CONTAINER_URL + applicationContainer.getMappedPort(8080);
+        if (portToOpen != -1) {
+            CONTAINER_URL = CONTAINER_URL + applicationContainer.getMappedPort(portToOpen);
         }
         applicationContainer.followOutput(outputFrame -> {
             String logOutput = outputFrame.getUtf8String();

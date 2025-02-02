@@ -59,7 +59,7 @@
 									<groupId>io.opentelemetry.javaagent</groupId>
 									<artifactId>opentelemetry-javaagent</artifactId>
 									<type>jar</type>
-									<destFileName>opentelemetry-javaagent-all.jar</destFileName>
+									<destFileName>opentelemetry-javaagent.jar</destFileName>
 								</artifactItem>
 								<artifactItem>
 									<groupId>io.retit</groupId>

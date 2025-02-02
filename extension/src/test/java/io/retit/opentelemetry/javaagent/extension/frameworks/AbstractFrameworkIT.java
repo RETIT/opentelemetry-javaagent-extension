@@ -1,35 +1,26 @@
-package io.retit.opentelemetry.javaagent.extension.frameworks.quarkus;
+package io.retit.opentelemetry.javaagent.extension.frameworks;
 
-import org.junit.jupiter.api.AfterEach;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.restassured.RestAssured;
+import io.retit.opentelemetry.javaagent.extension.common.ContainerLogMetricAndSpanExtractingTest;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.GenericContainer;
 
-public class AbstractQuarkusIT {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractQuarkusIT.class);
+public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest {
 
-    protected static String QUARKUS_CONTAINER_URL = "http://localhost:";
-
-    protected static GenericContainer<?> applicationContainer;
-
-    @AfterEach
-    public void removeApplication() {
-        LOGGER.info(applicationContainer.getLogs());
-        applicationContainer.stop();
-    }
-
-    protected void commonSetup(final boolean useExternalOtelAgent, final boolean exportMetricsToCollector) {
-        applicationContainer = new GenericContainer<>("quarkus-rest-service:feature")
-                .withExposedPorts(8080)
+    protected void commonSetup(final String containerName, final String serviceName, final int portToExpose, final boolean useExternalOtelAgent, final boolean exportMetricsToCollector) {
+        applicationContainer = new GenericContainer<>(containerName)
+                .withExposedPorts(portToExpose)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")
                 .withEnv("OTEL_TRACES_EXPORTER", "console")
-                .withEnv("OTEL_RESOURCE_ATTRIBUTES", "service.name=quarkus-app")
+                .withEnv("OTEL_RESOURCE_ATTRIBUTES", "service.name=" + serviceName)
                 .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION", "af-south-1")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE", "a1.medium")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
 
-        if(exportMetricsToCollector) {
+        if (exportMetricsToCollector) {
             applicationContainer = applicationContainer.withEnv("OTEL_METRICS_EXPORTER", "otlp").withEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://host.docker.internal:4318");
         } else {
             applicationContainer = applicationContainer.withEnv("OTEL_METRICS_EXPORTER", "console");
@@ -44,17 +35,26 @@ public class AbstractQuarkusIT {
                     .withEnv("QUARKUS_OTEL_SIMPLE", "true") // send telemetry right away
                     .withEnv("JAVA_TOOL_OPTIONS", "-Dotel.javaagent.extensions=/otel/io.retit.opentelemetry.javaagent.extension.jar");
         }
-        executeContainer();
+        executeContainer(portToExpose);
     }
 
-    private void executeContainer() {
-        // Start container and attach parser to log output
-        applicationContainer.start();
-        QUARKUS_CONTAINER_URL = QUARKUS_CONTAINER_URL + applicationContainer.getMappedPort(8080);
-        applicationContainer.followOutput(outputFrame -> {
-            String logOutput = outputFrame.getUtf8String();
-//            addToSpanDemands(logOutput);
-//            addToMetricDemands(logOutput);
-        });
+    protected void runTestContinuously() {
+        while (true) {
+            callAndAssertGetEndpoint();
+            callAndAssertPostEndpoint();
+            callAndAssertDeleteEndpoint();
+        }
+    }
+
+    protected void callAndAssertGetEndpoint() {
+        RestAssured.given().get(CONTAINER_URL + "/test-rest-endpoint/getData").then().statusCode(200);
+    }
+
+    protected void callAndAssertPostEndpoint() {
+        RestAssured.given().post(CONTAINER_URL + "/test-rest-endpoint/postData").then().statusCode(200);
+    }
+
+    protected void callAndAssertDeleteEndpoint() {
+        RestAssured.given().delete(CONTAINER_URL + "/test-rest-endpoint/deleteData").then().statusCode(200);
     }
 }

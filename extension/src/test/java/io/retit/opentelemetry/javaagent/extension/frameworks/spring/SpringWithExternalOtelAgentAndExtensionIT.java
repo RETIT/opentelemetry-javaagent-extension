@@ -1,18 +1,14 @@
-package io.retit.opentelemetry.javaagent.extension.frameworks.quarkus;
+package io.retit.opentelemetry.javaagent.extension.frameworks.spring;
 
 import io.retit.opentelemetry.javaagent.extension.frameworks.AbstractFrameworkIT;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-public class QuarkusWithExternalOtelAgentAndExtensionIT extends AbstractFrameworkIT {
-    private static final Logger LOGGER = LoggerFactory.getLogger(QuarkusWithExternalOtelAgentAndExtensionIT.class);
-
+public class SpringWithExternalOtelAgentAndExtensionIT extends AbstractFrameworkIT {
     @BeforeEach
     public void beforeEach() {
-        commonSetup("quarkus-rest-service:feature", "quarkus-app", 8080, true, true);
+        commonSetup("spring-rest-service:feature", "spring-app", 8081, true, true);
     }
 
     /**
@@ -23,5 +19,4 @@ public class QuarkusWithExternalOtelAgentAndExtensionIT extends AbstractFramewor
     public void runTestContinuously() {
         super.runTestContinuously();
     }
-
 }

@@ -58,7 +58,7 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
     }
 
     protected void executeContainer() {
-        super.executeContainer();
+        super.executeContainer(-1);
 
         // Wait until container has stopped running
         while (applicationContainer.isRunning()) {
