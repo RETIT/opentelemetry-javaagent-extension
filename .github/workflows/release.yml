@@ -24,7 +24,7 @@ jobs:
       - name: Package Extension and create Docker Container for Sample Application
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
-        run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT --file ./extension/pom.xml
+        run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT --file ./extension/pom.xml
       - name: Create Release and Upload Artifact
         uses: ncipollo/release-action@v1
         with:
