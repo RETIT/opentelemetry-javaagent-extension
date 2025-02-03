@@ -24,7 +24,7 @@ public class ResourceDemandMeasurementService {
         long cpuTime;
         long bytes;
 
-        public Measurement(long cpuTime, long bytes) {
+        public Measurement(final long cpuTime, final long bytes) {
             this.cpuTime = cpuTime;
             this.bytes = bytes;
         }
@@ -77,7 +77,7 @@ public class ResourceDemandMeasurementService {
      * @param httpMethod       - the HTTP method of the service operation that will be added as metric attribute.
      * @return - the attributes published along with the resource demand metrics.
      */
-    public Attributes measureAndPublishMetrics(Measurement startMeasurement, String httpMethod) {
+    public Attributes measureAndPublishMetrics(final Measurement startMeasurement, final String httpMethod) {
         Measurement endMeasurement = measure();
 
         Attributes attributes = Attributes.of(AttributeKey.stringKey("httpmethod"), httpMethod);

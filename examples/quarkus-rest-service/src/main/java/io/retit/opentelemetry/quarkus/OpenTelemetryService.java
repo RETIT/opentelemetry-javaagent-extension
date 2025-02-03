@@ -4,12 +4,12 @@ import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
-import io.quarkus.runtime.Startup;
 import jakarta.enterprise.context.ApplicationScoped;
 
 /**
  * This service is used to publish resource demand and CO2 emission data as OpenTelemetry metrics.
- */@ApplicationScoped
+ */
+@ApplicationScoped
 public class OpenTelemetryService {
 
     /**
@@ -18,7 +18,7 @@ public class OpenTelemetryService {
      * @param cpuTimeInMS - the CPU time in milliseconds.
      * @param attributes  - the attributes to be published along with the CPU time metric.
      */
-    public void publishCpuTimeMetric(long cpuTimeInMS, Attributes attributes) {
+    public void publishCpuTimeMetric(final long cpuTimeInMS, final Attributes attributes) {
         // Record data
 
         getLongCounter("cpu_demand",
@@ -32,7 +32,7 @@ public class OpenTelemetryService {
      * @param memoryDemandInKByte - the memory demand in kilobytes.
      * @param attributes          - the attributes to be published along with the memory demand metric.
      */
-    public void publishMemoryDemandMetric(long memoryDemandInKByte, Attributes attributes) {
+    public void publishMemoryDemandMetric(final long memoryDemandInKByte, final Attributes attributes) {
         // Record data
         getLongCounter("memory_demand",
                 "Memory Demand Metric", "kByte")
@@ -45,7 +45,7 @@ public class OpenTelemetryService {
      *
      * @param attributes - the attributes to be published along with the memory demand metric.
      */
-    public void publishCallCountMetric(Attributes attributes) {
+    public void publishCallCountMetric(final Attributes attributes) {
         // Record data
         getLongCounter("call_count",
                 "Tracks the number of calls to a service", "1")

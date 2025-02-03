@@ -31,7 +31,7 @@ public class TestService {
         return String.valueOf(Arrays.stream(data).sum());
     }
 
-    private static int[] generateRandomInputArray(int size) throws InterruptedException {
+    private static int[] generateRandomInputArray(final int size) throws InterruptedException {
         int array[] = new int[size];
 
         for (int i = 0; i < size; i++) {
@@ -43,7 +43,7 @@ public class TestService {
     }
 
     // O(n²)
-    private static int[] naiveSortingWithONSquareComplexity(int[] inputArray) {
+    private static int[] naiveSortingWithONSquareComplexity(final int... inputArray) {
         // Outer loop
         for (int i = 0; i < inputArray.length; i++) {
 
@@ -51,7 +51,7 @@ public class TestService {
             for (int j = i + 1; j < inputArray.length; j++) {
 
                 // Checking elements
-                int temp = 0;
+                int temp;
                 if (inputArray[j] < inputArray[i]) {
 
                     // Swapping
