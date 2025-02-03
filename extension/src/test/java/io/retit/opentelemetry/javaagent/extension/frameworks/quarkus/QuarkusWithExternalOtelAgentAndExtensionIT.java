@@ -12,7 +12,7 @@ public class QuarkusWithExternalOtelAgentAndExtensionIT extends AbstractFramewor
 
     @BeforeEach
     public void beforeEach() {
-        commonSetup("quarkus-rest-service:feature", "quarkus-app", 8080, true, true);
+        commonSetup("quarkus-rest-service:feature", "quarkus-app", 8080, true, false);
     }
 
     /**
@@ -24,4 +24,8 @@ public class QuarkusWithExternalOtelAgentAndExtensionIT extends AbstractFramewor
         super.runTestContinuously();
     }
 
+    @Test
+    public void testCallEachEndpointAndAssertSpansAndMetrics() {
+        super.testCallEachEndpointAndAsserSpansAndMetrics();
+    }
 }

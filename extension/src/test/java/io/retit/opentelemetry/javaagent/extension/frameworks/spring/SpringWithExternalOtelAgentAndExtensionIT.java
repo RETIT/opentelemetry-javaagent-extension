@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 public class SpringWithExternalOtelAgentAndExtensionIT extends AbstractFrameworkIT {
     @BeforeEach
     public void beforeEach() {
-        commonSetup("spring-rest-service:feature", "spring-app", 8081, true, true);
+        commonSetup("spring-rest-service:feature", "spring-app", 8081, true, false);
     }
 
     /**
@@ -18,5 +18,10 @@ public class SpringWithExternalOtelAgentAndExtensionIT extends AbstractFramework
     @Test
     public void runTestContinuously() {
         super.runTestContinuously();
+    }
+
+    @Test
+    public void testCallEachEndpointAndAssertSpansAndMetrics() {
+        super.testCallEachEndpointAndAsserSpansAndMetrics();
     }
 }

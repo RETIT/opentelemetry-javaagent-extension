@@ -60,14 +60,7 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
     protected void executeContainer() {
         super.executeContainer(-1);
 
-        // Wait until container has stopped running
-        while (applicationContainer.isRunning()) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                LOGGER.error("Interupted", e);
-            }
-        }
+        super.waitUntilContainerIsStopped();
     }
 
     /**
@@ -106,11 +99,6 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
         LOGGER.info("Found {} gc spans", gcSpans.values().stream().mapToInt(List::size).sum());
     }
 
-    @NotNull
-    private static boolean isGcSpanName(String s) {
-        return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE.equals(s) || Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE.equals(s);
-    }
-
     @Test
     void testAllAttributes() {
         applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
@@ -127,38 +115,7 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
 
         Assertions.assertTrue(!spanDemands.isEmpty());
 
-        for (Map.Entry<String, List<SpanDemand>> spanDemandEntryList : spanDemands.entrySet()) {
-            if ("<unspecified span name>".equals(spanDemandEntryList.getKey())) {
-                continue;
-            } else if (!isGcSpanName(spanDemandEntryList.getKey())) {
-                assertEquals(1, spanDemandEntryList.getValue().size());
-            }
-            for (SpanDemand spanDemandEntry : spanDemandEntryList.getValue()) {
-                assertNotEquals(0, spanDemandEntry.startCpuTime);
-                assertNotEquals(0, spanDemandEntry.endCpuTime);
-                assertNotEquals(0, spanDemandEntry.startHeapDemand);
-                assertNotEquals(0, spanDemandEntry.endHeapDemand);
-                if (spanDemandEntryList.getKey().contains(SAMPLE_METHOD)) {
-                    assertNull(spanDemandEntry.totalHeapSize);
-                } else {
-                    assertNotEquals(0, spanDemandEntry.totalHeapSize);
-                }
-                assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
-                assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
-                if (!isGcSpanName(spanDemandEntryList.getKey())) {
-                    assertNotEquals(0, spanDemandEntry.startDiskWriteDemand);
-                    assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
-                }
-                assertNotEquals(0, spanDemandEntry.logSystemTime);
-
-                assertNotNull(spanDemandEntry.startNetworkReadDemand);
-                assertNotNull(spanDemandEntry.endNetworkReadDemand);
-                assertNotNull(spanDemandEntry.startNetworkWriteDemand);
-                assertNotNull(spanDemandEntry.endNetworkWriteDemand);
-                assertNotEquals(0, spanDemandEntry.startThreadId);
-                assertNotEquals(0, spanDemandEntry.endThreadId);
-            }
-        }
+        assertFullSpanDataContent(SAMPLE_METHOD);
 
         Assertions.assertTrue(!metricDemands.isEmpty());
 

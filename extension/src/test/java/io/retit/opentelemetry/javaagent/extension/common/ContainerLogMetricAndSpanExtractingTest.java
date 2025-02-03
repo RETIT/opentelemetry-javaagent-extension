@@ -1,6 +1,8 @@
 package io.retit.opentelemetry.javaagent.extension.common;
 
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
+import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.Assertions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
@@ -9,6 +11,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public abstract class ContainerLogMetricAndSpanExtractingTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(ContainerLogMetricAndSpanExtractingTest.class);
@@ -72,4 +79,57 @@ public abstract class ContainerLogMetricAndSpanExtractingTest {
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
     }
 
+    protected void waitUntilContainerIsStopped() {
+        // Wait until container has stopped running
+        while (applicationContainer.isRunning()) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                LOGGER.error("Interupted", e);
+            }
+        }
+    }
+
+    @NotNull
+    protected static boolean isGcSpanName(String s) {
+        return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE.equals(s) || Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE.equals(s);
+    }
+
+    protected void assertFullSpanDataContent(final String sampleMethod) {
+        Assertions.assertFalse(spanDemands.isEmpty());
+        for (Map.Entry<String, List<SpanDemand>> spanDemandEntryList : spanDemands.entrySet()) {
+            if ("<unspecified span name>".equals(spanDemandEntryList.getKey())) {
+                continue;
+            } else if (!isGcSpanName(spanDemandEntryList.getKey())) {
+                assertEquals(1, spanDemandEntryList.getValue().size());
+            }
+            for (SpanDemand spanDemandEntry : spanDemandEntryList.getValue()) {
+                assertNotEquals(0, spanDemandEntry.startCpuTime);
+                assertNotEquals(0, spanDemandEntry.endCpuTime);
+                assertNotEquals(0, spanDemandEntry.startHeapDemand);
+                assertNotEquals(0, spanDemandEntry.endHeapDemand);
+                if (spanDemandEntryList.getKey().contains(sampleMethod)) {
+                    assertNull(spanDemandEntry.totalHeapSize);
+                } else {
+                    assertNotEquals(0, spanDemandEntry.totalHeapSize);
+                }
+                assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
+                assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
+                if (!isGcSpanName(spanDemandEntryList.getKey())) {
+                    if (spanDemandEntry.endDiskWriteDemand != 0) {
+                        assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
+                        assertNotEquals(0, spanDemandEntry.endDiskWriteDemand - spanDemandEntry.startDiskWriteDemand);
+                    }
+                }
+                assertNotEquals(0, spanDemandEntry.logSystemTime);
+
+                assertNotNull(spanDemandEntry.startNetworkReadDemand);
+                assertNotNull(spanDemandEntry.endNetworkReadDemand);
+                assertNotNull(spanDemandEntry.startNetworkWriteDemand);
+                assertNotNull(spanDemandEntry.endNetworkWriteDemand);
+                assertNotEquals(0, spanDemandEntry.startThreadId);
+                assertNotEquals(0, spanDemandEntry.endThreadId);
+            }
+        }
+    }
 }
