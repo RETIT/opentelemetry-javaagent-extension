@@ -21,19 +21,19 @@ public class TestRESTEndpoint {
 
     @GetMapping
     @RequestMapping("getData")
-    public String getData() throws InterruptedException, IOException {
+    public String getData() throws IOException {
         return "GET " + testService.veryComplexBusinessFunction(3000);
     }
 
     @PostMapping
     @RequestMapping("postData")
-    public String postData() throws InterruptedException, IOException {
+    public String postData() throws IOException {
         return "POST" + testService.veryComplexBusinessFunction(4000);
     }
 
     @DeleteMapping
     @RequestMapping("deleteData")
-    public String deleteData() throws InterruptedException, IOException {
+    public String deleteData() throws IOException {
         return "DELETE" + testService.veryComplexBusinessFunction(6000);
     }
 }

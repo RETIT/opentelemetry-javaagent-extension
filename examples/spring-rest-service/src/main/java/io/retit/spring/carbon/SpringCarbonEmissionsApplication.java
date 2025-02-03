@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class SpringCarbonEmissionsApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(SpringCarbonEmissionsApplication.class, args);
-	}
+    public static void main(final String[] args) {
+        SpringApplication.run(SpringCarbonEmissionsApplication.class, args);
+    }
 
 }
