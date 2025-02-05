@@ -55,6 +55,12 @@
             <groupId>io.opentelemetry.instrumentation</groupId>
             <artifactId>opentelemetry-instrumentation-annotations</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.retit</groupId>
+            <artifactId>extension</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
     <build>
         <plugins>
@@ -90,7 +96,7 @@
                 <executions>
                     <execution>
                         <id>copy-retit-opentelemetry-extension</id>
-                        <phase>compile</phase>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
