@@ -12,7 +12,7 @@ Furthermore, the extension follows the [Methodology](https://www.cloudcarbonfoot
 
 # Quickstart
 
-In order to use the extension with your app you need to attach it to the start command using the -Dotel.javaagent.extensions parameter along with the [OpenTelemetry Java Auto-Instrumentation agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/README.md#getting-started):
+In order to use the extension with your app you need to [download the latest version](https://github.com/RETIT/opentelemetry-javaagent-extension/releases) and attach it to the start command using the -Dotel.javaagent.extensions parameter along with the [OpenTelemetry Java Auto-Instrumentation agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/README.md#getting-started):
 
 ```bash
 java -javaagent:<replace_with_path>/opentelemetry-javaagent-all.jar \
@@ -31,47 +31,24 @@ java -javaagent:<replace_with_path>/opentelemetry-javaagent-all.jar \
 -jar <your_app>.jar
 ```
 
-# Demo
+# Building the project
 
-To see the extension in action for a very simple java application we will create the setup depicted in the following image. We will setup an Application that will be instrumented using the OpenTelemetry Java-Agent including our extension. This application will publish resource demand and carbon emission metrics. These metrics will be received by an OpenTelemetry collector which transforms the metrics into a format compatible to Prometheus. Prometheus will fetch the metrics from the collector and store them. Using Grafana, the metrics will be visualized in a preconfigured dashboard.
-
-![demo_architecture.png](img/demo_architecture.png)
-
-To build the Sample application you need to run the following maven command:
+In order to build the project from source, you need to have JDK 21 or higher installed. To build the whole project including the examples you need to run the following maven command from the top level of this project:
 
 ```bash
 ./mvnw clean package
 ```
 
-Afterwards, you can start OpenTelemetry compatible tracing and metrics backends using the following docker command: 
+# Examples
 
-```bash 
-docker compose -f ./examples/docker/docker-compose.yml up -d
-```
+For examples on how to use this project for different application types, please have a look at the [examples](examples/README.md) directory of this project. 
 
-This will start an [OpenTelemetry Collector](https://github.com/open-telemetry/opentelemetry-collector/tree/main) to which the metric and trace data is being sent. Furthermore, it starts [Prometheus](https://prometheus.io/) instance to store the metric data and a [Grafana](https://grafana.com/) instance to visualize the metrics stored in Prometheus. You can optionally also start a [Jaeger](https://www.jaegertracing.io/) instance by commenting out the corresponding section in the docker compose file to visualize the span attributes.
+In the [examples](examples/README.md) directory you will find examples for different scenarios in which you can use this this extension, for example:
 
-Once the backend is up, the sample Application can then be run with the OpenTelemetry Java agent attached from the root directory as follows.
-
-```bash
-java -javaagent:./examples/simple-jdk8-application/target/jib/opentelemetry-javaagent-all.jar \
--Dotel.service.name=sampleapplication \
--Dotel.logs.exporter=logging \
--Dotel.javaagent.extensions=./extension/target/io.retit.opentelemetry.javaagent.extension.jar \
--Dio.retit.emissions.cloud.provider=aws \
--Dio.retit.emissions.cloud.provider.region=af-south-1 \
--Dio.retit.emissions.cloud.provider.instance.type=a1.medium \
--DRUN_MODE=continuously \
--jar ./examples/simple-jdk8-application/target/simple-jdk8-application-0.0.1-SNAPSHOT.jar
-```
-
-This application will run until you stop it and generate data. While it is generating data, you can look at the data in the backends. The easiest way is to check out the [Grafana dashboard](http://localhost:3000/grafana/dashboards) here:
-
-    http://localhost:3000/grafana/dashboards
-
-After some time you can see the data produced by this application in the following dashboard. As an example the CPU and memory demands are shown as they are supported on most plattforms as well as the Emission Calculation Factors. Furthermore, we have integrated a [Software Carbon Intensity](https://sci.greensoftware.foundation/) calculation for each transaction based on this data. This calculation is based on our work presented at the [Symposium on Software Performance 2024](https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_44_Heft_4/SSP24_16_camera-ready_5255.pdf).
-
-![dashboard.png](img/dashboard.png)
+- In a simple [JDK8-based application](examples/simple-jdk8-application/README.md)
+- In a simple [JDK21-based application](examples/simple-jdk21-application/README.md)
+- In a [Quarkus-based REST service](examples/quarkus-rest-service/README.md)
+- In a [Spring-based REST service](examples/quarkus-rest-service/README.md)
 
 # Configuration Options
 
