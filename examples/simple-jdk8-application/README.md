@@ -11,14 +11,14 @@ To see the extension in action for a very simple java application we will create
 Once the preconditions ([building the project and starting the OpenTelemetry backends](#please-note-before-you-start-with-the-jdk8-sample-application))are completed, the sample Application can be started with the OpenTelemetry Java agent attached from the current directory as follows.
 ```bash
 java -javaagent:./target/jib/opentelemetry-javaagent-all.jar \
--Dotel.service.name=sampleapplication \
+-Dotel.service.name=simple-jdk8-application \
 -Dotel.logs.exporter=logging \
 -Dotel.javaagent.extensions=./target/jib/io.retit.opentelemetry.javaagent.extension.jar \
 -Dio.retit.emissions.cloud.provider=aws \
 -Dio.retit.emissions.cloud.provider.region=af-south-1 \
 -Dio.retit.emissions.cloud.provider.instance.type=a1.medium \
 -DRUN_MODE=continuously \
--jar ./examples/simple-jdk8-application/target/simple-jdk8-application.jar
+-jar ./target/simple-jdk8-application.jar
 ```
 
 This application will run until you stop it and generate data. While it is generating data, you can look at the data in the backends. The easiest way is to check out the [Grafana dashboard](http://localhost:3000/grafana/dashboards) here:
