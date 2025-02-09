@@ -80,10 +80,10 @@
 			<plugin>
 				<groupId>com.google.cloud.tools</groupId>
 				<artifactId>jib-maven-plugin</artifactId>
-				<version>3.4.2</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
+				<version>${jib.version}</version>
 				<configuration>
 					<from>
-						<image>openjdk:21-slim</image>
+						<image>${jdk21.base.container}</image>
 					</from>
 					<to>
 						<image>spring-rest-service:${project.version}</image>
