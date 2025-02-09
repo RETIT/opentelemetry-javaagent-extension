@@ -8,7 +8,7 @@ To see the extension in action for a very simple java application we will create
 
 ![demo_architecture.png](../../img/demo_architecture.png)
 
-Once the preconditions ([building the project and starting the OpenTelemetry backends](#please-note-before-you-start-with-the-jdk8-sample-application))are completed, the sample Application can be started with the OpenTelemetry Java agent attached from the current directory as follows.
+Once the preconditions ([building the project and starting the OpenTelemetry backends](#please-note-before-you-start-with-the-jdk8-sample-application)) are completed, the sample Application can be started with the OpenTelemetry Java agent attached from the current directory as follows.
 ```bash
 java -javaagent:./target/jib/opentelemetry-javaagent-all.jar \
 -Dotel.service.name=simple-jdk8-application \

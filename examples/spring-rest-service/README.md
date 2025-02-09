@@ -8,7 +8,7 @@ To see the extension in action for a Spring-based REST service we will create th
 
 ![demo_architecture.png](../../img/demo_architecture.png)
 
-Once the preconditions ([building the project and starting the OpenTelemetry backends](#please-note-before-you-start-with-the-jdk8-sample-application))are completed, the Spring-based REST-Service application can be started with the OpenTelemetry Java agent attached from the current directory as follows.
+Once the preconditions ([building the project and starting the OpenTelemetry backends](#please-note-before-you-start-with-the-jdk8-sample-application) are completed, the Spring-based REST-Service application can be started with the OpenTelemetry Java agent attached from the current directory as follows.
 ```bash
 java -javaagent:./target/jib/otel/opentelemetry-javaagent.jar \
 -Dotel.service.name=spring-app \
