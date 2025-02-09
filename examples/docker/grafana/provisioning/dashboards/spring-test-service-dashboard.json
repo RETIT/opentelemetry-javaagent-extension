@@ -18,6 +18,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "id": 5,
   "links": [],
   "panels": [
     {
@@ -29,7 +30,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "orange",
+            "mode": "fixed"
           },
           "custom": {
             "axisBorderShow": false,
@@ -83,11 +85,11 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 0
       },
-      "id": 2,
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [],
@@ -108,7 +110,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total{code_function=\"method1\", job=\"simple-jdk8-application\"}[1m])",
+          "expr": "sum by(http_request_method) (rate(io_retit_resource_demand_cpu_ms_milliseconds_total{http_request_method=\"GET\", job=\"spring-app\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -125,7 +127,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_gef{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_gef{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -142,7 +144,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_pue{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_pue{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -159,7 +161,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_cpu_power_min{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_cpu_power_min{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -176,7 +178,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_cpu_power_max{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_cpu_power_max{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -194,7 +196,7 @@
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "rate(io_retit_emissions_java_process_cpu_time_total{job=\"simple-jdk8-application\"}[1m])",
+          "expr": "max by(job) (rate(io_retit_emissions_java_process_cpu_time_total{job=\"spring-app\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -243,18 +245,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Pcpu * $CPUutilT",
-          "hide": true,
-          "refId": "Ptcpu",
-          "type": "math"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "($Ptcpu * 60000) / 1000",
+          "expression": "($Pcpu* 60000) / 1000",
           "hide": true,
           "refId": "Ecpu",
           "type": "math"
@@ -277,7 +268,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_storage_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_storage_energy_gb_minute{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -294,7 +285,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_network_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_network_energy_gb_minute{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -311,7 +302,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_memory_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_memory_energy_gb_minute{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -328,7 +319,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_memory_bytes_total{code_function=\"method1\", job=\"simple-jdk8-application\"}[1m])",
+          "expr": "sum by(http_request_method) (rate(io_retit_resource_demand_memory_bytes_total{http_request_method=\"GET\", job=\"spring-app\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": false,
@@ -367,7 +358,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_embodied_emissions_minute_mg{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_embodied_emissions_minute_mg{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -400,7 +391,7 @@
           "type": "math"
         }
       ],
-      "title": "Software Carbon Intensity (SCI) in gCO2eq for Transaction method1",
+      "title": "SCI in gCO2eq for GET (Spring)",
       "type": "timeseries"
     },
     {
@@ -412,7 +403,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "orange",
+            "mode": "fixed"
           },
           "custom": {
             "axisBorderShow": false,
@@ -466,11 +458,11 @@
       },
       "gridPos": {
         "h": 9,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 8,
         "y": 0
       },
-      "id": 7,
+      "id": 19,
       "options": {
         "legend": {
           "calcs": [],
@@ -491,7 +483,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total{code_function=\"method2\", job=\"simple-jdk8-application\"}[1m])",
+          "expr": "sum by(http_request_method) (rate(io_retit_resource_demand_cpu_ms_milliseconds_total{http_request_method=\"POST\", job=\"spring-app\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -508,7 +500,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_gef{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_gef{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -525,7 +517,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_pue{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_pue{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -542,7 +534,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_cpu_power_min{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_cpu_power_min{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -559,7 +551,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_cpu_power_max{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_cpu_power_max{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -577,7 +569,7 @@
           "disableTextWrap": false,
           "editorMode": "builder",
           "exemplar": false,
-          "expr": "rate(io_retit_emissions_java_process_cpu_time_total{job=\"simple-jdk8-application\"}[1m])",
+          "expr": "max by(job) (rate(io_retit_emissions_java_process_cpu_time_total{job=\"spring-app\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -626,18 +618,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Pcpu * $CPUutilT",
-          "hide": true,
-          "refId": "Ptcpu",
-          "type": "math"
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "($Ptcpu * 60000) / 1000",
+          "expression": "($Pcpu* 60000) / 1000",
           "hide": true,
           "refId": "Ecpu",
           "type": "math"
@@ -660,7 +641,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_storage_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_storage_energy_gb_minute{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -677,7 +658,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_network_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_network_energy_gb_minute{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -694,7 +675,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_memory_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_memory_energy_gb_minute{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -711,7 +692,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_memory_bytes_total{code_function=\"method2\", job=\"simple-jdk8-application\"}[1m])",
+          "expr": "sum by(http_request_method) (rate(io_retit_resource_demand_memory_bytes_total{http_request_method=\"POST\", job=\"spring-app\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": false,
@@ -750,7 +731,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_embodied_emissions_minute_mg{job=\"simple-jdk8-application\"}",
+          "expr": "avg by(job) (io_retit_emissions_embodied_emissions_minute_mg{job=\"spring-app\"})",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -783,7 +764,380 @@
           "type": "math"
         }
       ],
-      "title": "Software Carbon Intensity (SCI) in gCO2eq for Transaction method2",
+      "title": "SCI in gCO2eq for POST (Spring)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "api-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "orange",
+            "mode": "fixed"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum by(http_request_method) (rate(io_retit_resource_demand_cpu_ms_milliseconds_total{http_request_method=\"DELETE\", job=\"spring-app\"}[1m]))",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "dcpuSum",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_gef{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "GEF",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_pue{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "PUE",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_cpu_power_min{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Pcpumin",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_cpu_power_max{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Pcpumax",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "exemplar": false,
+          "expr": "max by(job) (rate(io_retit_emissions_java_process_cpu_time_total{job=\"spring-app\"}[1m]))",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "processcpudemand",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$processcpudemand  / 60000",
+          "hide": true,
+          "refId": "CPUutil",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$dcpuSum / $processcpudemand",
+          "hide": true,
+          "refId": "CPUutilT",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$Pcpumin + ($CPUutil * ($Pcpumax-$Pcpumin))",
+          "hide": true,
+          "refId": "Pcpu",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "($Pcpu* 60000) / 1000",
+          "hide": true,
+          "refId": "Ecpu",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$Ecpu * $GEF",
+          "hide": true,
+          "refId": "ccpu",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_storage_energy_gb_minute{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Esto",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_network_energy_gb_minute{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Enet",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_memory_energy_gb_minute{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "Emem",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "sum by(http_request_method) (rate(io_retit_resource_demand_memory_bytes_total{http_request_method=\"DELETE\", job=\"spring-app\"}[1m]))",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": false,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "dmem",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$dmem*0.000000001*$Emem*$GEF",
+          "hide": true,
+          "refId": "cmem",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$ccpu+$cmem",
+          "hide": true,
+          "refId": "ct",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "avg by(job) (io_retit_emissions_embodied_emissions_minute_mg{job=\"spring-app\"})",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "M",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$M * $CPUutilT",
+          "hide": true,
+          "refId": "Mt",
+          "type": "math"
+        },
+        {
+          "datasource": {
+            "name": "Expression",
+            "type": "__expr__",
+            "uid": "__expr__"
+          },
+          "expression": "$ct+$Mt",
+          "hide": false,
+          "refId": "SCIt",
+          "type": "math"
+        }
+      ],
+      "title": "SCI in gCO2eq for DELETE (Spring)",
       "type": "timeseries"
     },
     {
@@ -853,7 +1207,7 @@
         "x": 0,
         "y": 9
       },
-      "id": 1,
+      "id": 10,
       "options": {
         "legend": {
           "calcs": [],
@@ -874,9 +1228,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total{job=\"simple-jdk8-application\"}[1m])",
+          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total{job=\"spring-app\"}[1m])",
           "fullMetaSearch": false,
-          "includeNullMetadata": true,
+          "includeNullMetadata": false,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -884,7 +1238,7 @@
           "useBackend": false
         }
       ],
-      "title": "CPU Demand (ms) for the Test Transactions",
+      "title": "CPU Demand per Transaction",
       "type": "timeseries"
     },
     {
@@ -953,208 +1307,6 @@
         "w": 12,
         "x": 12,
         "y": 9
-      },
-      "id": 5,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "api-metrics"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "rate(io_retit_emissions_java_process_cpu_time_total{job=\"simple-jdk8-application\"}[1m])",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "CPU Demand for the Whole Process",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "api-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 17
-      },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
-      },
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "api-metrics"
-          },
-          "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_memory_bytes_total{job=\"simple-jdk8-application\"}[1m])",
-          "fullMetaSearch": false,
-          "includeNullMetadata": true,
-          "instant": false,
-          "legendFormat": "__auto",
-          "range": true,
-          "refId": "A",
-          "useBackend": false
-        }
-      ],
-      "title": "Memory Demand (bytes) for the Test Process",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "prometheus",
-        "uid": "api-metrics"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "barWidthFactor": 0.6,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 17
       },
       "id": 6,
       "options": {
@@ -1177,7 +1329,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_cpu_power_min{job=\"simple-jdk8-application\"}",
+          "expr": "io_retit_emissions_cpu_power_min{job=\"spring-app\"}",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "instant": false,
@@ -1193,7 +1345,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_cpu_power_max{job=\"simple-jdk8-application\"}",
+          "expr": "io_retit_emissions_cpu_power_max{job=\"spring-app\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1210,7 +1362,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_embodied_emissions_minute_mg{job=\"simple-jdk8-application\"}",
+          "expr": "io_retit_emissions_embodied_emissions_minute_mg{job=\"spring-app\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1227,7 +1379,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_gef{job=\"simple-jdk8-application\"}",
+          "expr": "io_retit_emissions_gef{job=\"spring-app\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1244,7 +1396,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_memory_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "io_retit_emissions_memory_energy_gb_minute{job=\"spring-app\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1261,7 +1413,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "io_retit_emissions_network_energy_gb_minute{job=\"simple-jdk8-application\"}",
+          "expr": "io_retit_emissions_network_energy_gb_minute{job=\"spring-app\"}",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1274,9 +1426,110 @@
       ],
       "title": "Emission Calculation Factors",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "default": true,
+        "type": "prometheus",
+        "uid": "api-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 17
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "rate(io_retit_emissions_java_process_cpu_time_total[1m])",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        }
+      ],
+      "title": "CPU Demand for the Whole Process",
+      "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": "5s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
@@ -1288,8 +1541,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Carbon Emissions Transaction - Simple JDK 8 Application",
-  "uid": "adv7vxmnrde68e",
+  "title": "Spring Carbon Emissions per REST Transaction",
+  "uid": "adv9vxmnrde68e",
   "version": 1,
   "weekStart": ""
 }

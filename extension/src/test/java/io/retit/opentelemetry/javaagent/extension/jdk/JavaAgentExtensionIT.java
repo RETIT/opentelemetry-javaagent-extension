@@ -14,11 +14,13 @@
  *   limitations under the License.
  */
 
-package io.retit.opentelemetry.javaagent.extension;
+package io.retit.opentelemetry.javaagent.extension.jdk;
 
+import io.retit.opentelemetry.javaagent.extension.common.ContainerLogMetricAndSpanExtractingTest;
+import io.retit.opentelemetry.javaagent.extension.common.MetricDemand;
+import io.retit.opentelemetry.javaagent.extension.common.SpanDemand;
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -35,63 +37,30 @@ import java.util.stream.Collectors;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-abstract class JavaAgentExtensionIT {
+abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingTest {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JavaAgentExtensionIT.class);
-    protected static GenericContainer<?> applicationContainer;
-    private static Map<String, List<SpanDemand>> spanDemands;
-    private static List<MetricDemand> metricDemands;
-
     // Operations in SampleApplication
     private static final String SAMPLE_METHOD = "SampleApplication.method";
     private static final String SAMPLE_METHOD1 = "SampleApplication.method1";
     private static final String SAMPLE_METHOD2 = "SampleApplication.method2";
 
-    // Metrics to be tested
-
-    private static final String[] METRIC_NAMES = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "io.retit.emissions.cpu.power.min", "io.retit.emissions.cpu.power.max",
-            "io.retit.emissions.embodied.emissions.minute.mg", "io.retit.emissions.memory.energy.gb.minute",
-            "io.retit.emissions.storage.energy.gb.minute", "io.retit.emissions.network.energy.gb.minute",
-            "io.retit.emissions.pue", "io.retit.emissions.gef", "io.retit.resource.demand.storage.bytes",
-            "io.retit.resource.demand.memory.bytes", "io.retit.resource.demand.network.bytes",
-            "io.retit.resource.demand.cpu.ms"
-    };
-
-    @AfterEach
-    public void removeApplication() {
-        LOGGER.info(applicationContainer.getLogs());
-        applicationContainer.stop();
-        LOGGER.info(spanDemands.toString());
-    }
 
     protected void commonSetup(final String imageName) {
         LOGGER.info("Using image: " + imageName);
         applicationContainer = new GenericContainer<>(imageName)
                 .withEnv("OTEL_LOGS_EXPORTER", "none")
-                .withEnv("OTEL_METRICS_EXPORTER", "logging")
-                .withEnv("OTEL_TRACES_EXPORTER", "logging")
+                .withEnv("OTEL_METRICS_EXPORTER", "console")
+                .withEnv("OTEL_TRACES_EXPORTER", "console")
                 .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:opentelemetry-javaagent-all.jar -Dotel.javaagent.extensions=io.retit.opentelemetry.javaagent.extension.jar");
         spanDemands = new HashMap<>();
         metricDemands = new ArrayList<>();
     }
 
-    private void executeContainer() {
-        // Start container and attach parser to log output
-        applicationContainer.start();
-        applicationContainer.followOutput(outputFrame -> {
-            String logOutput = outputFrame.getUtf8String();
-            addToSpanDemands(logOutput);
-            addToMetricDemands(logOutput);
-        });
+    protected void executeContainer() {
+        super.executeContainer(-1);
 
-        // Wait until container has stopped running
-        while (applicationContainer.isRunning()) {
-            try {
-                Thread.sleep(500);
-            } catch (InterruptedException e) {
-                LOGGER.error("Interupted", e);
-            }
-        }
+        super.waitUntilContainerIsStopped();
     }
 
     /**
@@ -130,11 +99,6 @@ abstract class JavaAgentExtensionIT {
         LOGGER.info("Found {} gc spans", gcSpans.values().stream().mapToInt(List::size).sum());
     }
 
-    @NotNull
-    private static boolean isGcSpanName(String s) {
-        return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE.equals(s) || Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE.equals(s);
-    }
-
     @Test
     void testAllAttributes() {
         applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
@@ -151,38 +115,7 @@ abstract class JavaAgentExtensionIT {
 
         Assertions.assertTrue(!spanDemands.isEmpty());
 
-        for (Map.Entry<String, List<SpanDemand>> spanDemandEntryList : spanDemands.entrySet()) {
-            if ("<unspecified span name>".equals(spanDemandEntryList.getKey())) {
-                continue;
-            } else if (!isGcSpanName(spanDemandEntryList.getKey())) {
-                assertEquals(1, spanDemandEntryList.getValue().size());
-            }
-            for (SpanDemand spanDemandEntry : spanDemandEntryList.getValue()) {
-                assertNotEquals(0, spanDemandEntry.startCpuTime);
-                assertNotEquals(0, spanDemandEntry.endCpuTime);
-                assertNotEquals(0, spanDemandEntry.startHeapDemand);
-                assertNotEquals(0, spanDemandEntry.endHeapDemand);
-                if (spanDemandEntryList.getKey().contains(SAMPLE_METHOD)) {
-                    assertNull(spanDemandEntry.totalHeapSize);
-                } else {
-                    assertNotEquals(0, spanDemandEntry.totalHeapSize);
-                }
-                assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
-                assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
-                if (!isGcSpanName(spanDemandEntryList.getKey())) {
-                    assertNotEquals(0, spanDemandEntry.startDiskWriteDemand);
-                    assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
-                }
-                assertNotEquals(0, spanDemandEntry.logSystemTime);
-
-                assertNotNull(spanDemandEntry.startNetworkReadDemand);
-                assertNotNull(spanDemandEntry.endNetworkReadDemand);
-                assertNotNull(spanDemandEntry.startNetworkWriteDemand);
-                assertNotNull(spanDemandEntry.endNetworkWriteDemand);
-                assertNotEquals(0, spanDemandEntry.startThreadId);
-                assertNotEquals(0, spanDemandEntry.endThreadId);
-            }
-        }
+        assertFullSpanDataContent(SAMPLE_METHOD);
 
         Assertions.assertTrue(!metricDemands.isEmpty());
 
@@ -194,7 +127,7 @@ abstract class JavaAgentExtensionIT {
             Assertions.assertNotNull(metricDemandResult.get().metricValue);
             if (!"io.retit.resource.demand.network.bytes".equals(metricDemandResult.get().metricName)) {
 
-                Assertions.assertNotEquals(0.0, metricDemandResult.get().metricValue);
+                assertNotEquals(0.0, metricDemandResult.get().metricValue);
             } else {
                 // no network demand
                 Assertions.assertEquals(0.0, metricDemandResult.get().metricValue);
@@ -435,145 +368,4 @@ abstract class JavaAgentExtensionIT {
         }
     }
 
-    private static void addToSpanDemands(String logOutput) {
-        // in case of span
-        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingSpanExporter")) {
-            String operationName = extractOperationNameFromLogOutput(logOutput);
-            SpanDemand spanDemand = parseProperties(logOutput);
-            List<SpanDemand> opSpanDemands;
-            if (spanDemands.containsKey(operationName)) {
-                opSpanDemands = spanDemands.get(operationName);
-            } else {
-                opSpanDemands = new ArrayList<>();
-                spanDemands.put(operationName, opSpanDemands);
-            }
-            opSpanDemands.add(spanDemand);
-        }
-    }
-
-    private static void addToMetricDemands(String logOutput) {
-        if (logOutput.contains("io.opentelemetry.exporter.logging.LoggingMetricExporter")) {
-            LOGGER.info("Processing metric " + logOutput);
-            List<MetricDemand> demands = extractMetricValuesFromLog(logOutput);
-            if (demands != null) {
-                metricDemands.addAll(demands);
-            }
-        }
-    }
-
-    private static List<MetricDemand> extractMetricValuesFromLog(String logMessage) {
-
-        List<MetricDemand> demands = new ArrayList<>();
-        String valueAttributeInLog = "value=";
-        String sampleApplicationName = "io.retit.opentelemetry.SampleApplication";
-
-        String emissionMetricNotTransactionRelated = "io.retit.emissions";
-
-        for (String key : METRIC_NAMES) {
-            if (logMessage.contains(key)) {
-                String dataForCurrentMetric = logMessage.substring(logMessage.indexOf(key) + 1);
-
-                if (!key.startsWith(emissionMetricNotTransactionRelated) && dataForCurrentMetric.contains(sampleApplicationName)) {
-                    dataForCurrentMetric = dataForCurrentMetric.substring(dataForCurrentMetric.indexOf(sampleApplicationName));
-                }
-
-                if (dataForCurrentMetric.indexOf(valueAttributeInLog) != -1) {
-
-                    MetricDemand metricDemand = new MetricDemand();
-                    int valueIndex = dataForCurrentMetric.indexOf(valueAttributeInLog);
-
-                    String valueString = dataForCurrentMetric.substring(valueIndex + valueAttributeInLog.length(), dataForCurrentMetric.indexOf(",", valueIndex));
-                    double value = Double.parseDouble(valueString);
-
-                    metricDemand.metricName = key;
-                    metricDemand.metricValue = value;
-                    demands.add(metricDemand);
-                }
-
-            }
-
-        }
-        return demands;
-    }
-
-    private static String extractOperationNameFromLogOutput(String logOutput) {
-        LOGGER.info("Processing span " + logOutput);
-        return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
-    }
-
-    private static SpanDemand parseProperties(String logOutput) {
-        SpanDemand spanDemand = new SpanDemand();
-        String[] properties = extractPropertiesFromLogOutput(logOutput);
-        for (String prop : properties) {
-            String[] elems = prop.split("=");
-            if (elems[0].contains("io.retit.endcputime")) {
-                spanDemand.endCpuTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.enddiskreaddemand")) {
-                spanDemand.endDiskReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.enddiskwritedemand")) {
-                spanDemand.endDiskWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.endnetworkreaddemand")) {
-                spanDemand.endNetworkReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.endnetworkwritedemand")) {
-                spanDemand.endNetworkWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.endheapbyteallocation")) {
-                spanDemand.endHeapDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.endsystemtime")) {
-                spanDemand.endSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startcputime")) {
-                spanDemand.startCpuTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startdiskreaddemand")) {
-                spanDemand.startDiskReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startdiskwritedemand")) {
-                spanDemand.startDiskWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startnetworkreaddemand")) {
-                spanDemand.startNetworkReadDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startnetworkwritedemand")) {
-                spanDemand.startNetworkWriteDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startheapbyteallocation")) {
-                spanDemand.startHeapDemand = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startsystemtime")) {
-                spanDemand.startSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.logsystemtime")) {
-                spanDemand.logSystemTime = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.totalheapsize")) {
-                spanDemand.totalHeapSize = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.startthread")) {
-                spanDemand.startThreadId = Long.valueOf(elems[1]);
-            } else if (elems[0].contains("io.retit.endthread")) {
-                spanDemand.endThreadId = Long.valueOf(elems[1]);
-            }
-        }
-        return spanDemand;
-    }
-
-    private static String[] extractPropertiesFromLogOutput(String logOutput) {
-        return logOutput.substring(logOutput.indexOf("={") + 1, logOutput.lastIndexOf("},")).split(",");
-    }
-
-    private static class SpanDemand {
-        public Long startCpuTime = null;
-        public Long endCpuTime = null;
-        public Long startSystemTime = null;
-        public Long endSystemTime = null;
-        public Long startHeapDemand = null;
-        public Long endHeapDemand = null;
-        public Long startDiskReadDemand = null;
-        public Long endDiskReadDemand = null;
-        public Long startDiskWriteDemand = null;
-        public Long endDiskWriteDemand = null;
-        public Long startNetworkReadDemand = null;
-        public Long endNetworkReadDemand = null;
-        public Long startNetworkWriteDemand = null;
-        public Long endNetworkWriteDemand = null;
-        public Long logSystemTime = null;
-        public Long totalHeapSize = null;
-        public Long startThreadId = null;
-        public Long endThreadId = null;
-    }
-
-    private static class MetricDemand {
-        public String metricName;
-        public Double metricValue;
-    }
 }
