@@ -41,6 +41,6 @@ The easiest way is to check out the [Grafana dashboard](http://localhost:3000/gr
 
 After some time you can see the data produced by this application in the following dashboard. As an example the CPU and memory demands are shown as they are supported on most plattforms as well as the Emission Calculation Factors. Furthermore, we have integrated a [Software Carbon Intensity](https://sci.greensoftware.foundation/) calculation for each transaction based on this data. This calculation is based on our work presented at the [Symposium on Software Performance 2024](https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_44_Heft_4/SSP24_16_camera-ready_5255.pdf).
 
-![dashboard.png](../../img/jdk21_dashboard.png)
+![dashboard.png](../../img/quarkus_dashboard.png)
 
-Please note on the dashboard that the metrics are split in a section for the core endpoint and for the corresponding blocking parts. This is due to the reactive nature of Quarkus in which the main processing happens in an event loop whereas blocking parts are executed on seperate worker threads. Therefore, you need to be careful what to measure in your Quarkus applications. 
+Please note on the dashboard that the metrics are split in a section for the core endpoints and for the corresponding blocking parts. This is due to the reactive nature of Quarkus in which the main processing happens in an event loop whereas blocking parts are executed on seperate worker threads. Therefore, you need to be careful what to measure in your Quarkus applications. 

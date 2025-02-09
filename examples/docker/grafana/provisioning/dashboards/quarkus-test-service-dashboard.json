@@ -1228,7 +1228,7 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(cpu_demand_milliseconds_total{httpmethod=\"GET\"}[1m])",
+          "expr": "max(rate(cpu_demand_milliseconds_total{httpmethod=\"GET\"}[1m]))",
           "fullMetaSearch": false,
           "hide": true,
           "includeNullMetadata": true,
@@ -2323,7 +2323,7 @@
         "x": 0,
         "y": 18
       },
-      "id": 10,
+      "id": 5,
       "options": {
         "legend": {
           "calcs": [],
@@ -2344,9 +2344,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total[1m])",
+          "expr": "rate(io_retit_emissions_java_process_cpu_time_total[1m])",
           "fullMetaSearch": false,
-          "includeNullMetadata": false,
+          "includeNullMetadata": true,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -2354,7 +2354,7 @@
           "useBackend": false
         }
       ],
-      "title": "Panel Title",
+      "title": "CPU Demand for the Whole Process",
       "type": "timeseries"
     },
     {
@@ -2610,7 +2610,7 @@
         "x": 0,
         "y": 26
       },
-      "id": 5,
+      "id": 10,
       "options": {
         "legend": {
           "calcs": [],
@@ -2631,9 +2631,9 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
-          "expr": "rate(io_retit_emissions_java_process_cpu_time_total[1m])",
+          "expr": "rate(io_retit_resource_demand_cpu_ms_milliseconds_total[1m])",
           "fullMetaSearch": false,
-          "includeNullMetadata": true,
+          "includeNullMetadata": false,
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -2641,7 +2641,7 @@
           "useBackend": false
         }
       ],
-      "title": "CPU Demand for the Whole Process",
+      "title": "CPU Demand per Transaction",
       "type": "timeseries"
     }
   ],
