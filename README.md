@@ -45,10 +45,10 @@ For examples on how to use this project for different application types, please 
 
 In the [examples](examples/README.md) directory you will find examples for different scenarios in which you can use this this extension, for example:
 
-- In a simple [JDK8-based application](examples/simple-jdk8-application/README.md)
-- In a simple [JDK21-based application](examples/simple-jdk21-application/README.md)
-- In a [Quarkus-based REST service](examples/quarkus-rest-service/README.md)
-- In a [Spring-based REST service](examples/quarkus-rest-service/README.md)
+| In a simple [JDK8-based application](examples/simple-jdk8-application/README.md) | In a simple [JDK21-based application](examples/simple-jdk21-application/README.md) | In a [Quarkus-based REST service](examples/quarkus-rest-service/README.md) | In a [Spring-based REST service](examples/quarkus-rest-service/README.md) |
+|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|----------------------------------------------------------------------------|---------------------------------------------------------------------------|
+| <img src="/img/jdk8_dashboard.png" width="250" />                                | <img src="/img/jdk21_dashboard.png" width="275" />                                 | <img src="/img/quarkus_dashboard.png" width="275" />                       | <img src="/img/spring_dashboard.png" width="275" />                        |
+
 
 # Configuration Options
 

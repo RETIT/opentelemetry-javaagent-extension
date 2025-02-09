@@ -15,15 +15,6 @@ public class QuarkusWithExternalOtelAgentAndExtensionIT extends AbstractFramewor
         commonSetup("quarkus-rest-service:feature", "quarkus-app", 8080, true, false);
     }
 
-    /**
-     * This test will run continuously until it is manually stopped, so it is disabled by default.
-     */
-    @Disabled
-    @Test
-    public void runTestContinuously() {
-        super.runTestContinuously();
-    }
-
     @Test
     public void testCallEachEndpointAndAssertSpansAndMetrics() {
         super.testCallEachEndpointAndAsserSpansAndMetrics();
