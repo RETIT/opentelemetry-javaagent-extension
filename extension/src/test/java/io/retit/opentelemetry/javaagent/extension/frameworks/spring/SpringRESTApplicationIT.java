@@ -12,7 +12,7 @@ public class SpringRESTApplicationIT extends AbstractFrameworkIT {
     @Test
     public void runTestContinuously() {
         // this test is meant to be executed for a Spring app that has been started by the user.
-        CONTAINER_URL = "http://localhost:8081/";
+        CONTAINER_URL = "http://localhost:8081";
         super.runTestContinuously();
     }
 }
