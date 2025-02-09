@@ -37,6 +37,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>spring-rest-service</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

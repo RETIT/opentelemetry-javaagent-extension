@@ -40,10 +40,6 @@
             <artifactId>quarkus-rest</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-container-image-jib</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.opentelemetry</groupId>
             <artifactId>opentelemetry-api</artifactId>
         </dependency>
@@ -63,8 +59,8 @@
         </dependency>
     </dependencies>
     <build>
+        <finalName>quarkus-rest-service</finalName>
         <plugins>
-
             <plugin>
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>quarkus-maven-plugin</artifactId>
@@ -95,30 +91,70 @@
                 <version>3.8.1</version>
                 <executions>
                     <execution>
-                        <id>copy-retit-opentelemetry-extension</id>
+                        <id>copy-opentelemetry</id>
                         <phase>package</phase>
                         <goals>
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.sourceDirectory}/../jib/otel</outputDirectory>
                             <artifactItems>
-                                <artifactItem>
-                                    <groupId>io.retit</groupId>
-                                    <artifactId>extension</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <destFileName>io.retit.opentelemetry.javaagent.extension.jar</destFileName>
-                                </artifactItem>
                                 <artifactItem>
                                     <groupId>io.opentelemetry.javaagent</groupId>
                                     <artifactId>opentelemetry-javaagent</artifactId>
-                                    <version>${opentelemetry.agent.version}</version>
                                     <type>jar</type>
                                     <destFileName>opentelemetry-javaagent.jar</destFileName>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>io.retit</groupId>
+                                    <artifactId>extension</artifactId>
+                                    <type>jar</type>
+                                    <version>${project.version}</version>
+                                    <destFileName>io.retit.opentelemetry.javaagent.extension.jar</destFileName>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
+                    </execution>
+                </executions>
+                <configuration>
+                    <outputDirectory>${project.build.directory}/jib/otel</outputDirectory>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>3.4.2</version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
+                <configuration>
+                    <from>
+                        <image>openjdk:21-slim</image>
+                    </from>
+                    <to>
+                        <image>quarkus-rest-service:${project.version}</image>
+                        <tags>
+                            <tag>feature</tag>
+                        </tags>
+                    </to>
+                    <!-- Copies files from 'src/main/custom-extra-dir' and '/home/user/jib-extras' instead of 'src/main/jib' -->
+                    <extraDirectories>
+                        <paths>
+                            <path>${project.build.directory}/jib</path>
+                            <path>
+                                <from>target/</from>
+                                <includes>${project.build.finalName}.jar</includes>
+                                <into>/app</into>
+                            </path>
+                        </paths>
+                    </extraDirectories>
+                    <containerizingMode>packaged</containerizingMode>
+                    <container>
+                        <entrypoint>java,-jar,/app/${project.build.finalName}.jar</entrypoint>
+                    </container>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>

@@ -18,7 +18,7 @@ java -javaagent:./target/jib/opentelemetry-javaagent-all.jar \
 -Dio.retit.emissions.cloud.provider.region=af-south-1 \
 -Dio.retit.emissions.cloud.provider.instance.type=a1.medium \
 -DRUN_MODE=continuously \
--jar ./examples/simple-jdk8-application/target/simple-jdk8-application-0.0.1-SNAPSHOT.jar
+-jar ./examples/simple-jdk8-application/target/simple-jdk8-application.jar
 ```
 
 This application will run until you stop it and generate data. While it is generating data, you can look at the data in the backends. The easiest way is to check out the [Grafana dashboard](http://localhost:3000/grafana/dashboards) here:

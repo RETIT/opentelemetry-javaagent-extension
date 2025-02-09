@@ -23,6 +23,7 @@
     </dependencies>
 
     <build>
+        <finalName>simple-jdk21-application</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
