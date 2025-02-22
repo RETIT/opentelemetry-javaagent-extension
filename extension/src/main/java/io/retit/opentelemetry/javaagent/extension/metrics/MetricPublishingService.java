@@ -137,9 +137,11 @@ public class MetricPublishingService {
     }
 
     private void publishDoubleMeasurement(final ObservableDoubleMeasurement measurement, final String type, final double value) {
-        LOGGER.info("Publishing " + type + " with value " + value);
-        measurement.record(value, Attributes.of(AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCloudProvider().name(),
-                AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceType()));
+        if (CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCloudProvider() != null) {
+            LOGGER.info("Publishing " + type + " with value " + value);
+            measurement.record(value, Attributes.of(AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCloudProvider().name(),
+                    AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceType()));
+        }
     }
 
     /**
