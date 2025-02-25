@@ -32,6 +32,10 @@ If you want to automate the execution of these requests, take a look at the foll
 
 When executing this test method, the test will send requests to the Spring REST application until you manually stop the tests. 
 
+As an alternative to generate load on the application, you can also find an [Apache JMeter](https://jmeter.apache.org/) load test script in the following location:
+
+[src/test/resource/jmeter_testplan.jmx](src/test/resources/jmeter_testplan.jmx)
+
 Once you have issued a few requests to one or more of these endpoints you will see the CO2 emissions for each endpoint in Grafana. 
 
 
