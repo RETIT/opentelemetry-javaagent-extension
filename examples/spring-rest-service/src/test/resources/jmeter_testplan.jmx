@@ -6,15 +6,25 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="RATE_PER_SERVICE" elementType="Argument">
             <stringProp name="Argument.name">RATE_PER_SERVICE</stringProp>
-            <stringProp name="Argument.value">85</stringProp>
+            <stringProp name="Argument.value">120</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="START_RATE" elementType="Argument">
+            <stringProp name="Argument.name">START_RATE</stringProp>
+            <stringProp name="Argument.value">120</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="TOTAL_RATE" elementType="Argument">
+            <stringProp name="Argument.name">TOTAL_RATE</stringProp>
+            <stringProp name="Argument.value">50</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
       </elementProp>
     </TestPlan>
     <hashTree>
-      <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Spring Thread Group - GET">
-        <stringProp name="OpenModelThreadGroup.schedule">rate(${RATE_PER_SERVICE}/sec) random_arrivals(1 min) rate(${RATE_PER_SERVICE}/sec) random_arrivals(10 min) rate(${RATE_PER_SERVICE}/sec) random_arrivals(1 min)  rate(0/sec) </stringProp>
+      <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Spring Thread Group">
+        <stringProp name="OpenModelThreadGroup.schedule">rate(${TOTAL_RATE}/sec) random_arrivals(1 min) rate(${TOTAL_RATE}/sec) random_arrivals(10 min) rate(${TOTAL_RATE}/sec) random_arrivals(1 min)  rate(0/sec) </stringProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="OpenModelThreadGroupController"/>
       </OpenModelThreadGroup>
@@ -33,13 +43,6 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-      </hashTree>
-      <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Spring Thread Group - POST">
-        <stringProp name="OpenModelThreadGroup.schedule">rate(${RATE_PER_SERVICE}/sec) random_arrivals(1 min) rate(${RATE_PER_SERVICE}/sec) random_arrivals(10 min) rate(${RATE_PER_SERVICE}/sec) random_arrivals(1 min)  rate(0/sec) </stringProp>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="OpenModelThreadGroupController"/>
-      </OpenModelThreadGroup>
-      <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST (Spring)">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8081</stringProp>
@@ -54,13 +57,6 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-      </hashTree>
-      <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Spring Thread Group - DELETE">
-        <stringProp name="OpenModelThreadGroup.schedule">rate(${RATE_PER_SERVICE}/sec) random_arrivals(1 min) rate(${RATE_PER_SERVICE}/sec) random_arrivals(10 min) rate(${RATE_PER_SERVICE}/sec) random_arrivals(1 min)  rate(0/sec) </stringProp>
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="OpenModelThreadGroupController"/>
-      </OpenModelThreadGroup>
-      <hashTree>
         <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE (Spring)">
           <stringProp name="HTTPSampler.domain">localhost</stringProp>
           <stringProp name="HTTPSampler.port">8081</stringProp>
@@ -113,7 +109,7 @@
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -147,7 +143,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">jmeter_50_result.txt</stringProp>
+        <stringProp name="filename">jmeter_25_result.txt</stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
