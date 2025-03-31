@@ -15,7 +15,7 @@
 
     <properties>
         <jdk21.base.container>mirror.gcr.io/library/eclipse-temurin:21-jre</jdk21.base.container>
-        <jib.version>3.4.5</jib.version> <!-- newer versions get stuck at 80 percent - https://stackoverflow.com/questions/78573169/googlejib-is-stuck-at-80-percent-while-creating-docker-image -->
+        <jib.version>3.4.5</jib.version>
     </properties>
 
     <modules>
