@@ -9,11 +9,13 @@ resource demand data as [Attributes](https://opentelemetry.io/docs/concepts/sign
 In addition to attaching Span attributes for OpenTelemetry Traces this extension publishes the resource demand data as OpenTelemetry [Metrics](https://opentelemetry.io/docs/concepts/signals/metrics/) for all entry level transactions (e.g., API calls) of an instrumented application. You can find a list of metrics published by this extension in the corresponding [section](#OpenTelemetry-Metrics-published-by-this-extension).  If you are just starting with analyzing the resource demand of your application this is the best starting point for you, before you dig into the span attributes to analyze where exactly the resources are consumed.
 
 ![extension_data_capture.png](img/extension_data_capture.png)
+
 *Figure 1: The OpenTelemetry Java-Agent Extension captures resource demand data for all transactions of instrumented applications*
 
 Furthermore, the extension follows the [Methodology](https://www.cloudcarbonfootprint.org/docs/methodology/) published by the [Cloud Carbon Footprint (CCF)](https://www.cloudcarbonfootprint.org/) project to calculate the carbon emissions of an instrumented application as shown in Figure 2. It contains data from the [CCF coefficients project](https://github.com/cloud-carbon-footprint/ccf-coefficients) for the biggest clouds (AWS, Azure, and GCP) and their instances. Using the resource demand data and the data of the CCF coefficents allows you to calculate the carbon emissions of single API calls of your application. This is usually done in an OpenTelemetry compatible backend, you can find an examples on how this works in the [Examples](#Examples) section of this document. If you want to use the extension for your own application check out the [Quickstart](#Quickstart) and [Configuration Options](#configuration-options) section of this document.  
 
 ![energy_emission_calculations.png](img/energy_emission_calculations.png)
+
 *Figure 2: The OpenTelemetry Java-Agent Extension follows the methodology published by the Cloud Carbon Footprint (CCF) project to calculate software energy consumption and carbon emissions based on the collected data*
 
 # Quickstart
