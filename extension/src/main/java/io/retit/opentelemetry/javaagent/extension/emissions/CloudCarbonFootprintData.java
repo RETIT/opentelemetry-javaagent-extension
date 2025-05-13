@@ -54,7 +54,7 @@ public final class CloudCarbonFootprintData {
         this.microarchitecture = InstanceConfiguration.getMicroarchitecture();
         this.gridEmissionsFactor = initializeGridEmissionFactor(InstanceConfiguration.getCloudProviderRegion());
         cloudInstanceDetails = initializeCloudInstanceDetails(InstanceConfiguration.getCloudProviderInstanceType());
-        this.pueValue = initializePueValue();
+        this.pueValue = initializePueValue(InstanceConfiguration.getCloudProviderRegion());
     }
 
     public Double getGridEmissionsFactor() {
@@ -271,14 +271,17 @@ public final class CloudCarbonFootprintData {
         return 0.0;
     }
 
-    private Double initializePueValue() {
+    private Double initializePueValue(final String region) {
         double returnValue = 0.0;
         if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AWS.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            returnValue = CloudCarbonFootprintCoefficients.AWS_PUE;
+            double pue = getDoubleValueFromCSVForRegionOrInstance("/pue/pue-aws.csv", 1, region, 3);
+            returnValue = (pue == 0.0) ? CloudCarbonFootprintCoefficients.AWS_PUE : pue;
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            returnValue = CloudCarbonFootprintCoefficients.AZURE_PUE;
+            double pue = getDoubleValueFromCSVForRegionOrInstance("/pue/pue-azure.csv", 3, region, 1);
+            returnValue = (pue == 0.0) ? CloudCarbonFootprintCoefficients.AZURE_PUE : pue;
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            returnValue = CloudCarbonFootprintCoefficients.GCP_PUE;
+            double pue = getDoubleValueFromCSVForRegionOrInstance("/pue/pue-gcp.csv", 3, region, 1);
+            returnValue = (pue == 0.0) ? CloudCarbonFootprintCoefficients.GCP_PUE : pue;
         }
         return returnValue;
     }
