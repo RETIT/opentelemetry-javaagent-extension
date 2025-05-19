@@ -10,7 +10,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <auto-service.version>1.1.1</auto-service.version>
-        <opentelemetry.agent.version>2.15.0</opentelemetry.agent.version>
+        <opentelemetry.agent.version>2.16.0</opentelemetry.agent.version>
     </properties>
 
     <modules>
