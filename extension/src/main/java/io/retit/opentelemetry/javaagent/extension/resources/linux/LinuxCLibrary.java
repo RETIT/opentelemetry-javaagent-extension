@@ -13,7 +13,6 @@ import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
  * to the interface. However, please also add a generalized method
  * to {@link NativeFacade} if possible.
  */
-@SuppressWarnings("PMD")
 public interface LinuxCLibrary extends CLibrary {
     /**
      * This is a clock that measures CPU time consumed by this
