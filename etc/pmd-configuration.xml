@@ -10,6 +10,7 @@
         <exclude name="JUnit5TestShouldBePackagePrivate"/>
         <exclude name="UnusedPrivateMethod"/>
         <exclude name="SystemPrintln"/>
+        <exclude name="ImplicitFunctionalInterface"/>
     </rule>
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor"/>
