@@ -140,6 +140,7 @@ public class InstanceConfiguration {
      * @param <S> Source type.
      * @param <T> Target type.
      */
+    @FunctionalInterface
     public interface Converter<S, T> {
         /**
          * Converts the given value of type S to type T.
