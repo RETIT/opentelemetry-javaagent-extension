@@ -20,7 +20,7 @@ jobs:
 
     steps:
       - name: Start Measurement
-        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        uses: green-coding-solutions/eco-ci-energy-estimation@v5
         with:
           task: start-measurement
           co2-calculation-method: constant
@@ -41,7 +41,7 @@ jobs:
       - name: Run Integration Test
         run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT --file ./extension/pom.xml
       - name: Show Energy Results
-        uses: green-coding-solutions/eco-ci-energy-estimation@v4
+        uses: green-coding-solutions/eco-ci-energy-estimation@v5
         with:
           task: display-results
           pr-comment: true
