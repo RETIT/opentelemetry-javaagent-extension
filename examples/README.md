@@ -3,7 +3,7 @@ This directory contains several examples on how to use the OpenTelemetry extensi
 - A simple [JDK8-based application](simple-jdk8-application/README.md)
 - A simple [JDK21-based application](simple-jdk21-application/README.md)
 - A [Quarkus-based REST service](quarkus-rest-service/README.md)
-- A [Spring-based REST service](quarkus-rest-service/README.md)
+- A [Spring-based REST service](spring-rest-service/README.md)
 
 # Starting OpenTelemetry Backends for the Example Applications 
 
