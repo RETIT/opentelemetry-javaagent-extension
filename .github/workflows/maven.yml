@@ -22,6 +22,9 @@ jobs:
       - name: Start Measurement
         uses: green-coding-solutions/eco-ci-energy-estimation@v4
         with:
+          co2-calculation-method: constant
+          co2-grid-intensity-constant: 334 # German average in 2024
+          send-data: false
           task: start-measurement
           continue-on-error: true
       - uses: actions/checkout@v4
