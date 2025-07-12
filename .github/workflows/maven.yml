@@ -17,7 +17,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
+    steps
+      - uses: actions/checkout@v4
       - name: Start Measurement
         uses: green-coding-solutions/eco-ci-energy-estimation@v5
         with:
@@ -26,7 +27,6 @@ jobs:
           co2-grid-intensity-constant: 334 # German average in 2024
           send-data: false
         continue-on-error: true
-      - uses: actions/checkout@v4
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
@@ -44,6 +44,9 @@ jobs:
         with:
           task: display-results
           pr-comment: true
+          co2-calculation-method: constant
+          co2-grid-intensity-constant: 334 # German average in 2024
+          send-data: false
         continue-on-error: true
       # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
       #- name: Update dependency graph
