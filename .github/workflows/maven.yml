@@ -43,6 +43,15 @@ jobs:
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
         run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT --file ./extension/pom.xml
+      - name: Get Energy Results
+        uses: green-coding-solutions/eco-ci-energy-estimation@v5
+        with:
+          task: get-measurement
+          pr-comment: true
+          co2-calculation-method: constant
+          co2-grid-intensity-constant: 334 # German average in 2024
+          send-data: false
+        continue-on-error: true
       - name: Show Energy Results
         uses: green-coding-solutions/eco-ci-energy-estimation@v5
         with:
