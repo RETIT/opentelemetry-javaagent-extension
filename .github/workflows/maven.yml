@@ -16,6 +16,7 @@ on:
 
 permissions:
   read-all
+  pull-requests: write
 
 jobs:
   build:
