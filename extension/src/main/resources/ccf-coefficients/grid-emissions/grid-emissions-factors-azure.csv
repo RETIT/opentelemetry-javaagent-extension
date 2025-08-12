@@ -9,17 +9,17 @@ West Central US,Wyoming,WECC,0.000350861,EPA
 West US,California,WECC,0.000350861,EPA
 West US 2,Washington,WECC,0.000350861,EPA
 West US 3,Arizona,WECC,0.000350861,EPA
-East Asia,Hong Kong,,0.00081,carbonfootprint.com
-Southeast Asia,Singapore,,0.0004085,EMA Singapore
-North Europe,Ireland,,0.000316,EEA
-West Europe,Netherlands,,0.00039,EEA
-Central India,Pune,,0.000708,carbonfootprint.com
-South India,Chennai,,0.000708,carbonfootprint.com
-West India,Mumbai,,0.000708,carbonfootprint.com
-UK South,London,,0.000228,EEA
-UK West,Cardiff,,0.000228,EEA
-France Central,Paris,,0.000067,EEA
-Finland Central,Helsinki,,0.00077,EEA,
-Germany West Central,Frankfurt,,0.00402,EEA
-Belgium Central,Brussels,,0.000154,EEA
-Sweden Central,Gavle,,0.000009,EEA
+East Asia,Hong Kong,,0.00069294,carbondi.com
+Southeast Asia,Singapore,,0.00050249,carbondi.com
+North Europe,Ireland,,0.00031413,carbondi.com
+West Europe,Netherlands,,0.00030901,carbondi.com
+Central India,Pune,,0.00093355,carbondi.com
+South India,Chennai,,0.00093355,carbondi.com
+West India,Mumbai,,0.00093355,carbondi.com
+UK South,London,,0.00020705,carbondi.com
+UK West,Cardiff,,0.00020705,carbondi.com
+France Central,Paris,,0.00007055,carbondi.com
+Finland Central,Helsinki,,0.00009501,carbondi.com,
+Germany West Central,Frankfurt,,0.00037995,carbondi.com
+Belgium Central,Brussels,,0.00012525,carbondi.com
+Sweden Central,Gavle,,0.00001518,carbondi.com
