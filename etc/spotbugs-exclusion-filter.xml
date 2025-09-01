@@ -32,4 +32,9 @@
   <Match>
     <Bug code="THROWS"/>
   </Match>
+  <Match>
+    <Class name="~.*(TestService).*" />
+    <Method name="veryComplexBusinessFunction" />
+    <Bug pattern="DMI_INVOKING_TOSTRING_ON_ARRAY" />
+  </Match>
 </FindBugsFilter>
