@@ -146,7 +146,7 @@
                 <artifactId>spotbugs-maven-plugin</artifactId>
                 <version>4.9.4.0</version>
                 <configuration>
-                    <excludeFilterFile>etc/spotbugs-exclusion-filter.xml</excludeFilterFile>
+                    <excludeFilterFile>${user.dir}/etc/spotbugs-exclusion-filter.xml</excludeFilterFile>
                 </configuration>
             </plugin>
 
