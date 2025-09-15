@@ -6,7 +6,27 @@
         <collectionProp name="Arguments.arguments">
           <elementProp name="TOTAL_RATE" elementType="Argument">
             <stringProp name="Argument.name">TOTAL_RATE</stringProp>
-            <stringProp name="Argument.value">50</stringProp>
+            <stringProp name="Argument.value">${__P(total_rate,50)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="HOSTNAME" elementType="Argument">
+            <stringProp name="Argument.name">HOSTNAME</stringProp>
+            <stringProp name="Argument.value">${__P(hostname,localhost)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="PORT" elementType="Argument">
+            <stringProp name="Argument.name">PORT</stringProp>
+            <stringProp name="Argument.value">${__P(port,8081)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="RAMP_UP_AND_DOWN_IN_SECONDS" elementType="Argument">
+            <stringProp name="Argument.name">RAMP_UP_AND_DOWN_IN_SECONDS</stringProp>
+            <stringProp name="Argument.value">${__P(ramp_up_and_down,60)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="STEADY_STATE_IN_SECONDS" elementType="Argument">
+            <stringProp name="Argument.name">STEADY_STATE_IN_SECONDS</stringProp>
+            <stringProp name="Argument.value">${__P(steady_state,600)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
         </collectionProp>
@@ -14,14 +34,14 @@
     </TestPlan>
     <hashTree>
       <OpenModelThreadGroup guiclass="OpenModelThreadGroupGui" testclass="OpenModelThreadGroup" testname="Spring Thread Group">
-        <stringProp name="OpenModelThreadGroup.schedule">rate(${TOTAL_RATE}/sec) random_arrivals(1 min) rate(${TOTAL_RATE}/sec) random_arrivals(10 min) rate(${TOTAL_RATE}/sec) random_arrivals(1 min)  rate(0/sec) </stringProp>
+        <stringProp name="OpenModelThreadGroup.schedule">rate(0/sec) random_arrivals(${RAMP_UP_AND_DOWN_IN_SECONDS} sec) rate(${TOTAL_RATE}/sec) random_arrivals(${STEADY_STATE_IN_SECONDS} sec) rate(${TOTAL_RATE}/sec) random_arrivals(${RAMP_UP_AND_DOWN_IN_SECONDS} sec)  rate(0/sec) </stringProp>
         <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="OpenModelThreadGroupController"/>
       </OpenModelThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET (Spring)" enabled="true">
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8081</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="GET (Spring)">
+          <stringProp name="HTTPSampler.domain">${HOSTNAME}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/test-rest-endpoint/getData</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -33,9 +53,9 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST (Spring)" enabled="true">
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8081</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="POST (Spring)">
+          <stringProp name="HTTPSampler.domain">${HOSTNAME}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/test-rest-endpoint/postData</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -47,9 +67,9 @@
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree/>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE (Spring)" enabled="true">
-          <stringProp name="HTTPSampler.domain">localhost</stringProp>
-          <stringProp name="HTTPSampler.port">8081</stringProp>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="DELETE (Spring)">
+          <stringProp name="HTTPSampler.domain">${HOSTNAME}</stringProp>
+          <stringProp name="HTTPSampler.port">${PORT}</stringProp>
           <stringProp name="HTTPSampler.protocol">http</stringProp>
           <stringProp name="HTTPSampler.path">/test-rest-endpoint/deleteData</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -99,7 +119,7 @@
         <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
-      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="true">
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
         <boolProp name="ResultCollector.error_logging">false</boolProp>
         <objProp>
           <name>saveConfig</name>
@@ -133,7 +153,7 @@
             <connectTime>true</connectTime>
           </value>
         </objProp>
-        <stringProp name="filename">jmeter_25_result.txt</stringProp>
+        <stringProp name="filename"></stringProp>
       </ResultCollector>
       <hashTree/>
     </hashTree>
