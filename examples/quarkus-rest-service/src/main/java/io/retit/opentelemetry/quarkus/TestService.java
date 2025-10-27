@@ -4,6 +4,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class TestService {
 
         int[] data = naiveSortingWithONSquareComplexity(generateRandomInputArray(size));
 
-        Files.write(tempFile, String.valueOf(data).getBytes());
+        Files.write(tempFile, String.valueOf(data).getBytes(StandardCharsets.UTF_8));
 
         Files.delete(tempFile);
         resourceDemandMeasurementService.measureAndPublishMetrics(measurement, httpMethod);
