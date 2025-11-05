@@ -5,22 +5,22 @@ us-west-1,United States,WECC,0.000350861,EPA
 us-west-2,United States,WECC,0.000350861,EPA
 us-gov-east-1,United States,SERC,0.000415755,EPA
 us-gov-west-1,United States,WECC,0.000350861,EPA
-af-south-1,South Africa,,0.000928,carbonfootprint.com
-ap-east-1,Hong Kong,,0.00081,carbonfootprint.com
-ap-south-1,India,,0.000708,carbonfootprint.com
-ap-northeast-3,Japan,,0.000506,carbonfootprint.com
-ap-northeast-2,South Korea,,0.0005,carbonfootprint.com
-ap-southeast-1,Singapore,,0.0004085,EMA Singapore
-ap-southeast-2,Australia,,0.00079,carbonfootprint.com
-ap-northeast-1,Japan,,0.000506,carbonfootprint.com
-ca-central-1,Canada,,0.00013,carbonfootprint.com
-cn-north-1,China,,0.000555,carbonfootprint.com
-cn-northwest-1,China,,0.000555,carbonfootprint.com
-eu-central-1,Germany,,0.000338,EEA
-eu-west-1,Ireland,,0.000316,EEA
-eu-west-2,England,,0.000228,EEA
-eu-south-1,Italy,,0.000233,EEA
-eu-west-3,France,,0.000052,EEA
-eu-north-1,Sweden,,0.000008,EEA
-me-south-1,Bahrain,,0.000732,carbonfootprint.com
-sa-east-1,Brazil,,0.000074,carbonfootprint.com
+af-south-1,South Africa,,0.00077347,carbondi.com
+ap-east-1,Hong Kong,,0.00069294,carbondi.com
+ap-south-1,India,,0.00093355,carbondi.com
+ap-northeast-3,Japan,,0.00045773,carbondi.com
+ap-northeast-2,South Korea,,0.00048755,carbondi.com
+ap-southeast-1,Singapore,,0.00050249,carbondi.com
+ap-southeast-2,Australia,,0.00059512,carbondi.com
+ap-northeast-1,Japan,,0.00045773,carbondi.com
+ca-central-1,Canada,,0.00011600,carbondi.com
+cn-north-1,China,,0.00066080,carbondi.com
+cn-northwest-1,China,,0.00066080,carbondi.com
+eu-central-1,Germany,,0.00037995,carbondi.com
+eu-west-1,Ireland,,0.00031413,carbondi.com
+eu-west-2,England,,0.00020705,carbondi.com
+eu-south-1,Italy,,0.00031432,carbondi.com
+eu-west-3,France,,0.00007055,carbondi.com
+eu-north-1,Sweden,,0.00001518,carbondi.com
+me-south-1,Bahrain,,0.00051086,carbondi.com
+sa-east-1,Brazil,,0.00007410,carbondi.com

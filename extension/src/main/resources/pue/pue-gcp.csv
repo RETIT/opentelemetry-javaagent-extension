@@ -1,0 +1,29 @@
+"Campuses","Quarterly","TrailingTwelveMonth","Region"
+"Douglas County, Georgia",1.12,1.09,us-east1
+"Lenoir, North Carolina",1.24,1.13,us-east1
+"Berkeley County, South Carolina",1.13,1.10,us-east1
+"Montgomery County, Tennessee",1.13,1.10,us-east1
+"Jackson County, Alabama",1.13,1.10,us-east1
+"Loudoun County, Virginia",1.11,1.09,us-east4
+"Loudoun County, Virginia (2nd facility)",1.09,1.08,us-east4
+"Central Ohio (Columbus), Ohio",1.05,0.0,us-east5
+"Central Ohio (New Albany), Ohio",1.07,1.08,us-east5
+"Central Ohio (Lancaster), Ohio",1.04,0.0,us-east5
+"Council Bluffs, Iowa",1.13,1.11,us-central1
+"Council Bluffs, Iowa (2nd facility)",1.08,1.07,us-central1
+"Papillion, Nebraska",1.10,1.09,us-central1
+"Mayes County, Oklahoma",1.14,1.11,us-south1
+"Midlothian, Texas",1.13,1.11,us-south1
+"The Dalles, Oregon",1.11,1.10,us-west1
+"The Dalles, Oregon (2nd facility)",1.08,1.07,us-west1
+"Henderson, Nevada",1.11,1.09,us-west4
+"Storey County, Nevada",1.22,1.17,us-west4
+"Dublin, Ireland",1.07,1.08,N/A
+"St. Ghislain, Belgium",1.08,1.08,europe-west1
+"Eemshaven, Netherlands",1.08,1.08,europe-west4
+"Fredericia, Denmark",1.07,1.08,N/A
+"Hamina, Finland",1.10,1.10,europe-north1
+"Changua County, Taiwan",1.15,1.12,asia-east1
+"Singapore",1.13,1.13,asia-southeast1
+"Singapore (2nd facility)",1.15,1.16,asia-southeast1
+"Quilicura, Chile",1.09,1.10,southamerica-west1
