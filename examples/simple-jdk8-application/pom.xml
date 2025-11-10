@@ -112,7 +112,7 @@
                 <version>${jib.version}</version>
                 <configuration>
                     <from>
-                        <image>openjdk:8-slim</image>
+                        <image>eclipse-temurin:8-jre</image>
                     </from>
                     <to>
                         <image>simple-jdk8-application:${project.version}</image>
