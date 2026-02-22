@@ -39,7 +39,7 @@ public class CloudCarbonFootprintDataTest {
         CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
         instance.init();
         Assertions.assertNotNull(instance);
-        Assertions.assertEquals(0.338, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(0.37995, instance.getGridEmissionsFactor());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
 
@@ -59,7 +59,7 @@ public class CloudCarbonFootprintDataTest {
         CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
         instance.init();
         Assertions.assertNotNull(instance);
-        Assertions.assertEquals(0.319, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(0.37995, instance.getGridEmissionsFactor());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
         Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
@@ -79,7 +79,7 @@ public class CloudCarbonFootprintDataTest {
         CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
         instance.init();
         Assertions.assertNotNull(instance);
-        Assertions.assertEquals(0.319, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(0.37995, instance.getGridEmissionsFactor());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
         Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
@@ -98,7 +98,7 @@ public class CloudCarbonFootprintDataTest {
         CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
         instance.init();
         Assertions.assertNotNull(instance);
-        Assertions.assertEquals(0.39, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(0.30901, instance.getGridEmissionsFactor());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
         Assertions.assertEquals(1, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
@@ -118,7 +118,7 @@ public class CloudCarbonFootprintDataTest {
         CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
         instance.init();
         Assertions.assertNotNull(instance);
-        Assertions.assertEquals(0.39, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(0.30901, instance.getGridEmissionsFactor());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
         Assertions.assertEquals(0.8, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
