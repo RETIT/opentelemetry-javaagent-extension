@@ -86,6 +86,8 @@ public final class CloudCarbonFootprintData {
             gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/grid-emissions/grid-emissions-factors-azure.csv", 0, envRegion, 3);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/grid-emissions/grid-emissions-factors-gcp.csv", 0, envRegion, 2);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_ON_PREMISE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            return InstanceConfiguration.getOnPremiseGridEmissionsFactor();
         }
 
         // we need to do the conversion using BigDecimal to avoid loosing precision
@@ -129,6 +131,8 @@ public final class CloudCarbonFootprintData {
             cloudVMInstanceDetails = initializeCloudInstanceDetailsForAws(vmInstanceType);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             cloudVMInstanceDetails = initializeCloudInstanceDetailsForGcp(vmInstanceType);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_ON_PREMISE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            cloudVMInstanceDetails = initializeCloudInstanceDetailsForOnPremise();
         } else {
             cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData(0.0, 0.0, 0.0, 0.0, 0.0);
         }
@@ -250,7 +254,23 @@ public final class CloudCarbonFootprintData {
     }
 
     /**
-     * Initializes the total embodied emissions for the specified instance type.
+     * Initializes the instance details for on-premise instances.
+     * All values are provided through configuration parameters.
+     *
+     * @return the CloudCarbonFootprintInstanceData with values from configuration
+     */
+    private CloudCarbonFootprintInstanceData initializeCloudInstanceDetailsForOnPremise() {
+        CloudCarbonFootprintInstanceData cloudVMInstanceDetails = new CloudCarbonFootprintInstanceData();
+        cloudVMInstanceDetails.setCloudProvider(CloudProvider.ON_PREMISE);
+        cloudVMInstanceDetails.setInstanceType("OnPremise");
+        cloudVMInstanceDetails.setInstanceVCpuCount(InstanceConfiguration.getOnPremiseInstanceVCpuCount());
+        cloudVMInstanceDetails.setPlatformTotalVCpuCount(InstanceConfiguration.getOnPremisePlatformTotalVCpuCount());
+        cloudVMInstanceDetails.setCpuPowerConsumptionIdle(InstanceConfiguration.getOnPremiseCpuPowerConsumptionIdle());
+        cloudVMInstanceDetails.setCpuPowerConsumption100Percent(InstanceConfiguration.getOnPremiseCpuPowerConsumption100());
+        return cloudVMInstanceDetails;
+    }
+
+    /**
      * The total embodied emissions are determined based on the cloud provider and instance type.
      * It reads the embodied emissions from CSV files specific to each cloud provider.
      * The provided CSV files come from:
@@ -267,6 +287,8 @@ public final class CloudCarbonFootprintData {
             return getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/embodied-emissions/coefficients-gcp-embodied-mean.csv", 1, instanceType, 2);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_AZURE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             return getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/embodied-emissions/coefficients-azure-embodied.csv", 2, instanceType, 8);
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_ON_PREMISE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            return InstanceConfiguration.getOnPremiseTotalEmbodiedEmissions();
         }
         return 0.0;
     }
@@ -279,6 +301,8 @@ public final class CloudCarbonFootprintData {
             returnValue = CloudCarbonFootprintCoefficients.AZURE_PUE;
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             returnValue = CloudCarbonFootprintCoefficients.GCP_PUE;
+        } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_ON_PREMISE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
+            returnValue = InstanceConfiguration.getOnPremisePue();
         }
         return returnValue;
     }
