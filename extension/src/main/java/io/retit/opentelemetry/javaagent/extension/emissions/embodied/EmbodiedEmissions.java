@@ -55,7 +55,7 @@ public class EmbodiedEmissions {
      * @return The calculated embodied carbon emissions in milligrams.
      */
     public double calculateEmbodiedEmissionsInMilliGramPerMinute() {
-        if (InstanceConfiguration.getCloudProviderInstanceType() == null || Constants.RETIT_VALUE_NOT_SET.equals(InstanceConfiguration.getCloudProviderInstanceType())) {
+        if (InstanceConfiguration.getOnPremiseTotalEmbodiedEmissions() == 0.0 && (InstanceConfiguration.getCloudProviderInstanceType() == null || Constants.RETIT_VALUE_NOT_SET.equals(InstanceConfiguration.getCloudProviderInstanceType()))) {
             return 0;
         } else {
             return configLoader.getCloudInstanceDetails().getTotalEmbodiedEmissions() * (CloudCarbonFootprintCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR / 60)

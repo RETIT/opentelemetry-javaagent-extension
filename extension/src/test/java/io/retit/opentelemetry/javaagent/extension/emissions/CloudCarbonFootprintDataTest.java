@@ -29,6 +29,13 @@ public class CloudCarbonFootprintDataTest {
         System.clearProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY);
         System.clearProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY);
         System.clearProperty(Constants.RETIT_EMISSIONS_MICROARCHITECTURE_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_INSTANCE_VCPU_COUNT_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PLATFORM_TOTAL_VCPU_COUNT_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_IDLE_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_100_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_TOTAL_EMBODIED_EMISSIONS_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_GRID_EMISSIONS_FACTOR_CONFIGURATION_PROPERTY);
+        System.clearProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PUE_CONFIGURATION_PROPERTY);
     }
 
     @Test
@@ -127,5 +134,48 @@ public class CloudCarbonFootprintDataTest {
         Assertions.assertEquals(2.0193277994791665, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
         Assertions.assertEquals(1699.62, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
         Assertions.assertEquals(CloudProvider.AZURE, cloudCarbonFootprintInstanceData.getCloudProvider());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataOnPremise() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "OnPremise");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_INSTANCE_VCPU_COUNT_CONFIGURATION_PROPERTY, "8");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PLATFORM_TOTAL_VCPU_COUNT_CONFIGURATION_PROPERTY, "64");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_IDLE_CONFIGURATION_PROPERTY, "10.5");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_100_CONFIGURATION_PROPERTY, "45.0");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_TOTAL_EMBODIED_EMISSIONS_CONFIGURATION_PROPERTY, "1500.0");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_GRID_EMISSIONS_FACTOR_CONFIGURATION_PROPERTY, "0.4");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PUE_CONFIGURATION_PROPERTY, "1.3");
+        CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
+        instance.init();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.0004, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(1.3, instance.getPueValue());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(8, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(64, cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
+        Assertions.assertEquals(10.5, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
+        Assertions.assertEquals(45.0, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
+        Assertions.assertEquals(1500.0, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+        Assertions.assertEquals(CloudProvider.ON_PREMISE, cloudCarbonFootprintInstanceData.getCloudProvider());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataOnPremiseDefaultValues() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "OnPremise");
+        CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
+        instance.init();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.342, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(1.43, instance.getPueValue());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(Runtime.getRuntime().availableProcessors(), cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(Runtime.getRuntime().availableProcessors(), cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
+        Assertions.assertEquals(0.74, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
+        Assertions.assertEquals(3.84, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
+        Assertions.assertEquals(0.0, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+        Assertions.assertEquals(CloudProvider.ON_PREMISE, cloudCarbonFootprintInstanceData.getCloudProvider());
     }
 }
