@@ -154,6 +154,12 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.7.1</version>
+                <configuration>
+                    <connectTimeout>1000</connectTimeout>
+                    <socketTimeout>1000</socketTimeout>
+                    <connectionRequestTimeout>1000</connectionRequestTimeout>
+                    <errorRemedy>ignore</errorRemedy>
+                </configuration>
                 <executions>
                     <execution>
                         <id>download-licenses</id>
