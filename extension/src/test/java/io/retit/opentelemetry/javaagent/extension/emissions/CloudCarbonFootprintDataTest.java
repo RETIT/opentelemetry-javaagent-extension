@@ -149,7 +149,7 @@ public class CloudCarbonFootprintDataTest {
         CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
         instance.init();
         Assertions.assertNotNull(instance);
-        Assertions.assertEquals(0.4, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(0.0004, instance.getGridEmissionsFactor());
         Assertions.assertEquals(1.3, instance.getPueValue());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
@@ -158,6 +158,24 @@ public class CloudCarbonFootprintDataTest {
         Assertions.assertEquals(10.5, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
         Assertions.assertEquals(45.0, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
         Assertions.assertEquals(1500.0, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+        Assertions.assertEquals(CloudProvider.ON_PREMISE, cloudCarbonFootprintInstanceData.getCloudProvider());
+    }
+
+    @Test
+    public void testCloudCarbonFootprintDataOnPremiseDefaultValues() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "OnPremise");
+        CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
+        instance.init();
+        Assertions.assertNotNull(instance);
+        Assertions.assertEquals(0.342, instance.getGridEmissionsFactor());
+        Assertions.assertEquals(1.43, instance.getPueValue());
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        Assertions.assertEquals(Runtime.getRuntime().availableProcessors(), cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(Runtime.getRuntime().availableProcessors(), cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
+        Assertions.assertEquals(0.74, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
+        Assertions.assertEquals(3.84, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
+        Assertions.assertEquals(0.0, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
         Assertions.assertEquals(CloudProvider.ON_PREMISE, cloudCarbonFootprintInstanceData.getCloudProvider());
     }
 }

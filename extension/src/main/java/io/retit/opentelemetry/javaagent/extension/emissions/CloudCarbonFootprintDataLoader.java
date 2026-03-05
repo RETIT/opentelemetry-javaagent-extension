@@ -54,7 +54,7 @@ final class CloudCarbonFootprintDataLoader {
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_GCP.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
             gridEmissionFactorMetricTonPerKwh = getDoubleValueFromCSVForRegionOrInstance("/ccf-coefficients/grid-emissions/grid-emissions-factors-gcp.csv", 0, envRegion, 2);
         } else if (Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY_VALUE_ON_PREMISE.equalsIgnoreCase(InstanceConfiguration.getCloudProvider())) {
-            return InstanceConfiguration.getOnPremiseGridEmissionsFactor();
+            gridEmissionFactorMetricTonPerKwh = InstanceConfiguration.getOnPremiseGridEmissionsFactor() / 1_000_000.0; // Convert from gram per kWh to metric ton per kWh
         }
 
         // we need to do the conversion using BigDecimal to avoid loosing precision
