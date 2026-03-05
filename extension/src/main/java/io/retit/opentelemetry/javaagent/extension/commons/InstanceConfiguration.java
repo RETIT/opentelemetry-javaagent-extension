@@ -76,19 +76,19 @@ public class InstanceConfiguration {
     }
 
     public static double getOnPremiseInstanceVCpuCount() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_INSTANCE_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, 0.0);
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_INSTANCE_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, Double.valueOf("" + Runtime.getRuntime().availableProcessors()));
     }
 
     public static double getOnPremisePlatformTotalVCpuCount() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PLATFORM_TOTAL_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, 0.0);
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PLATFORM_TOTAL_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, Double.valueOf("" + Runtime.getRuntime().availableProcessors()));
     }
 
     public static double getOnPremiseCpuPowerConsumptionIdle() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_IDLE_CONFIGURATION_PROPERTY, Double::valueOf, 0.0);
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_IDLE_CONFIGURATION_PROPERTY, Double::valueOf, 0.74);
     }
 
     public static double getOnPremiseCpuPowerConsumption100() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_100_CONFIGURATION_PROPERTY, Double::valueOf, 0.0);
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_CPU_POWER_CONSUMPTION_100_CONFIGURATION_PROPERTY, Double::valueOf, 3.84);
     }
 
     public static double getOnPremiseTotalEmbodiedEmissions() {
@@ -96,11 +96,11 @@ public class InstanceConfiguration {
     }
 
     public static double getOnPremiseGridEmissionsFactor() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_GRID_EMISSIONS_FACTOR_CONFIGURATION_PROPERTY, Double::valueOf, 0.0);
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_GRID_EMISSIONS_FACTOR_CONFIGURATION_PROPERTY, Double::valueOf, 342.0);
     }
 
     public static double getOnPremisePue() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PUE_CONFIGURATION_PROPERTY, Double::valueOf, 0.0);
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PUE_CONFIGURATION_PROPERTY, Double::valueOf, 1.43);
     }
 
     /**
