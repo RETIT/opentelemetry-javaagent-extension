@@ -76,11 +76,11 @@ public class InstanceConfiguration {
     }
 
     public static double getOnPremiseInstanceVCpuCount() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_INSTANCE_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, Double.valueOf("" + Runtime.getRuntime().availableProcessors()));
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_INSTANCE_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, Double.valueOf(String.valueOf(Runtime.getRuntime().availableProcessors())));
     }
 
     public static double getOnPremisePlatformTotalVCpuCount() {
-        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PLATFORM_TOTAL_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, Double.valueOf("" + Runtime.getRuntime().availableProcessors()));
+        return getProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_PLATFORM_TOTAL_VCPU_COUNT_CONFIGURATION_PROPERTY, Double::valueOf, Double.valueOf(String.valueOf(Runtime.getRuntime().availableProcessors())));
     }
 
     public static double getOnPremiseCpuPowerConsumptionIdle() {
