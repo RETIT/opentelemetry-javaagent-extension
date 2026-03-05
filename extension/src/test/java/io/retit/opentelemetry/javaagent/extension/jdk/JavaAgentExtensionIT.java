@@ -135,6 +135,41 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
         }
     }
 
+    @Test
+    void testAllAttributesOnPremise() {
+        applicationContainer.withEnv("IO_RETIT_LOG_CPU_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_DISK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_HEAP_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
+                .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
+                .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
+                .withEnv("IO_RETIT_EMISSIONS_ONPREMISE_TOTAL_EMBODIED_EMISSIONS", "1000")
+                .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "OnPremise")
+                .withEnv("WAIT_FOR_ONE_MINUTE", "true"); // we need to wait for one minute for the metrics to be published
+        executeContainer();
+
+        Assertions.assertTrue(!spanDemands.isEmpty());
+
+        assertFullSpanDataContent(SAMPLE_METHOD);
+
+        Assertions.assertTrue(!metricDemands.isEmpty());
+
+        for (String metricName : METRIC_NAMES) {
+            LOGGER.info("Asserting metric {}", metricName);
+            Optional<MetricDemand> metricDemandResult = metricDemands.stream().filter(metricDemand -> metricName.equals(metricDemand.metricName)).findFirst();
+            LOGGER.info("Found metric {} with value {}", metricName, metricDemandResult.get().metricValue);
+            Assertions.assertTrue(metricDemandResult.isPresent());
+            Assertions.assertNotNull(metricDemandResult.get().metricValue);
+            if (!"io.retit.resource.demand.network.bytes".equals(metricDemandResult.get().metricName)) {
+
+                assertNotEquals(0.0, metricDemandResult.get().metricValue);
+            } else {
+                // no network demand
+                Assertions.assertEquals(0.0, metricDemandResult.get().metricValue);
+            }
+        }
+    }
+
 
     @Test
     void testOnlyCPUDemand() {
