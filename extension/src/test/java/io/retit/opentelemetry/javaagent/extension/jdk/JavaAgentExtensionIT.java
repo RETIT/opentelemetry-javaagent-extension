@@ -143,7 +143,7 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
                 .withEnv("IO_RETIT_LOG_NETWORK_DEMAND", "true")
                 .withEnv("IO_RETIT_LOG_GC_EVENT", "true")
                 .withEnv("IO_RETIT_EMISSIONS_STORAGE_TYPE", "SSD")
-                .withEnv("IO_RETIT_EMISSIONS_ONPREMISE_TOTAL_EMBODIED_EMISSIONS", "1000")
+                .withEnv("IO_RETIT_EMISSIONS_ONPREMISE_TOTAL_EMBODIED_EMISSIONS", "3000.0")
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "OnPremise")
                 .withEnv("WAIT_FOR_ONE_MINUTE", "true"); // we need to wait for one minute for the metrics to be published
         executeContainer();

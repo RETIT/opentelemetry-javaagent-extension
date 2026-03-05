@@ -32,4 +32,13 @@ public class EmissionDataLoaderTest {
         double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGramPerMinute();
         Assertions.assertTrue(embodiedEmissions > 0.0);
     }
+
+    @Test
+    public void testEmissionDataLoaderForOnPremise() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "OnPremise");
+        System.setProperty(Constants.RETIT_EMISSIONS_ON_PREMISE_TOTAL_EMBODIED_EMISSIONS_CONFIGURATION_PROPERTY, "3000.0");
+        Assertions.assertNotNull(CloudCarbonFootprintData.getConfigInstance());
+        double embodiedEmissions = EmbodiedEmissions.getInstance().calculateEmbodiedEmissionsInMilliGramPerMinute();
+        Assertions.assertTrue(embodiedEmissions > 0.0);
+    }
 }
