@@ -104,6 +104,17 @@ public class InstanceConfiguration {
     }
 
     /**
+     * Returns the configured hardware lifespan in years used for embodied emissions conversion.
+     * Falls back to the default value of 4 years when no value or a non-positive value is configured.
+     *
+     * @return the hardware lifespan in years
+     */
+    public static double getHardwareLifespanInYears() {
+        double configuredValue = getProperty(Constants.RETIT_EMISSIONS_HARDWARE_LIFESPAN_CONFIGURATION_PROPERTY, Double::valueOf, 4.0);
+        return configuredValue > 0.0 ? configuredValue : 4.0;
+    }
+
+    /**
      * Returns the property of type String with the given propertyName.
      *
      * @param propertyName - the property to return.

@@ -84,13 +84,6 @@ public class CloudCarbonFootprintCoefficients {
     public static final double AVERAGE_MAX_WATT_GCP = 3.77;
 
     /**
-     * Coefficient for breaking down total kg embodied emissions to gram per hour based on four year usage.
-     * This is calculated as follows: (1000 (kg to g) / 4 (years) / 12 (months per year) / 30 (days per month) / 24 (hours per day).
-     * Source: <a href="https://www.cloudcarbonfootprint.org/docs/embodied-emissions">...</a>
-     */
-    public static final double TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR = 0.0289;
-
-    /**
      * Coefficient for calculating memory emissions in kWh per GB-hour.
      * It is the same for all cloud providers.
      * Source: https://www.cloudcarbonfootprint.org/docs/methodology/#appendix-i-energy-coefficients

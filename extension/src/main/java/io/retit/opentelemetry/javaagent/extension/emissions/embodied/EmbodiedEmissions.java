@@ -18,7 +18,6 @@ package io.retit.opentelemetry.javaagent.extension.emissions.embodied;
 
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
-import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintCoefficients;
 import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintData;
 
 /**
@@ -49,6 +48,18 @@ public class EmbodiedEmissions {
     }
 
     /**
+     * Calculates the embodied carbon emissions coefficient in grams per hour.
+     * This is calculated based on the configured hardware lifespan.
+     * Formula: (1000 kg to grams / hardware lifespan in years / 12 months per year / 30 days per month / 24 hours per day)
+     *
+     * @return The embodied emissions coefficient in grams per hour.
+     */
+    private double calculateTotalEmbodiedEmissionsToGramsPerHour() {
+        double hardwareLifespanInYears = InstanceConfiguration.getHardwareLifespanInYears();
+        return 1000.0 / hardwareLifespanInYears / 12.0 / 30.0 / 24.0;
+    }
+
+    /**
      * Calculates the embodied carbon emissions in grams in minutes.
      * This method estimates the emissions based on the cloud instance's specifications and the total embodied emissions data.
      *
@@ -58,7 +69,7 @@ public class EmbodiedEmissions {
         if (InstanceConfiguration.getOnPremiseTotalEmbodiedEmissions() == 0.0 && (InstanceConfiguration.getCloudProviderInstanceType() == null || Constants.RETIT_VALUE_NOT_SET.equals(InstanceConfiguration.getCloudProviderInstanceType()))) {
             return 0;
         } else {
-            return configLoader.getCloudInstanceDetails().getTotalEmbodiedEmissions() * (CloudCarbonFootprintCoefficients.TOTAL_EMBODIED_EMISSIONS_TO_GRAMS_PER_HOUR / 60)
+            return configLoader.getCloudInstanceDetails().getTotalEmbodiedEmissions() * (calculateTotalEmbodiedEmissionsToGramsPerHour() / 60)
                     * (configLoader.getCloudInstanceDetails().getInstanceVCpuCount() / configLoader.getCloudInstanceDetails().getPlatformTotalVCpuCount()) * 1_000;
         }
     }
