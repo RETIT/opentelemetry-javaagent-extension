@@ -54,6 +54,7 @@ public class Constants {
     public static final String RETIT_EMISSIONS_ON_PREMISE_TOTAL_EMBODIED_EMISSIONS_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.onpremise.total.embodied.emissions";
     public static final String RETIT_EMISSIONS_ON_PREMISE_GRID_EMISSIONS_FACTOR_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.onpremise.grid.emissions.factor";
     public static final String RETIT_EMISSIONS_ON_PREMISE_PUE_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.onpremise.pue";
+    public static final String RETIT_EMISSIONS_HARDWARE_LIFESPAN_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.hardware.lifespan";
 
     public static final String RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD = "SSD";
     public static final String RETIT_VALUE_NOT_SET = "not-set";
