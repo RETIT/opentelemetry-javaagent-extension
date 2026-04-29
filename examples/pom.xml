@@ -22,6 +22,7 @@
         <module>simple-jdk8-application</module>
         <module>simple-jdk21-application</module>
         <module>quarkus-rest-service</module>
+        <module>quarkus-rest-service-library</module>
         <module>spring-rest-service</module>
     </modules>
 </project>

@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright 2024 RETIT GmbH
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>quarkus-rest-service-library</artifactId>
+    <description>
+        Demo showing how to use the RETIT OpenTelemetry instrumentation library inside a Quarkus application
+        WITHOUT the Java-agent.  The quarkus-opentelemetry extension provides OTel support, and the library
+        registers its SpanProcessor via CDI.
+    </description>
+
+    <parent>
+        <groupId>io.retit</groupId>
+        <artifactId>examples</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <compiler-plugin.version>3.15.0</compiler-plugin.version>
+        <failsafe.useModulePath>false</failsafe.useModulePath>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus.platform</quarkus.platform.group-id>
+        <quarkus.platform.version>3.34.6</quarkus.platform.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>${quarkus.platform.artifact-id}</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Quarkus REST support -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-rest</artifactId>
+        </dependency>
+
+        <!--
+            Quarkus OpenTelemetry extension – provides the full OTel SDK lifecycle (TracerProvider,
+            MeterProvider, LoggerProvider) that the library depends on at runtime.
+        -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-opentelemetry</artifactId>
+        </dependency>
+
+        <!--
+            RETIT instrumentation library.  No Java-agent required – the library JAR is a plain
+            compile-time dependency and exposes the RETITSpanProcessor that we register via CDI.
+            JNA is pulled in transitively and collects OS-level resource metrics.
+        -->
+        <!-- Apache 2.0 License -->
+        <dependency>
+            <groupId>io.retit</groupId>
+            <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>quarkus-rest-service-library</finalName>
+        <plugins>
+            <plugin>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>quarkus-maven-plugin</artifactId>
+                <version>${quarkus.platform.version}</version>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>build</goal>
+                            <goal>generate-code</goal>
+                            <goal>generate-code-tests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${compiler-plugin.version}</version>
+                <configuration>
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                    </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib.version}</version>
+                <configuration>
+                    <from>
+                        <image>${jdk21.base.container}</image>
+                    </from>
+                    <to>
+                        <image>quarkus-rest-service-library:${project.version}</image>
+                        <tags>
+                            <tag>feature</tag>
+                        </tags>
+                    </to>
+                    <extraDirectories>
+                        <paths>
+                            <path>
+                                <from>target/</from>
+                                <includes>${project.build.finalName}.jar</includes>
+                                <into>/app</into>
+                            </path>
+                        </paths>
+                    </extraDirectories>
+                    <containerizingMode>packaged</containerizingMode>
+                    <container>
+                        <!--
+                            No Java-agent needed.  The library is embedded in the uber-jar.
+                            Configure RETIT via environment variables:
+                              IO_RETIT_EMISSIONS_CLOUD_PROVIDER, IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION, etc.
+                        -->
+                        <entrypoint>java,-jar,/app/${project.build.finalName}.jar</entrypoint>
+                    </container>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Default profile: builds the container image using Docker -->
+        <profile>
+            <id>docker</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jib-docker-build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>dockerBuild</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Podman profile: builds a tar image and loads it into Podman -->
+        <profile>
+            <id>podman</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.google.cloud.tools</groupId>
+                        <artifactId>jib-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jib-tar-build</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>buildTar</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.6.3</version>
+                        <executions>
+                            <execution>
+                                <id>podman-load</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>podman</executable>
+                                    <arguments>
+                                        <argument>load</argument>
+                                        <argument>--input</argument>
+                                        <argument>${project.build.directory}/jib-image.tar</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>
+

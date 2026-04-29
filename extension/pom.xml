@@ -10,6 +10,18 @@
     </parent>
 
     <dependencies>
+        <!--
+            The library module contains all instrumentation logic.  The extension module only adds the
+            agent-specific auto-configuration customizer on top.  The library is shaded into the final
+            fat JAR by the maven-shade-plugin below.
+        -->
+        <dependency>
+            <groupId>io.retit</groupId>
+            <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
         <dependency>
             <groupId>io.opentelemetry</groupId>
@@ -23,6 +35,10 @@
             <version>${auto-service.version}</version>
             <scope>compile</scope>
         </dependency>
+        <!--
+            JNA is a transitive compile dependency coming through the library module.
+            Declaring it here explicitly ensures the shade filter below can address it.
+        -->
         <!--Java Native Access (JNA) is licensed under the LGPL, version 2.1 or later, or (from version 4.0 onward) the Apache License,version 2.0.-->
         <!-- https://github.com/java-native-access/jna/blob/master/LICENSE -->
         <dependency>
@@ -72,6 +88,19 @@
 
     <build>
         <finalName>io.retit.opentelemetry.javaagent.extension</finalName>
+        <!--
+            The ccf-coefficients resources live in the library module's source tree (extension/src/main/resources
+            is also the library's resource root).  Shading the library JAR already brings them into the fat JAR,
+            so we exclude them from the extension's own resource processing to avoid duplicates.
+        -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>ccf-coefficients/**</exclude>
+                </excludes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -89,12 +118,31 @@
                                     <exclude>io.opentelemetry:*</exclude>
                                     <exclude>com.google.auto.service:*</exclude>
                                 </excludes>
+                                <!-- Explicitly include the library so all instrumentation classes end up in the fat JAR -->
+                                <includes>
+                                    <include>io.retit:opentelemetry-java-agent-extension-cdi-library</include>
+                                    <include>net.java.dev.jna:*</include>
+                                </includes>
                             </artifactSet>
                             <filters>
                                 <filter>
                                     <artifact>net.java.dev.jna:*</artifact>
                                     <excludes>
                                         <exclude>META-INF/*</exclude>
+                                    </excludes>
+                                </filter>
+                                <!--
+                                    Exclude the CDI integration package and the beans.xml that accompany
+                                    it in the library JAR.  CDI APIs (jakarta.enterprise.*) require
+                                    Java 11+ and are not available inside a plain Java-agent context.
+                                    Keeping the extension JAR free of CDI references ensures it remains
+                                    Java 8 compatible for users that pass it via -Dotel.javaagent.extensions=…
+                                -->
+                                <filter>
+                                    <artifact>io.retit:opentelemetry-java-agent-extension-cdi-library</artifact>
+                                    <excludes>
+                                        <exclude>io/retit/opentelemetry/javaagent/extension/cdi/**</exclude>
+                                        <exclude>META-INF/beans.xml</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -110,6 +158,13 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+                    <!--
+                        Only compile the agent-specific customizer.  All other classes are provided by
+                        the library dependency and will be shaded into the final JAR below.
+                    -->
+                    <includes>
+                        <include>io/retit/opentelemetry/javaagent/extension/OpenTelemetryCustomizer.java</include>
+                    </includes>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>com.google.auto.service</groupId>

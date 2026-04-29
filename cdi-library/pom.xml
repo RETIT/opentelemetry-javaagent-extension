@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!--
+   Copyright 2024 RETIT GmbH
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
+    <description>
+        Library module that provides the RETIT OpenTelemetry instrumentation logic (SpanProcessor, emissions
+        calculations, resource demand collectors) as a plain JAR dependency.  Frameworks such as Quarkus that ship
+        their own OpenTelemetry support can depend on this artifact instead of using the Java-agent extension JAR.
+    </description>
+
+    <parent>
+        <groupId>io.retit</groupId>
+        <artifactId>opentelemetry-javaagent-extension</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <!--
+            OpenTelemetry SDK is provided by the host framework (e.g. quarkus-opentelemetry) or by the
+            Java-agent at runtime.  We only need it on the compile classpath for compilation.
+        -->
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--
+            Jakarta CDI API â€“ used to provide the zero-boilerplate RETITSpanProcessorConfiguration
+            CDI producer bean that frameworks such as Quarkus auto-discover from this JAR.
+            The API is always provided by the host framework at runtime; we only need it for
+            compilation and it must never be bundled in the JAR.
+        -->
+        <!-- Apache 2.0 License https://github.com/jakartaee/cdi/blob/main/LICENSE -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>4.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!--Java Native Access (JNA) is licensed under the LGPL, version 2.1 or later, or (from version 4.0 onward) the Apache License, version 2.0.-->
+        <!-- https://github.com/java-native-access/jna/blob/master/LICENSE -->
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+        </dependency>
+
+        <!-- Test Dependencies -->
+
+        <!-- EPL v2.0 https://github.com/junit-team/junit5/blob/main/LICENSE.md -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- MIT License https://github.com/mockito/mockito?tab=MIT-1-ov-file -->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-sdk-testing</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <!--
+            Instead of duplicating source files, the library module points directly at the extension
+            module's source tree.  Only OpenTelemetryCustomizer.java (the agent-entry-point) is excluded
+            because that class requires the autoconfigure-spi which is agent-specific.
+        -->
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-extension-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/../extension/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-extension-resources</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}/../extension/src/main/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.15.0</version>
+                <configuration>
+                    <source>8</source>
+                    <target>8</target>
+                    <!--
+                        Exclude the agent-specific customizer.  Everything else in the extension source
+                        tree becomes part of this library.
+                    -->
+                    <excludes>
+                        <exclude>io/retit/opentelemetry/javaagent/extension/OpenTelemetryCustomizer.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.5</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*IntegrationTest.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+
