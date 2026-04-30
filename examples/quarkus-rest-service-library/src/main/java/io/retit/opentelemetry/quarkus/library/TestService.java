@@ -49,11 +49,14 @@ public class TestService {
             throws InterruptedException, IOException {
         ResourceDemandMeasurementService.Measurement measurement = resourceDemandMeasurementService.measure();
         Path tempFile = Files.createTempFile("sampleapplication", "veryComplexBusinessFunction");
-        int[] data = naiveSortingWithONSquareComplexity(generateRandomInputArray(size));
-        Files.write(tempFile, String.valueOf(data).getBytes(StandardCharsets.UTF_8));
-        Files.delete(tempFile);
-        resourceDemandMeasurementService.measureAndPublishMetrics(measurement, httpMethod);
-        return String.valueOf(Arrays.stream(data).sum());
+        try {
+            int[] data = naiveSortingWithONSquareComplexity(generateRandomInputArray(size));
+            Files.write(tempFile, String.valueOf(data).getBytes(StandardCharsets.UTF_8));
+            resourceDemandMeasurementService.measureAndPublishMetrics(measurement, httpMethod);
+            return String.valueOf(Arrays.stream(data).sum());
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
     }
 
     private static int[] generateRandomInputArray(final int size) throws InterruptedException {
