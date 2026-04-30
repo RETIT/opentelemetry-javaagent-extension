@@ -115,13 +115,6 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
-                    <!--
-                        Only compile the agent-specific customizer.  All other classes are provided by
-                        the library dependency and will be shaded into the final JAR below.
-                    -->
-                    <includes>
-                        <include>io/retit/opentelemetry/javaagent/extension/OpenTelemetryCustomizer.java</include>
-                    </includes>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>com.google.auto.service</groupId>
