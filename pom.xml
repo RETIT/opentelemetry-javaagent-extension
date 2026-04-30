@@ -167,24 +167,24 @@
                     -->
                     <licenseUrlReplacements>
                         <licenseUrlReplacement>
-                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/lgpl-2\.1.*</licenseUrlRegex>
-                            <licenseUrlReplacement>https://spdx.org/licenses/LGPL-2.1-only.html</licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/lgpl-2\.1.*</regexp>
+                            <replacement>https://spdx.org/licenses/LGPL-2.1-only.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
-                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/lgpl.*</licenseUrlRegex>
-                            <licenseUrlReplacement>https://spdx.org/licenses/LGPL-2.1-or-later.html</licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/lgpl.*</regexp>
+                            <replacement>https://spdx.org/licenses/LGPL-2.1-or-later.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
-                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/gpl-2\.0.*</licenseUrlRegex>
-                            <licenseUrlReplacement>https://spdx.org/licenses/GPL-2.0-only.html</licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/gpl-2\.0.*</regexp>
+                            <replacement>https://spdx.org/licenses/GPL-2.0-only.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
-                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/gpl-3\.0.*</licenseUrlRegex>
-                            <licenseUrlReplacement>https://spdx.org/licenses/GPL-3.0-only.html</licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/gpl-3\.0.*</regexp>
+                            <replacement>https://spdx.org/licenses/GPL-3.0-only.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
-                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/agpl-3\.0.*</licenseUrlRegex>
-                            <licenseUrlReplacement>https://spdx.org/licenses/AGPL-3.0-only.html</licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/agpl-3\.0.*</regexp>
+                            <replacement>https://spdx.org/licenses/AGPL-3.0-only.html</replacement>
                         </licenseUrlReplacement>
                     </licenseUrlReplacements>
                 </configuration>
