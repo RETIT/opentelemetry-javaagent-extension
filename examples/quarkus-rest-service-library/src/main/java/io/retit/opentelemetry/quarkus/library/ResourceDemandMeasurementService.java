@@ -35,45 +35,6 @@ public class ResourceDemandMeasurementService {
     private OpenTelemetryService otelService;
 
     /**
-     * Snapshot of thread-level metrics.
-     */
-    public static final class Measurement {
-
-        private final long cpuTime;
-
-        private final long bytes;
-
-        /**
-         * Creates a new resource-demand snapshot.
-         *
-         * @param cpuTime thread CPU time in nanoseconds.
-         * @param bytes   heap bytes allocated by thread.
-         */
-        public Measurement(final long cpuTime, final long bytes) {
-            this.cpuTime = cpuTime;
-            this.bytes = bytes;
-        }
-
-        /**
-         * Returns the CPU time captured in this snapshot.
-         *
-         * @return CPU time in nanoseconds.
-         */
-        public long getCpuTime() {
-            return cpuTime;
-        }
-
-        /**
-         * Returns the heap allocation captured in this snapshot.
-         *
-         * @return bytes allocated.
-         */
-        public long getBytes() {
-            return bytes;
-        }
-    }
-
-    /**
      * Returns the CPU time of the current thread.
      *
      * @return CPU time in nanoseconds.
@@ -118,5 +79,44 @@ public class ResourceDemandMeasurementService {
                 (endMeasurement.getBytes() - startMeasurement.getBytes()) / 1_000, attributes);
         otelService.publishCallCountMetric(attributes);
         return attributes;
+    }
+
+    /**
+     * Snapshot of thread-level metrics.
+     */
+    public static final class Measurement {
+
+        private final long cpuTime;
+
+        private final long bytes;
+
+        /**
+         * Creates a new resource-demand snapshot.
+         *
+         * @param cpuTime thread CPU time in nanoseconds.
+         * @param bytes   heap bytes allocated by thread.
+         */
+        public Measurement(final long cpuTime, final long bytes) {
+            this.cpuTime = cpuTime;
+            this.bytes = bytes;
+        }
+
+        /**
+         * Returns the CPU time captured in this snapshot.
+         *
+         * @return CPU time in nanoseconds.
+         */
+        public long getCpuTime() {
+            return cpuTime;
+        }
+
+        /**
+         * Returns the heap allocation captured in this snapshot.
+         *
+         * @return bytes allocated.
+         */
+        public long getBytes() {
+            return bytes;
+        }
     }
 }
