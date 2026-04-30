@@ -43,7 +43,7 @@
         </dependency>
 
         <!--
-            Jakarta CDI API â€“ used to provide the zero-boilerplate RETITSpanProcessorConfiguration
+            Jakarta CDI API – used to provide the zero-boilerplate RETITSpanProcessorConfiguration
             CDI producer bean that frameworks such as Quarkus auto-discover from this JAR.
             The API is always provided by the host framework at runtime; we only need it for
             compilation and it must never be bundled in the JAR.
