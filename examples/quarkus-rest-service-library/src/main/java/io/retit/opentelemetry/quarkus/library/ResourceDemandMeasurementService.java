@@ -26,7 +26,7 @@ import java.lang.management.ThreadMXBean;
 
 /**
  * Measures CPU and memory resource demand of the current thread and publishes the results
- * as OpenTelemetry metrics via {@link OpenTelemetryServiceOld}.
+ * as OpenTelemetry metrics via {@link OpenTelemetryService}.
  */
 @ApplicationScoped
 public class ResourceDemandMeasurementService {
