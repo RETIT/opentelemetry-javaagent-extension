@@ -160,6 +160,33 @@
                     <socketTimeout>1000</socketTimeout>
                     <connectionRequestTimeout>1000</connectionRequestTimeout>
                     <errorRemedy>ignore</errorRemedy>
+                    <!--
+                        gnu.org is frequently unreachable (blocked by firewalls, rate-limited, etc.).
+                        Redirect all gnu.org license URLs to the equivalent SPDX pages before any
+                        HTTP request is attempted, so the plugin never tries to contact gnu.org at all.
+                    -->
+                    <licenseUrlReplacements>
+                        <licenseUrlReplacement>
+                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/lgpl-2\.1.*</licenseUrlRegex>
+                            <licenseUrlReplacement>https://spdx.org/licenses/LGPL-2.1-only.html</licenseUrlReplacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/lgpl.*</licenseUrlRegex>
+                            <licenseUrlReplacement>https://spdx.org/licenses/LGPL-2.1-or-later.html</licenseUrlReplacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/gpl-2\.0.*</licenseUrlRegex>
+                            <licenseUrlReplacement>https://spdx.org/licenses/GPL-2.0-only.html</licenseUrlReplacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/gpl-3\.0.*</licenseUrlRegex>
+                            <licenseUrlReplacement>https://spdx.org/licenses/GPL-3.0-only.html</licenseUrlReplacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <licenseUrlRegex>https?://www\.gnu\.org/licenses/agpl-3\.0.*</licenseUrlRegex>
+                            <licenseUrlReplacement>https://spdx.org/licenses/AGPL-3.0-only.html</licenseUrlReplacement>
+                        </licenseUrlReplacement>
+                    </licenseUrlReplacements>
                 </configuration>
                 <executions>
                     <execution>
