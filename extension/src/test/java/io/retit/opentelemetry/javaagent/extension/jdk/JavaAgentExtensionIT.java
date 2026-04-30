@@ -19,19 +19,13 @@ package io.retit.opentelemetry.javaagent.extension.jdk;
 import io.retit.opentelemetry.javaagent.extension.common.ContainerLogMetricAndSpanExtractingTest;
 import io.retit.opentelemetry.javaagent.extension.common.MetricDemand;
 import io.retit.opentelemetry.javaagent.extension.common.SpanDemand;
-import io.retit.opentelemetry.javaagent.extension.commons.Constants;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
