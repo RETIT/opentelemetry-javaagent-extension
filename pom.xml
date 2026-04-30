@@ -14,6 +14,7 @@
     </properties>
 
     <modules>
+        <module>core</module>
         <module>cdi-library</module>
         <module>extension</module>
         <module>examples</module>

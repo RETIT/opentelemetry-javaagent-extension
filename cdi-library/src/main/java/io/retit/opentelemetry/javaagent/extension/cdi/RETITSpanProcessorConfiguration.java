@@ -23,6 +23,8 @@ import io.retit.opentelemetry.javaagent.extension.resources.jvm.JavaAgentGCHandl
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.inject.Produces;
 
+import java.util.logging.Logger;
+
 /**
  * CDI configuration class that integrates the RETIT OpenTelemetry instrumentation library into
  * any CDI-capable framework (Quarkus, WildFly, Payara, …) <em>without</em> requiring the Java agent.
@@ -50,6 +52,7 @@ import jakarta.enterprise.inject.Produces;
  */
 @ApplicationScoped
 public class RETITSpanProcessorConfiguration {
+    private static final Logger LOGGER = Logger.getLogger(RETITSpanProcessorConfiguration.class.getName());
 
     /**
      * Produces the {@link RETITSpanProcessor} as an application-scoped CDI bean.
@@ -71,6 +74,8 @@ public class RETITSpanProcessorConfiguration {
         if (InstanceConfiguration.isLogGCEventDefaultTrue()) {
             JavaAgentGCHandler.addJavaAgentGCListener();
         }
+        LOGGER.info("Adding RETITSpanProcessor as CDI Bean");
+
         return new RETITSpanProcessor();
     }
 }

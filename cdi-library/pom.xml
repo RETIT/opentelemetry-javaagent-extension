@@ -20,7 +20,7 @@
     <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
     <description>
         Library module that provides the RETIT OpenTelemetry instrumentation logic (SpanProcessor, emissions
-        calculations, resource demand collectors) as a plain JAR dependency.  Frameworks such as Quarkus that ship
+        calculations, resource demand collectors) as a plain JAR dependency. Frameworks such as Quarkus that ship
         their own OpenTelemetry support can depend on this artifact instead of using the Java-agent extension JAR.
     </description>
 
@@ -31,6 +31,12 @@
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>io.retit</groupId>
+            <artifactId>core</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
         <!--
             OpenTelemetry SDK is provided by the host framework (e.g. quarkus-opentelemetry) or by the
             Java-agent at runtime.  We only need it on the compile classpath for compilation.
@@ -86,45 +92,7 @@
     </dependencies>
 
     <build>
-        <!--
-            Instead of duplicating source files, the library module points directly at the extension
-            module's source tree.  Only OpenTelemetryCustomizer.java (the agent-entry-point) is excluded
-            because that class requires the autoconfigure-spi which is agent-specific.
-        -->
         <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
-                    <execution>
-                        <id>add-extension-sources</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>add-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${project.basedir}/../extension/src/main/java</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>add-extension-resources</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>add-resource</goal>
-                        </goals>
-                        <configuration>
-                            <resources>
-                                <resource>
-                                    <directory>${project.basedir}/../extension/src/main/resources</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -133,13 +101,6 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
-                    <!--
-                        Exclude the agent-specific customizer.  Everything else in the extension source
-                        tree becomes part of this library.
-                    -->
-                    <excludes>
-                        <exclude>io/retit/opentelemetry/javaagent/extension/OpenTelemetryCustomizer.java</exclude>
-                    </excludes>
                 </configuration>
             </plugin>
 
