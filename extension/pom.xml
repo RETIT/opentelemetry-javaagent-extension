@@ -16,12 +16,6 @@
             <version>${project.version}</version>
         </dependency>
 
-        <!-- Apache 2.0 License https://github.com/open-telemetry/opentelemetry-java/blob/main/LICENSE -->
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-sdk-extension-autoconfigure-spi</artifactId>
-            <scope>compile</scope>
-        </dependency>
         <!-- Apache 2.0 License https://github.com/google/auto/blob/main/service/README.md -->
         <dependency>
             <groupId>com.google.auto.service</groupId>
@@ -29,13 +23,6 @@
             <version>${auto-service.version}</version>
             <scope>compile</scope>
         </dependency>
-        <!--Java Native Access (JNA) is licensed under the LGPL, version 2.1 or later, or (from version 4.0 onward) the Apache License,version 2.0.-->
-        <!-- https://github.com/java-native-access/jna/blob/master/LICENSE -->
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
-        </dependency>
-
         <!-- Test Dependencies -->
 
         <!-- EPL v2.0 https://github.com/junit-team/junit5/blob/main/LICENSE.md -->
