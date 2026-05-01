@@ -18,7 +18,24 @@ Furthermore, the extension follows the [Methodology](https://www.cloudcarbonfoot
 
 *Figure 2: The OpenTelemetry Java-Agent Extension follows the methodology published by the Cloud Carbon Footprint (CCF) project to calculate software energy consumption and carbon emissions based on the collected data*
 
-# Quickstart
+# Two Ways to Integrate
+
+This project provides **two integration modes** — pick the one that fits your application:
+
+| | Java Agent Extension | CDI Library |
+|---|---|---|
+| **Packaging** | Separate JAR attached via `-javaagent` | Plain compile dependency |
+| **OTel SDK lifecycle** | Managed by the OpenTelemetry Java agent | Managed by your framework (e.g. `quarkus-opentelemetry`) |
+| **Startup** | Requires `-javaagent` and `-Dotel.javaagent.extensions` JVM flags | No JVM flags needed |
+| **Quarkus native image** | Not supported | Supported |
+| **Compatible runtimes** | Any JVM application | Any CDI 3.0+ runtime (Quarkus, WildFly, Open Liberty, …) |
+| **Configuration** | System properties / environment variables | Environment variables or `application.properties` forwarded via CDI |
+
+## Option 1 — Java Agent Extension (recommended for non-CDI apps)
+
+Suitable for any JVM application where you can pass JVM flags. The OpenTelemetry Java agent handles all instrumentation; this extension is loaded as a plugin.
+
+### Quickstart (Java Agent Extension)
 
 In order to use the extension with your app you need to [download the latest version](https://github.com/RETIT/opentelemetry-javaagent-extension/releases) and attach it to the start command using the -Dotel.javaagent.extensions parameter along with the [OpenTelemetry Java Auto-Instrumentation agent](https://github.com/open-telemetry/opentelemetry-java-instrumentation/blob/main/README.md#getting-started):
 
@@ -39,6 +56,53 @@ java -javaagent:<replace_with_path>/opentelemetry-javaagent-all.jar \
 -jar <your_app>.jar
 ```
 
+## Option 2 — CDI Library (recommended for Quarkus, WildFly, and other CDI runtimes)
+
+If your application already runs inside a CDI container (e.g. Quarkus with `quarkus-opentelemetry`, WildFly, or Open Liberty), you can add the `opentelemetry-java-agent-extension-cdi-library` as a regular Maven dependency instead of using a Java agent. The library ships a `META-INF/beans.xml` so that any CDI 3.0+ container **auto-discovers** the `RETITSpanProcessorConfiguration` producer bean, which registers the `RETITSpanProcessor` into the existing OTel SDK pipeline — no boilerplate required in your application code.
+
+### CDI Library Quick Start
+
+**1. Add the dependency** (published to [GitHub Packages](https://github.com/RETIT/opentelemetry-javaagent-extension/packages)):
+
+```xml
+<dependency>
+    <groupId>io.retit</groupId>
+    <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
+    <version><!-- latest release tag --></version>
+</dependency>
+```
+
+For Quarkus, `quarkus-opentelemetry` must also be present (usually already in a Quarkus project):
+
+```xml
+<dependency>
+    <groupId>io.quarkus</groupId>
+    <artifactId>quarkus-opentelemetry</artifactId>
+</dependency>
+```
+
+**2. Configure** via environment variables (same options as the agent, see [Configuration Options](#configuration-options)):
+
+```bash
+IO_RETIT_EMISSIONS_CLOUD_PROVIDER=AWS
+IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION=eu-central-1
+IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE=m5.large
+```
+
+Or in `application.properties` — Quarkus forwards matching `io.retit.*` properties to `System.setProperty()` automatically via the library's built-in CDI bridge:
+
+```properties
+io.retit.emissions.cloud.provider=AWS
+io.retit.emissions.cloud.provider.region=eu-central-1
+io.retit.emissions.cloud.provider.instance.type=m5.large
+```
+
+**3. That's it** — no `-javaagent` flag, no custom configuration class. Every span automatically carries resource-demand attributes and top-level transaction spans are published as OpenTelemetry metrics for SCI/carbon calculations.
+
+See the [quarkus-rest-service-library example](examples/quarkus-rest-service-library/README.md) for a complete working example including Docker image build and integration tests.
+
+---
+
 # Building the project
 
 In order to build the project from source, you need to have JDK 21 or higher installed. To build the whole project including the examples you need to run the following maven command from the top level of this project:
@@ -53,9 +117,9 @@ For examples on how to use this project for different application types, please 
 
 In the [examples](examples/README.md) directory you will find examples for different scenarios in which you can use this this extension, for example:
 
-| In a simple [JDK8-based application](examples/simple-jdk8-application/README.md) | In a simple [JDK21-based application](examples/simple-jdk21-application/README.md) | In a [Quarkus-based REST service](examples/quarkus-rest-service/README.md) | In a [Spring-based REST service](examples/spring-rest-service/README.md) |
-|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------|
-| <img src="/img/jdk8_dashboard.png" width="250" />                                | <img src="/img/jdk21_dashboard.png" width="275" />                                 | <img src="/img/quarkus_dashboard.png" width="260" />                       | <img src="/img/spring_dashboard.png" width="280" />                      |
+| In a simple [JDK8-based application](examples/simple-jdk8-application/README.md) | In a simple [JDK21-based application](examples/simple-jdk21-application/README.md) | In a [Quarkus-based REST service](examples/quarkus-rest-service/README.md) | In a [Spring-based REST service](examples/spring-rest-service/README.md) | In a [Quarkus REST service using the CDI library](examples/quarkus-rest-service-library/README.md) (no Java agent) |
+|----------------------------------------------------------------------------------|------------------------------------------------------------------------------------|----------------------------------------------------------------------------|--------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------|
+| <img src="/img/jdk8_dashboard.png" width="250" />                                | <img src="/img/jdk21_dashboard.png" width="275" />                                 | <img src="/img/quarkus_dashboard.png" width="260" />                       | <img src="/img/spring_dashboard.png" width="280" />                      | <img src="/img/quarkus_dashboard.png" width="260" />                                                                |
 
 
 # Configuration Options
