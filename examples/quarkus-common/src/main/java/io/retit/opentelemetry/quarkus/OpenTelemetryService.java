@@ -1,11 +1,10 @@
 package io.retit.opentelemetry.quarkus;
 
-import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.common.Attributes;
 import io.opentelemetry.api.metrics.LongCounter;
 import io.opentelemetry.api.metrics.Meter;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
 
 /**
  * This service is used to publish resource demand and CO2 emission data as OpenTelemetry metrics.
@@ -17,9 +16,8 @@ public class OpenTelemetryService {
     private final LongCounter memoryDemandCounter;
     private final LongCounter callCountCounter;
 
-    @Inject
-    OpenTelemetryService(final OpenTelemetry openTelemetry) {
-        Meter meter = openTelemetry.meterBuilder("instrumentation-library-name")
+    OpenTelemetryService() {
+        Meter meter = GlobalOpenTelemetry.get().meterBuilder("instrumentation-library-name")
                 .setInstrumentationVersion("1.0.0")
                 .build();
 
