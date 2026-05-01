@@ -75,7 +75,7 @@ public class RETITSpanProcessorConfiguration {
      * @return a configured {@link RETITSpanProcessor} instance.
      */
     @Produces
-    @Dependent // important so that this bean is not proxied as instanceof ExtendedSpanProcessor checks are not working otherwiseo
+    @Dependent // important so that this bean is not proxied as instanceof ExtendedSpanProcessor checks are not working otherwise
     public SpanProcessor retitSpanProcessor() {
         for (String name : config.getPropertyNames()) {
             if (name.startsWith("io.retit.")) {
