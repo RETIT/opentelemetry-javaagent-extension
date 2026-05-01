@@ -31,8 +31,10 @@ jobs:
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
         run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT --file ./extension/pom.xml
-      - name: Deploy to GitHub Packages
-        run: mvn -B deploy -DskipTests --file pom.xml
+      - name: Deploy core and cdi-library to GitHub Packages
+        run: |
+          mvn -B deploy -DskipTests -N --file pom.xml
+          mvn -B deploy -DskipTests -pl core,cdi-library --file pom.xml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release and Upload Artifact

@@ -30,7 +30,7 @@ instrumentation library** without a Java agent.
 <dependency>
     <groupId>io.retit</groupId>
     <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version><!-- latest release tag --></version>
 </dependency>
 ```
 
@@ -85,8 +85,7 @@ java -jar target/quarkus-rest-service-library.jar
 
 ## Testing
 
-The integration test `io.retit.opentelemetry.javaagent.extension.frameworks.quarkus.QuarkusWithInternalOtelSupportAndCDILibraryIT` (in the `extension` module) builds a Docker image
-of this service and verifies that:
+The integration test `io.retit.opentelemetry.javaagent.extension.frameworks.quarkus.QuarkusWithInternalOtelSupportAndCDILibraryIT` (in the `extension` module) uses a Container image of this service and verifies that:
 
 - The three REST endpoints (`/test-rest-endpoint/getData`, `/postData`, `/deleteData`) return
   HTTP 200.

@@ -7,6 +7,7 @@ import jakarta.inject.Inject;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
+import java.util.logging.Logger;
 
 /**
  * This service can be used to measure the CPU and memory resource demands of a service.
@@ -14,17 +15,35 @@ import java.lang.management.ThreadMXBean;
 @ApplicationScoped
 public class ResourceDemandMeasurementService {
 
+    private static final Logger LOGGER = Logger.getLogger(ResourceDemandMeasurementService.class.getName());
+    private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
+
+    static {
+        if (THREAD_MX_BEAN.isThreadCpuTimeSupported()) {
+            if (!THREAD_MX_BEAN.isThreadCpuTimeEnabled()) {
+                THREAD_MX_BEAN.setThreadCpuTimeEnabled(true);
+                LOGGER.info("Thread CPU time measurement enabled.");
+            }
+        } else {
+            LOGGER.warning("Thread CPU time measurement is not supported by this JVM. CPU demand metrics will be 0.");
+        }
+    }
+
     @Inject
     private OpenTelemetryService otelService;
 
     /**
      * Returns the total CPU time used by the current thread since its creation.
+     * Returns 0 if thread CPU time measurement is not supported or not enabled.
      *
-     * @return - the total CPU time of the current thread in nanoseconds.
+     * @return - the total CPU time of the current thread in nanoseconds, or 0 if unavailable.
      */
     protected long getCurrentThreadCpuTime() {
-        ThreadMXBean mxBean = ManagementFactory.getThreadMXBean();
-        return mxBean.getCurrentThreadCpuTime();
+        if (!THREAD_MX_BEAN.isThreadCpuTimeSupported() || !THREAD_MX_BEAN.isThreadCpuTimeEnabled()) {
+            return 0L;
+        }
+        long cpuTime = THREAD_MX_BEAN.getCurrentThreadCpuTime();
+        return cpuTime == -1 ? 0L : cpuTime;
     }
 
     /**
