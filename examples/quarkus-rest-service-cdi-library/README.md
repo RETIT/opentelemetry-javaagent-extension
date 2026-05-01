@@ -61,6 +61,10 @@ instrumentation library** without a Java agent.
 ```properties
 quarkus.otel.exporter.otlp.endpoint=http://otelcol:4317
 quarkus.otel.metrics.enabled=true
+
+io.retit.emissions.cloud.provider=AWS
+io.retit.emissions.cloud.provider.region=eu-central-1
+io.retit.emissions.cloud.provider.instance.type=m5.large
 ```
 
 ### 4. That's it!
@@ -76,16 +80,12 @@ transaction spans are published as OpenTelemetry metrics for SCI/carbon calculat
 mvn package
 
 # Run locally (without container)
-java \
-  -Dio.retit.emissions.cloud.provider=AWS \
-  -Dio.retit.emissions.cloud.provider.region=eu-central-1 \
-  -Dio.retit.emissions.cloud.provider.instance.type=m5.large \
-  -jar target/quarkus-rest-service-library.jar
+java -jar target/quarkus-rest-service-library.jar
 ```
 
 ## Testing
 
-The integration test `QuarkusWithLibraryIT` (in the `extension` module) builds a Docker image
+The integration test `io.retit.opentelemetry.javaagent.extension.frameworks.quarkus.QuarkusWithInternalOtelSupportAndCDILibraryIT` (in the `extension` module) builds a Docker image
 of this service and verifies that:
 
 - The three REST endpoints (`/test-rest-endpoint/getData`, `/postData`, `/deleteData`) return
@@ -95,6 +95,6 @@ of this service and verifies that:
 
 ```bash
 # From the project root – runs unit and integration tests for the extension module
-mvn verify -pl extension -Dtest=QuarkusWithLibraryIT
+mvn verify -pl extension -Dtest=QuarkusWithInternalOtelSupportAndCDILibraryIT
 ```
 
