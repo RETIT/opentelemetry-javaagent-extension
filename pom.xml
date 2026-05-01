@@ -180,7 +180,11 @@
                             <replacement>https://spdx.org/licenses/LGPL-2.1-only.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
-                            <regexp>https?://www\.gnu\.org/licenses/lgpl.*</regexp>
+                            <regexp>https?://www\.gnu\.org/licenses/(lgpl-3\.0.*|lgpl\.html)</regexp>
+                            <replacement>https://spdx.org/licenses/LGPL-3.0-only.html</replacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/lgpl(?:-[12]\..*)?</regexp>
                             <replacement>https://spdx.org/licenses/LGPL-2.1-or-later.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
