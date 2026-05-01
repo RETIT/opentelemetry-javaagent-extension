@@ -29,7 +29,7 @@ instrumentation library** without a Java agent.
 ```xml
 <dependency>
     <groupId>io.retit</groupId>
-    <artifactId>opentelemetry-java-agent-extension-library</artifactId>
+    <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 </dependency>
 ```
