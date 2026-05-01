@@ -91,13 +91,6 @@
 
     </dependencyManagement>
 
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub RETIT Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/RETIT/opentelemetry-javaagent-extension</url>
-        </repository>
-    </distributionManagement>
 
     <build>
         <plugins>

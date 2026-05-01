@@ -1,0 +1,6 @@
+jdk:
+  - openjdk21
+build:
+  commands:
+    - mvn -B install -DskipTests -pl core,cdi-library -am
+
