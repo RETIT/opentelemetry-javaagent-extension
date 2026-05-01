@@ -74,6 +74,12 @@
             <artifactId>quarkus-opentelemetry</artifactId>
         </dependency>
 
+        <!-- required for the integration tests -->
+        <dependency>
+            <groupId>io.opentelemetry</groupId>
+            <artifactId>opentelemetry-exporter-logging</artifactId>
+        </dependency>
+        
         <!--
             RETIT instrumentation library.  No Java-agent required – the library JAR is a plain
             compile-time dependency and exposes the RETITSpanProcessor that we register via CDI.
