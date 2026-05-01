@@ -2,11 +2,8 @@ package io.retit.opentelemetry.javaagent.extension.frameworks;
 
 import io.restassured.RestAssured;
 import io.retit.opentelemetry.javaagent.extension.common.ContainerLogMetricAndSpanExtractingTest;
-import io.retit.opentelemetry.javaagent.extension.common.SpanDemand;
 import org.junit.jupiter.api.Assertions;
 import org.testcontainers.containers.GenericContainer;
-
-import java.util.List;
 
 public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest {
 
@@ -25,9 +22,9 @@ public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest
      * via CDI and Quarkus' own OpenTelemetry extension manages the SDK lifecycle.  Both traces
      * and metrics are exported to the console so that the log parser can verify them.</p>
      *
-     * @param containerName  Docker image name (e.g. {@code quarkus-rest-service-library:feature}).
-     * @param serviceName    OTel service.name resource attribute.
-     * @param portToExpose   HTTP port exposed by the container.
+     * @param containerName Docker image name (e.g. {@code quarkus-rest-service-library:feature}).
+     * @param serviceName   OTel service.name resource attribute.
+     * @param portToExpose  HTTP port exposed by the container.
      */
     protected void commonSetupForLibrary(final String containerName, final String serviceName, final int portToExpose) {
         applicationContainer = new GenericContainer<>(containerName)
@@ -77,11 +74,6 @@ public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest
             applicationContainer = applicationContainer
                     .withEnv("QUARKUS_OTEL_ENABLED", "false") // disable quarkus internal OpenTelemetry Support as we are using the agent
                     .withEnv("JAVA_TOOL_OPTIONS", "-javaagent:/otel/opentelemetry-javaagent.jar -Dotel.javaagent.extensions=/otel/io.retit.opentelemetry.javaagent.extension.jar");
-        } else {
-            applicationContainer = applicationContainer
-                    .withEnv("QUARKUS_OTEL_ENABLED", "true") // enable quarkus internal OpenTelemetry Support
-                    .withEnv("QUARKUS_OTEL_SIMPLE", "true") // send telemetry right away
-                    .withEnv("JAVA_TOOL_OPTIONS", "-Dotel.javaagent.extensions=/otel/io.retit.opentelemetry.javaagent.extension.jar");
         }
         executeContainer(portToExpose);
     }
@@ -99,7 +91,7 @@ public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest
         int testRestEndpointCount = 0;
         for (String spanName : spanDemands.keySet()) {
             System.out.println(spanName);
-            if(spanName.contains(CONTEXT_ROOT)) {
+            if (spanName.contains(CONTEXT_ROOT)) {
                 testRestEndpointCount++;
             }
         }
