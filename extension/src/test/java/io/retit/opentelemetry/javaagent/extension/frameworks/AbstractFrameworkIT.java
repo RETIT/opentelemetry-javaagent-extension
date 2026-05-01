@@ -4,7 +4,6 @@ import io.restassured.RestAssured;
 import io.retit.opentelemetry.javaagent.extension.common.ContainerLogMetricAndSpanExtractingTest;
 import org.junit.jupiter.api.Assertions;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 
 public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest {
 
