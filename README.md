@@ -99,7 +99,7 @@ io.retit.emissions.cloud.provider.instance.type=m5.large
 
 **3. That's it** — no `-javaagent` flag, no custom configuration class. Every span automatically carries resource-demand attributes and top-level transaction spans are published as OpenTelemetry metrics for SCI/carbon calculations.
 
-See the [quarkus-rest-service-library example](examples/quarkus-rest-service-library/README.md) for a complete working example including Docker image build and integration tests.
+See the [quarkus-rest-service-cdi-library example](examples/quarkus-rest-service-cdi-library/README.md) for a complete working example including Docker image build and integration tests.
 
 ---
 
