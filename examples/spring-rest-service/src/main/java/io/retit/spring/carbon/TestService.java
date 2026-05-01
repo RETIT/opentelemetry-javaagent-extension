@@ -15,6 +15,12 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service
 public class TestService {
 
+    /**
+     * Executes an artificial workload.
+     *
+     * @param size workload size used to create and sort the random array
+     * @return the sum of the sorted random data
+     */
     public String veryComplexBusinessFunction(final int size) throws IOException {
 
         Path tempFile = Files.createTempFile("sampleapplication", "veryComplexBusinessFunction");
@@ -28,7 +34,7 @@ public class TestService {
     }
 
     private static int[] generateRandomInputArray(final int size) {
-        int array[] = new int[size];
+        int[] array = new int[size];
 
         for (int i = 0; i < size; i++) {
             array[i] = ThreadLocalRandom.current().nextInt(0, size * 10);

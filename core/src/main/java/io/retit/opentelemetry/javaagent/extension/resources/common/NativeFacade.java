@@ -58,12 +58,11 @@ public class NativeFacade {
 
             WindowsKernel32Library.INSTANCE.GetThreadTimes(threadHandle, lpCreationTime, lpExitTime, lpKernelTime, lpUserTime);
 
+            // All times are expressed using FILETIME data structures.
+            // Such a structure contains two 32-bit values that combine to form a 64-bit
+            // count of 100-nanosecond time units.
+            // https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadtimes
             long cpuTime = lpKernelTime.toDWordLong().longValue() + lpUserTime.toDWordLong().longValue();
-            /**
-             * All times are expressed using FILETIME data structures.
-             * Such a structure contains two 32-bit values that combine to form a 64-bit count of 100-nanosecond time units.
-             * https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-getthreadtimes
-             */
             return cpuTime * 100;
         } else if (Platform.isLinux()) {
             return getTotalClockTime(LinuxCLibrary.INSTANCE, LinuxCLibrary.CLOCK_THREAD_CPUTIME_ID);
@@ -77,6 +76,6 @@ public class NativeFacade {
     private static long getTotalClockTime(final CLibrary cLibrary, final int clockId) {
         CLibrary.TimeSpec timeSpecBefore = new CLibrary.TimeSpec();
         cLibrary.clock_gettime(clockId, timeSpecBefore);
-        return (timeSpecBefore.tv_sec.longValue() * 1_000_000_000l) + timeSpecBefore.tv_nsec;
+        return (timeSpecBefore.tv_sec.longValue() * 1_000_000_000L) + timeSpecBefore.tv_nsec;
     }
 }

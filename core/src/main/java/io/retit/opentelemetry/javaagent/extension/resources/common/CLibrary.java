@@ -21,9 +21,19 @@ public interface CLibrary extends Library {
      */
     int clock_gettime(int clockid, TimeSpec tp);
 
+    /**
+     * Native timespec structure as used by clock_gettime.
+     */
     @Structure.FieldOrder({"tv_sec", "tv_nsec"})
     class TimeSpec extends Structure {
-        public NativeLong tv_sec; // seconds
-        public int tv_nsec; // nanoseconds
+        /**
+         * Seconds part of the timestamp.
+         */
+        public NativeLong tv_sec;
+
+        /**
+         * Nanoseconds part of the timestamp.
+         */
+        public int tv_nsec;
     }
 }

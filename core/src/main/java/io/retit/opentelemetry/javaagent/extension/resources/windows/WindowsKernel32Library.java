@@ -73,18 +73,24 @@ public interface WindowsKernel32Library extends Library {
 
     /**
      * Simplified version of the FILETIME datastructure.
-     * <p>
      * See https://github.com/java-native-access/jna/blob/5.16.0/contrib/platform/src/com/sun/jna/platform/win32/WinBase.java#L811
      */
     @Structure.FieldOrder({"dwLowDateTime", "dwHighDateTime"})
     class FILETIME extends Structure {
+        /**
+         * Low-order 32 bits of the file time.
+         */
         public int dwLowDateTime;
+
+        /**
+         * High-order 32 bits of the file time.
+         */
         public int dwHighDateTime;
 
         /**
-         * <p>Converts the two 32-bit unsigned integer parts of this filetime
+         * Converts the two 32-bit unsigned integer parts of this filetime
          * into a 64-bit unsigned integer representing the number of
-         * 100-nanosecond intervals since January 1, 1601 (UTC).</p>
+         * 100-nanosecond intervals since January 1, 1601 (UTC).
          *
          * @return This filetime as a 64-bit unsigned integer number of
          * 100-nanosecond intervals since January 1, 1601 (UTC).

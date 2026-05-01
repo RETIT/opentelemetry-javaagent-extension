@@ -58,11 +58,11 @@ public class ResourceDemandMeasurementService {
             if (sunThreadMXBean.isThreadAllocatedMemorySupported()) {
                 return sunThreadMXBean.getThreadAllocatedBytes(Thread.currentThread().getId());
             } else {
-                return 0l;
+                return 0L;
             }
 
         } else {
-            return 0l;
+            return 0L;
         }
 
     }
@@ -101,18 +101,34 @@ public class ResourceDemandMeasurementService {
      * Data structure to capture the resource measurements.
      */
     public static final class Measurement {
-        long cpuTime;
-        long bytes;
+        private long cpuTime;
+        private long bytes;
 
+        /**
+         * Creates a measurement snapshot.
+         *
+         * @param cpuTime captured current thread cpu time in ns
+         * @param bytes   captured allocated bytes for the current thread
+         */
         public Measurement(final long cpuTime, final long bytes) {
             this.cpuTime = cpuTime;
             this.bytes = bytes;
         }
 
+        /**
+         * Returns the captured CPU time snapshot.
+         *
+         * @return captured current thread cpu time in ns
+         */
         public long getCpuTime() {
             return cpuTime;
         }
 
+        /**
+         * Returns the captured allocated-bytes snapshot.
+         *
+         * @return captured allocated bytes for the current thread
+         */
         public long getBytes() {
             return bytes;
         }

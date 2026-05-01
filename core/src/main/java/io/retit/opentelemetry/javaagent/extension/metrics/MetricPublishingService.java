@@ -47,6 +47,14 @@ public class MetricPublishingService {
     private static final Logger LOGGER = Logger.getLogger(MetricPublishingService.class.getName());
 
     private static final long NANOSECOND_TO_MILLISECOND_CONVERSION = 1_000_000;
+    private static final String[] EXCLUDED_ATTRIBUTE_NAMESPACES = {
+            Constants.RETIT_NAMESPACE,
+            Constants.NETWORK_NAMESPACE,
+            Constants.THREAD_NAMESPACE,
+            Constants.USER_NAMESPACE,
+            Constants.CLIENT_NAMESPACE,
+            Constants.INSTANCE_NAMESPACE
+    };
 
     private static MetricPublishingService instance = new MetricPublishingService();
 
@@ -236,14 +244,17 @@ public class MetricPublishingService {
 
         attributesBuilder.putAll(spanAttributes);
 
-        attributesBuilder.removeIf(key -> key.getKey().startsWith(Constants.RETIT_NAMESPACE)
-                || key.getKey().startsWith(Constants.NETWORK_NAMESPACE)
-                || key.getKey().startsWith(Constants.THREAD_NAMESPACE)
-                || key.getKey().startsWith(Constants.USER_NAMESPACE)
-                || key.getKey().startsWith(Constants.CLIENT_NAMESPACE)
-                || key.getKey().startsWith(Constants.INSTANCE_NAMESPACE));
+        attributesBuilder.removeIf(key -> hasExcludedNamespacePrefix(key.getKey()));
 
         return attributesBuilder.build();
     }
-}
 
+    private static boolean hasExcludedNamespacePrefix(final String key) {
+        for (String namespace : EXCLUDED_ATTRIBUTE_NAMESPACES) {
+            if (key.startsWith(namespace)) {
+                return true;
+            }
+        }
+        return false;
+    }
+}

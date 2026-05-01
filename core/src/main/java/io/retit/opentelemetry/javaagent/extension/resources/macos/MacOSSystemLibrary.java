@@ -22,9 +22,23 @@ public interface MacOSSystemLibrary extends CLibrary {
      */
     int CLOCK_THREAD_CPUTIME_ID = 16;
 
+    /**
+     * The JNA-backed singleton used to call into the native macOS System library.
+     */
     MacOSSystemLibrary INSTANCE = Native.load("System", MacOSSystemLibrary.class);
 
+    /**
+     * Returns a handle for the current thread.
+     *
+     * @return current pthread handle
+     */
     ThreadHandle pthread_self();
 
+    /**
+     * Returns the Mach thread id for a given pthread handle.
+     *
+     * @param threadHandle pthread handle
+     * @return Mach thread id
+     */
     int pthread_mach_thread_np(ThreadHandle threadHandle);
 }

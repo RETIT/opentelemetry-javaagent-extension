@@ -19,18 +19,33 @@ public class TestRESTEndpoint {
     @Autowired
     private TestService testService;
 
+    /**
+     * Example GET endpoint.
+     *
+     * @return operation result including the computed value
+     */
     @GetMapping
     @RequestMapping("getData")
     public String getData() throws IOException {
         return "GET " + testService.veryComplexBusinessFunction(3000);
     }
 
+    /**
+     * Example POST endpoint.
+     *
+     * @return operation result including the computed value
+     */
     @PostMapping
     @RequestMapping("postData")
     public String postData() throws IOException {
         return "POST" + testService.veryComplexBusinessFunction(4000);
     }
 
+    /**
+     * Example DELETE endpoint.
+     *
+     * @return operation result including the computed value
+     */
     @DeleteMapping
     @RequestMapping("deleteData")
     public String deleteData() throws IOException {

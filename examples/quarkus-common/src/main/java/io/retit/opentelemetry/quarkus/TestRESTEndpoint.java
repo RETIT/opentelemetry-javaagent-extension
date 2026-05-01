@@ -17,18 +17,33 @@ public class TestRESTEndpoint {
     @Inject
     private TestService testService;
 
+    /**
+     * Example GET endpoint.
+     *
+     * @return operation result including the computed value
+     */
     @GET
     @Path("getData")
     public String getData() throws InterruptedException, IOException {
         return "GET " + testService.veryComplexBusinessFunction(3000, "GET");
     }
 
+    /**
+     * Example POST endpoint.
+     *
+     * @return operation result including the computed value
+     */
     @POST
     @Path("postData")
     public String postData() throws InterruptedException, IOException {
         return "POST" + testService.veryComplexBusinessFunction(4000, "POST");
     }
 
+    /**
+     * Example DELETE endpoint.
+     *
+     * @return operation result including the computed value
+     */
     @DELETE
     @Path("deleteData")
     public String deleteData() throws InterruptedException, IOException {

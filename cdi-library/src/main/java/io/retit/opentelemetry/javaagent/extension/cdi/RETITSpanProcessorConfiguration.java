@@ -58,7 +58,7 @@ public class RETITSpanProcessorConfiguration {
     private static final Logger LOGGER = Logger.getLogger(RETITSpanProcessorConfiguration.class.getName());
 
     @Inject
-    Config config;
+    private Config config;
 
     /**
      * Produces the {@link RETITSpanProcessor} as an application-scoped CDI bean.
@@ -96,4 +96,3 @@ public class RETITSpanProcessorConfiguration {
         return new RETITSpanProcessor();
     }
 }
-

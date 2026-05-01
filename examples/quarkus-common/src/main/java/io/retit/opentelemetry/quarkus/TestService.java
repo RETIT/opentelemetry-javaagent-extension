@@ -19,6 +19,13 @@ public class TestService {
     @Inject
     private ResourceDemandMeasurementService resourceDemandMeasurementService;
 
+    /**
+     * Executes an artificial workload and publishes measured resource demand metrics.
+     *
+     * @param size       workload size used to create and sort the random array
+     * @param httpMethod HTTP method used as metric attribute
+     * @return the sum of the sorted random data
+     */
     public String veryComplexBusinessFunction(final int size, final String httpMethod) throws InterruptedException, IOException {
         ResourceDemandMeasurementService.Measurement measurement = resourceDemandMeasurementService.measure();
         Path tempFile = Files.createTempFile("sampleapplication", "veryComplexBusinessFunction");
@@ -33,7 +40,7 @@ public class TestService {
     }
 
     private static int[] generateRandomInputArray(final int size) throws InterruptedException {
-        int array[] = new int[size];
+        int[] array = new int[size];
 
         for (int i = 0; i < size; i++) {
             array[i] = ThreadLocalRandom.current().nextInt(0, size * 10);
