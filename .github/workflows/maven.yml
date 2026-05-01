@@ -45,7 +45,7 @@ jobs:
       - name: Package Extension and create Docker Container for Sample Application
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
-        run: mvn -B test -pl extension -am -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithInternalOtelSupportAndCDILibraryIT,QuarkusWithExternalOtelAgentAndExtensionIT -Dsurefire.failIfNoSpecifiedTests=false
+        run: mvn -B test -pl extension -am -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithInternalOtelSupportAndCDILibraryIT,QuarkusWithExternalOtelAgentAndExtensionIT
       - name: Get Energy Results
         uses: green-coding-solutions/eco-ci-energy-estimation@v5
         with:
