@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
@@ -19,12 +20,21 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          server-id: github
+          server-username: GITHUB_ACTOR
+          server-password: GITHUB_TOKEN
+      - name: Set version from tag
+        run: mvn -B versions:set -DnewVersion=${GITHUB_REF_NAME} -DgenerateBackupPoms=false
       - name: Compile and run Checkstyle, PMD and Spotbugs checks
         run: mvn -B checkstyle:check pmd:check compile spotbugs:check --file pom.xml
       - name: Package Extension and create Docker Container for Sample Application
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
         run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT --file ./extension/pom.xml
+      - name: Deploy to GitHub Packages
+        run: mvn -B deploy -DskipTests --file pom.xml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release and Upload Artifact
         uses: ncipollo/release-action@v1
         with:
