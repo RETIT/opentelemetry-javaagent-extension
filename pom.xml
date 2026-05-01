@@ -189,15 +189,15 @@
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
                             <regexp>https?://www\.gnu\.org/licenses/gpl-2\.0.*</regexp>
-                            <replacement>https://spdx.org/licenses/GPL-2.0-only.html</replacement>
+                            <replacement>https://spdx.org/licenses/GPL-2.0-or-later.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
                             <regexp>https?://www\.gnu\.org/licenses/gpl-3\.0.*</regexp>
-                            <replacement>https://spdx.org/licenses/GPL-3.0-only.html</replacement>
+                            <replacement>https://spdx.org/licenses/GPL-3.0-or-later.html</replacement>
                         </licenseUrlReplacement>
                         <licenseUrlReplacement>
                             <regexp>https?://www\.gnu\.org/licenses/agpl-3\.0.*</regexp>
-                            <replacement>https://spdx.org/licenses/AGPL-3.0-only.html</replacement>
+                            <replacement>https://spdx.org/licenses/AGPL-3.0-or-later.html</replacement>
                         </licenseUrlReplacement>
                     </licenseUrlReplacements>
                 </configuration>
