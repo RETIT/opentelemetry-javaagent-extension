@@ -26,7 +26,6 @@ import io.retit.opentelemetry.javaagent.extension.resources.windows.WindowsDataC
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.Locale;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -119,23 +118,41 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
      * @return the JVMDataCollector for the selected JVM
      */
     protected static IResourceDemandDataCollector getDataCollectorFromJVM(final String jvmName) {
-        return (IResourceDemandDataCollector) loadInstance("io.retit.opentelemetry.javaagent.extension.resources.jvm." + jvmName + "DataCollector");
-    }
-
-    private static Object loadInstance(final String className) {
-        Class<?> collectorClass;
-        Object collector = null;
-        try {
-            collectorClass = Class.forName(className);
-            collector = collectorClass.newInstance();
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-            LOGGER.log(Level.SEVERE, "Could not initialize instance: " + className, e);
+        if (HOTSPOT_NAME.equals(jvmName)) {
+            return new io.retit.opentelemetry.javaagent.extension.resources.jvm.HotSpotDataCollector();
+        } else if (IBM_JVM_NAME.equals(jvmName)) {
+            return new io.retit.opentelemetry.javaagent.extension.resources.jvm.IBMDataCollector();
         }
-        return collector;
+        throw new UnsupportedOperationException("Unsupported JVM: " + jvmName);
     }
 
     protected static ThreadMXBean getThreadMXBean() {
         return THREAD_MX_BEAN;
+    }
+
+    private static boolean isIBMJVM() {
+        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains(IBM_VENDOR);
+    }
+
+    private static boolean isHotspotJVM() {
+        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("hotspot");
+    }
+
+    private static boolean isOpenJDK() {
+        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("openjdk");
+    }
+
+    /**
+     * Returns the processID of the JVM process.
+     *
+     * @return - the process id of the JVM process.
+     */
+    public static long getProcessID() {
+        String jvmName = ManagementFactory.getRuntimeMXBean().getName();
+        if (!StringUtils.isNullOrEmpty(jvmName) && jvmName.contains("@")) {
+            return Long.parseLong(jvmName.split("@")[0]);
+        }
+        return -1;
     }
 
     @Override
@@ -186,31 +203,6 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
      */
     private void setJvmCollector(final IResourceDemandDataCollector jvmCollector) {
         this.jvmCollector = jvmCollector;
-    }
-
-    private static boolean isIBMJVM() {
-        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains(IBM_VENDOR);
-    }
-
-    private static boolean isHotspotJVM() {
-        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("hotspot");
-    }
-
-    private static boolean isOpenJDK() {
-        return System.getProperty(JVM_NAME_PROPERTY, "").toLowerCase(Locale.ENGLISH).contains("openjdk");
-    }
-
-    /**
-     * Returns the processID of the JVM process.
-     *
-     * @return - the process id of the JVM process.
-     */
-    public static long getProcessID() {
-        String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        if (!StringUtils.isNullOrEmpty(jvmName) && jvmName.contains("@")) {
-            return Long.parseLong(jvmName.split("@")[0]);
-        }
-        return -1;
     }
 
     @Override
