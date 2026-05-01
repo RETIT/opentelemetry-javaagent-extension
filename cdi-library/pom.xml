@@ -62,6 +62,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>org.eclipse.microprofile.config</groupId>
+            <artifactId>microprofile-config-api</artifactId>
+            <version>3.1</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!--Java Native Access (JNA) is licensed under the LGPL, version 2.1 or later, or (from version 4.0 onward) the Apache License, version 2.0.-->
         <!-- https://github.com/java-native-access/jna/blob/master/LICENSE -->
         <dependency>

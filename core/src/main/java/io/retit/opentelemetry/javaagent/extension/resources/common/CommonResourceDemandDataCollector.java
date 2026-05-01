@@ -26,7 +26,6 @@ import io.retit.opentelemetry.javaagent.extension.resources.windows.WindowsDataC
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 /**
  * General-purpose implementation of an {@link IResourceDemandDataCollector}.
@@ -49,8 +48,6 @@ public abstract class CommonResourceDemandDataCollector implements IResourceDema
     private static final String IBM_VENDOR = "ibm";
 
     private static final String JVM_NAME_PROPERTY = "java.vm.name";
-
-    private static final Logger LOGGER = Logger.getLogger(CommonResourceDemandDataCollector.class.getName());
 
     private static final ThreadMXBean THREAD_MX_BEAN = ManagementFactory.getThreadMXBean();
 

@@ -26,6 +26,7 @@ import javax.management.NotificationListener;
 import javax.management.openmbean.CompositeData;
 import java.lang.management.MemoryUsage;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * A {@link NotificationListener} which triggers on garbage collection invocations.
@@ -36,6 +37,17 @@ public class JavaAgentGCNotificationListener implements NotificationListener {
 
     private static final String END_OF_MINOR_GC = "end of minor GC";
     private static final String END_OF_MAJOR_GC = "end of major GC";
+
+    private static final Logger LOGGER = Logger.getLogger(JavaAgentGCNotificationListener.class.getName());
+
+    private static String determineOperationName(final String garbageCollectionType) {
+        if (END_OF_MINOR_GC.equals(garbageCollectionType)) {
+            return Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE;
+        } else if (END_OF_MAJOR_GC.equals(garbageCollectionType)) {
+            return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE;
+        }
+        return "";
+    }
 
     @Override
     public void handleNotification(final Notification notification, final Object handback) {
@@ -69,22 +81,17 @@ public class JavaAgentGCNotificationListener implements NotificationListener {
             memCommitted += memdetail.getCommitted();
         }
 
-        Span span =
-                GlobalOpenTelemetry.getTracer(Constants.JAVA_AGENT_INSTRUMENTATION_NAME_GC_LISTENER).spanBuilder(operationName).setNoParent().startSpan();
-        span.setAttribute(Constants.SPAN_ATTRIBUTE_START_SYSTEM_TIME, 0);
-        span.setAttribute(Constants.SPAN_ATTRIBUTE_END_SYSTEM_TIME, duration);
-        span.setAttribute(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION, totalMemBeforeGC);
-        span.setAttribute(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION, totalMemAfterGC);
-        span.setAttribute(Constants.SPAN_ATTRIBUTE_TOTAL_HEAP_SIZE, memCommitted);
-        span.end();
-    }
-
-    private static String determineOperationName(final String garbageCollectionType) {
-        if (END_OF_MINOR_GC.equals(garbageCollectionType)) {
-            return Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE;
-        } else if (END_OF_MAJOR_GC.equals(garbageCollectionType)) {
-            return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE;
+        if (GlobalOpenTelemetry.isSet()) {
+            Span span =
+                    GlobalOpenTelemetry.getTracer(Constants.JAVA_AGENT_INSTRUMENTATION_NAME_GC_LISTENER).spanBuilder(operationName).setNoParent().startSpan();
+            span.setAttribute(Constants.SPAN_ATTRIBUTE_START_SYSTEM_TIME, 0);
+            span.setAttribute(Constants.SPAN_ATTRIBUTE_END_SYSTEM_TIME, duration);
+            span.setAttribute(Constants.SPAN_ATTRIBUTE_START_HEAP_BYTE_ALLOCATION, totalMemBeforeGC);
+            span.setAttribute(Constants.SPAN_ATTRIBUTE_END_HEAP_BYTE_ALLOCATION, totalMemAfterGC);
+            span.setAttribute(Constants.SPAN_ATTRIBUTE_TOTAL_HEAP_SIZE, memCommitted);
+            span.end();
+        } else {
+            LOGGER.warning("OpenTelemetry is not set. Cannot create span for GC event.");
         }
-        return "";
     }
 }

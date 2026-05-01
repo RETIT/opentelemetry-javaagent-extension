@@ -21,7 +21,10 @@ import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.processor.RETITSpanProcessor;
 import io.retit.opentelemetry.javaagent.extension.resources.jvm.JavaAgentGCHandler;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.Produces;
+import jakarta.inject.Inject;
+import org.eclipse.microprofile.config.Config;
 
 import java.util.logging.Logger;
 
@@ -54,6 +57,9 @@ import java.util.logging.Logger;
 public class RETITSpanProcessorConfiguration {
     private static final Logger LOGGER = Logger.getLogger(RETITSpanProcessorConfiguration.class.getName());
 
+    @Inject
+    Config config;
+
     /**
      * Produces the {@link RETITSpanProcessor} as an application-scoped CDI bean.
      *
@@ -69,11 +75,22 @@ public class RETITSpanProcessorConfiguration {
      * @return a configured {@link RETITSpanProcessor} instance.
      */
     @Produces
-    @ApplicationScoped
+    @Dependent // important so that this bean is not proxied as instanceof ExtendedSpanProcessor checks are not working otherwiseo
     public SpanProcessor retitSpanProcessor() {
+        for (String name : config.getPropertyNames()) {
+            if (name.startsWith("io.retit.")) {
+                config.getOptionalValue(name, String.class)
+                        .ifPresent(value -> {
+                            LOGGER.info(String.format("Retit config property: %s=%s", name, value));
+                            System.setProperty(name, value);
+                        });
+            }
+        }
+
         if (InstanceConfiguration.isLogGCEventDefaultTrue()) {
             JavaAgentGCHandler.addJavaAgentGCListener();
         }
+
         LOGGER.info("Adding RETITSpanProcessor as CDI Bean");
 
         return new RETITSpanProcessor();
