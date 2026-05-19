@@ -16,13 +16,13 @@ public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest
     private static final String DELETE_URI = CONTEXT_ROOT + "/deleteData";
 
     /**
-     * Sets up the container for the library-based Quarkus example ({@code quarkus-rest-service-library}).
+     * Sets up the container for the library-based Quarkus example ({@code quarkus-rest-service-cdi-library}).
      *
      * <p>In this mode no Java-agent is used.  The RETIT {@code RETITSpanProcessor} is registered
      * via CDI and Quarkus' own OpenTelemetry extension manages the SDK lifecycle.  Both traces
      * and metrics are exported to the console so that the log parser can verify them.</p>
      *
-     * @param containerName Docker image name (e.g. {@code quarkus-rest-service-library:feature}).
+     * @param containerName Docker image name (e.g. {@code quarkus-rest-service-cdi-library:feature}).
      * @param serviceName   OTel service.name resource attribute.
      * @param portToExpose  HTTP port exposed by the container.
      */

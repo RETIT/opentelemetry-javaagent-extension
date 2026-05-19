@@ -27,7 +27,7 @@ public class QuarkusWithLibraryIT extends AbstractFrameworkIT {
 
     @BeforeEach
     public void beforeEach() {
-        commonSetupForLibrary("quarkus-rest-service-library:feature", "quarkus-library-app", 8080);
+        commonSetupForLibrary("quarkus-rest-service-cdi-library:feature", "quarkus-library-app", 8080);
     }
 
     @Test
