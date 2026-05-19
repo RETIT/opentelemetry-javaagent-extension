@@ -12,14 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public abstract class ContainerLogMetricAndSpanExtractingTest {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ContainerLogMetricAndSpanExtractingTest.class);
-
     // Metrics to be tested
     protected static final String[] METRIC_NAMES = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "io.retit.emissions.cpu.power.min", "io.retit.emissions.cpu.power.max",
             "io.retit.emissions.embodied.emissions.minute.mg", "io.retit.emissions.memory.energy.gb.minute",
@@ -28,11 +22,16 @@ public abstract class ContainerLogMetricAndSpanExtractingTest {
             "io.retit.resource.demand.memory.bytes", "io.retit.resource.demand.network.bytes",
             "io.retit.resource.demand.cpu.ms"
     };
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContainerLogMetricAndSpanExtractingTest.class);
     protected GenericContainer<?> applicationContainer;
     protected Map<String, List<SpanDemand>> spanDemands = new HashMap<>();
     protected List<MetricDemand> metricDemands = new ArrayList<>();
     protected String CONTAINER_URL = "http://localhost:";
+
+    @NotNull
+    protected static boolean isGcSpanName(String s) {
+        return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE.equals(s) || Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE.equals(s);
+    }
 
     protected void executeContainer(final int portToOpen) {
         // Start container and attach parser to log output
@@ -73,7 +72,6 @@ public abstract class ContainerLogMetricAndSpanExtractingTest {
         }
     }
 
-
     private String extractOperationNameFromLogOutput(String logOutput) {
         LOGGER.info("Processing span " + logOutput);
         return logOutput.substring(logOutput.indexOf('\'') + 1, logOutput.lastIndexOf('\''));
@@ -90,45 +88,40 @@ public abstract class ContainerLogMetricAndSpanExtractingTest {
         }
     }
 
-    @NotNull
-    protected static boolean isGcSpanName(String s) {
-        return Constants.JAVA_AGENT_GC_OPERATION_NAME_MAJOR_FREE.equals(s) || Constants.JAVA_AGENT_GC_OPERATION_NAME_MINOR_FREE.equals(s);
-    }
-
     protected void assertFullSpanDataContent(final String sampleMethod) {
         Assertions.assertFalse(spanDemands.isEmpty());
         for (Map.Entry<String, List<SpanDemand>> spanDemandEntryList : spanDemands.entrySet()) {
             if ("<unspecified span name>".equals(spanDemandEntryList.getKey())) {
                 continue;
             } else if (!isGcSpanName(spanDemandEntryList.getKey())) {
-                assertEquals(1, spanDemandEntryList.getValue().size());
+                Assertions.assertEquals(1, spanDemandEntryList.getValue().size());
             }
             for (SpanDemand spanDemandEntry : spanDemandEntryList.getValue()) {
-                assertNotEquals(0, spanDemandEntry.startCpuTime);
-                assertNotEquals(0, spanDemandEntry.endCpuTime);
-                assertNotEquals(0, spanDemandEntry.startHeapDemand);
-                assertNotEquals(0, spanDemandEntry.endHeapDemand);
+                Assertions.assertNotEquals(0, spanDemandEntry.startCpuTime);
+                Assertions.assertNotEquals(0, spanDemandEntry.endCpuTime);
+                Assertions.assertNotEquals(0, spanDemandEntry.startHeapDemand);
+                Assertions.assertNotEquals(0, spanDemandEntry.endHeapDemand);
                 if (spanDemandEntryList.getKey().contains(sampleMethod)) {
-                    assertNull(spanDemandEntry.totalHeapSize);
+                    Assertions.assertNull(spanDemandEntry.totalHeapSize);
                 } else {
-                    assertNotEquals(0, spanDemandEntry.totalHeapSize);
+                    Assertions.assertNotEquals(0, spanDemandEntry.totalHeapSize);
                 }
-                assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
-                assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
+                Assertions.assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
+                Assertions.assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
                 if (!isGcSpanName(spanDemandEntryList.getKey())) {
                     if (spanDemandEntry.endDiskWriteDemand != 0) {
-                        assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
-                        assertNotEquals(0, spanDemandEntry.endDiskWriteDemand - spanDemandEntry.startDiskWriteDemand);
+                        Assertions.assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);
+                        Assertions.assertNotEquals(0, spanDemandEntry.endDiskWriteDemand - spanDemandEntry.startDiskWriteDemand);
                     }
                 }
-                assertNotEquals(0, spanDemandEntry.logSystemTime);
+                Assertions.assertNotEquals(0, spanDemandEntry.logSystemTime);
 
-                assertNotNull(spanDemandEntry.startNetworkReadDemand);
-                assertNotNull(spanDemandEntry.endNetworkReadDemand);
-                assertNotNull(spanDemandEntry.startNetworkWriteDemand);
-                assertNotNull(spanDemandEntry.endNetworkWriteDemand);
-                assertNotEquals(0, spanDemandEntry.startThreadId);
-                assertNotEquals(0, spanDemandEntry.endThreadId);
+                Assertions.assertNotNull(spanDemandEntry.startNetworkReadDemand);
+                Assertions.assertNotNull(spanDemandEntry.endNetworkReadDemand);
+                Assertions.assertNotNull(spanDemandEntry.startNetworkWriteDemand);
+                Assertions.assertNotNull(spanDemandEntry.endNetworkWriteDemand);
+                Assertions.assertNotEquals(0, spanDemandEntry.startThreadId);
+                Assertions.assertNotEquals(0, spanDemandEntry.endThreadId);
             }
         }
     }

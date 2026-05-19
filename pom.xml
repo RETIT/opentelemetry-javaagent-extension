@@ -14,9 +14,19 @@
     </properties>
 
     <modules>
+        <module>core</module>
+        <module>cdi-library</module>
         <module>extension</module>
         <module>examples</module>
     </modules>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/RETIT/opentelemetry-javaagent-extension</url>
+        </repository>
+    </distributionManagement>
 
     <dependencyManagement>
         <dependencies>
@@ -89,6 +99,7 @@
 
     </dependencyManagement>
 
+
     <build>
         <plugins>
             <plugin>
@@ -159,6 +170,37 @@
                     <socketTimeout>1000</socketTimeout>
                     <connectionRequestTimeout>1000</connectionRequestTimeout>
                     <errorRemedy>ignore</errorRemedy>
+                    <!--
+                        gnu.org is frequently unreachable (blocked by firewalls, rate-limited, etc.).
+                        Redirect all gnu.org license URLs to the equivalent SPDX pages before any
+                        HTTP request is attempted, so the plugin never tries to contact gnu.org at all.
+                    -->
+                    <licenseUrlReplacements>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/lgpl-2\.1.*</regexp>
+                            <replacement>https://spdx.org/licenses/LGPL-2.1-only.html</replacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/(lgpl-3\.0.*|lgpl\.html)</regexp>
+                            <replacement>https://spdx.org/licenses/LGPL-3.0-only.html</replacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/lgpl(?:-[12]\..*)?</regexp>
+                            <replacement>https://spdx.org/licenses/LGPL-2.1-or-later.html</replacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/gpl-2\.0.*</regexp>
+                            <replacement>https://spdx.org/licenses/GPL-2.0-or-later.html</replacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/gpl-3\.0.*</regexp>
+                            <replacement>https://spdx.org/licenses/GPL-3.0-or-later.html</replacement>
+                        </licenseUrlReplacement>
+                        <licenseUrlReplacement>
+                            <regexp>https?://www\.gnu\.org/licenses/agpl-3\.0.*</regexp>
+                            <replacement>https://spdx.org/licenses/AGPL-3.0-or-later.html</replacement>
+                        </licenseUrlReplacement>
+                    </licenseUrlReplacements>
                 </configuration>
                 <executions>
                     <execution>

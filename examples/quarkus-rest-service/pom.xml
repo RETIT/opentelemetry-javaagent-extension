@@ -36,6 +36,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.retit</groupId>
+            <artifactId>quarkus-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-rest</artifactId>
         </dependency>

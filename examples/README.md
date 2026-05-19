@@ -4,6 +4,7 @@ This directory contains several examples on how to use the OpenTelemetry extensi
 - A simple [JDK21-based application](simple-jdk21-application/README.md)
 - A [Quarkus-based REST service](quarkus-rest-service/README.md)
 - A [Spring-based REST service](spring-rest-service/README.md)
+- A [Quarkus REST service using the CDI library](quarkus-rest-service-cdi-library/README.md) (no Java agent — uses the `opentelemetry-java-agent-extension-cdi-library` Maven dependency)
 
 # Starting OpenTelemetry Backends for the Example Applications 
 

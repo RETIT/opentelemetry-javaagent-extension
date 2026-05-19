@@ -70,3 +70,4 @@ de.retit.apm/de.retit.apm.javaagent.sampleapplication/dependency-reduced-pom.xml
 /extension/dependency-reduced-pom.xml
 /examples/quarkus-rest-service/src/main/jib/otel/opentelemetry-javaagent.jar
 /examples/quarkus-rest-service/src/main/jib/otel/io.retit.opentelemetry.javaagent.extension.jar
+/core/dependency-reduced-pom.xml

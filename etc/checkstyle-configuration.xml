@@ -5,6 +5,35 @@
         "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
 <module name="Checker">
     <property name="severity" value="warning"/>
+
+    <!-- Native/JNA symbols and struct fields must match platform ABI names exactly. -->
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MethodName"/>
+        <property name="files" value=".*[\\/]core[\\/]src[\\/]main[\\/]java[\\/]io[\\/]retit[\\/]opentelemetry[\\/]javaagent[\\/]extension[\\/]resources[\\/]common[\\/]CLibrary\.java"/>
+    </module>
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MemberName"/>
+        <property name="files" value=".*[\\/]core[\\/]src[\\/]main[\\/]java[\\/]io[\\/]retit[\\/]opentelemetry[\\/]javaagent[\\/]extension[\\/]resources[\\/]common[\\/]CLibrary\.java"/>
+    </module>
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="VisibilityModifier"/>
+        <property name="files" value=".*[\\/]core[\\/]src[\\/]main[\\/]java[\\/]io[\\/]retit[\\/]opentelemetry[\\/]javaagent[\\/]extension[\\/]resources[\\/]common[\\/]CLibrary\.java"/>
+    </module>
+
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MethodName"/>
+        <property name="files" value=".*[\\/]core[\\/]src[\\/]main[\\/]java[\\/]io[\\/]retit[\\/]opentelemetry[\\/]javaagent[\\/]extension[\\/]resources[\\/]macos[\\/]MacOSSystemLibrary\.java"/>
+    </module>
+
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="MethodName"/>
+        <property name="files" value=".*[\\/]core[\\/]src[\\/]main[\\/]java[\\/]io[\\/]retit[\\/]opentelemetry[\\/]javaagent[\\/]extension[\\/]resources[\\/]windows[\\/]WindowsKernel32Library\.java"/>
+    </module>
+    <module name="SuppressionSingleFilter">
+        <property name="checks" value="VisibilityModifier"/>
+        <property name="files" value=".*[\\/]core[\\/]src[\\/]main[\\/]java[\\/]io[\\/]retit[\\/]opentelemetry[\\/]javaagent[\\/]extension[\\/]resources[\\/]windows[\\/]WindowsKernel32Library\.java"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="SuppressWarningsHolder"/>
 

@@ -1,0 +1,44 @@
+package io.retit.opentelemetry.javaagent.extension.resources.macos;
+
+import com.sun.jna.Native;
+import io.retit.opentelemetry.javaagent.extension.resources.common.CLibrary;
+import io.retit.opentelemetry.javaagent.extension.resources.common.NativeFacade;
+import io.retit.opentelemetry.javaagent.extension.resources.common.ThreadHandle;
+
+/**
+ * JNA Library which allows access to the native System API of MacOS.
+ * Generally, this class should not be accessed directly - the wrapper
+ * functions defined in {@link NativeFacade} should be used instead.
+ * Currently, we only define those methods which we need for our purposes.
+ * If you need another method from the glibc API, just add the method
+ * to the interface. However, please also add a generalized method
+ * to {@link NativeFacade} if possible.
+ */
+@SuppressWarnings("PMD")
+public interface MacOSSystemLibrary extends CLibrary {
+    /**
+     * This is a clock that measures CPU time consumed by this
+     * thread.
+     */
+    int CLOCK_THREAD_CPUTIME_ID = 16;
+
+    /**
+     * The JNA-backed singleton used to call into the native macOS System library.
+     */
+    MacOSSystemLibrary INSTANCE = Native.load("System", MacOSSystemLibrary.class);
+
+    /**
+     * Returns a handle for the current thread.
+     *
+     * @return current pthread handle
+     */
+    ThreadHandle pthread_self();
+
+    /**
+     * Returns the Mach thread id for a given pthread handle.
+     *
+     * @param threadHandle pthread handle
+     * @return Mach thread id
+     */
+    int pthread_mach_thread_np(ThreadHandle threadHandle);
+}
