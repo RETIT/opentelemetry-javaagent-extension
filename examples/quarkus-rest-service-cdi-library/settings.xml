@@ -9,7 +9,7 @@
         GITHUB_TOKEN   – a GitHub Personal Access Token (PAT) with the "read:packages" scope
 
     Then run Maven with:
-        mvn package --settings settings.xml
+        mvn package -s settings.xml
 -->
 <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
