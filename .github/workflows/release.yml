@@ -31,7 +31,7 @@ jobs:
       - name: Package Extension and create Docker Container for Sample Application
         run: mvn -B package --file pom.xml
       - name: Run Integration Test
-        run: mvn -B test -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT,QuarkusWithInternalOtelSupportAndCDILibraryIT --file ./extension/pom.xml
+        run: mvn -B test -pl extension -am -Dtest=JDK8JavaAgentExtensionIT,JDK21JavaAgentExtensionIT,SpringWithExternalOtelAgentAndExtensionIT,QuarkusWithExternalOtelAgentAndExtensionIT,QuarkusWithInternalOtelSupportAndCDILibraryIT -Dsurefire.failIfNoSpecifiedTests=false
       - name: Publish to GitHub Packages
         run: mvn -B deploy -DskipTests --file pom.xml
         env:
