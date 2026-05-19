@@ -8,7 +8,7 @@ public class QuarkusWithInternalOtelSupportAndCDILibraryIT extends AbstractFrame
 
     @BeforeEach
     public void beforeEach() {
-        commonSetup("quarkus-rest-service-cdi-library:feature", "quarkus-app", 8080, false, false);
+        commonSetupForLibrary("quarkus-rest-service-cdi-library:feature", "quarkus-app", 8080);
     }
 
     @Test
