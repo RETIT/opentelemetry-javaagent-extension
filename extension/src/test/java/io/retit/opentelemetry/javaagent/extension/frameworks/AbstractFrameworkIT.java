@@ -66,6 +66,11 @@ public class AbstractFrameworkIT extends ContainerLogMetricAndSpanExtractingTest
                 .withEnv("IO_RETIT_EMISSIONS_CLOUD_PROVIDER", "AWS");
 
         if (exportMetricsToCollector) {
+            // host.docker.internal is intentionally used here: integration tests run the application
+            // inside a Testcontainers container and need to reach the OTel Collector on the host
+            // (started separately via docker-compose). host.docker.internal is the standard hostname
+            // for this on Docker Desktop (Windows/macOS) and on Linux with Docker >= 20.10 when
+            // --add-host=host-gateway is configured by Testcontainers automatically.
             applicationContainer = applicationContainer.withEnv("OTEL_METRICS_EXPORTER", "otlp").withEnv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://host.docker.internal:4318");
         } else {
             applicationContainer = applicationContainer.withEnv("OTEL_METRICS_EXPORTER", "console");
