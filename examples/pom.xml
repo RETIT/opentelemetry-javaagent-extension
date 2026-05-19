@@ -16,6 +16,8 @@
     <properties>
         <jdk21.base.container>mirror.gcr.io/library/eclipse-temurin:21-jre</jdk21.base.container>
         <jib.version>3.5.1</jib.version>
+        <!-- Do not publish example applications to GitHub Packages -->
+        <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
     <modules>

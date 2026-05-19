@@ -30,7 +30,7 @@ instrumentation library** without a Java agent.
 <dependency>
     <groupId>io.retit</groupId>
     <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
-    <version><!-- latest release tag --></version>
+    <version><!-- latest release tag, e.g. v0.0.20-alpha --></version>
 </dependency>
 ```
 
@@ -41,6 +41,46 @@ instrumentation library** without a Java agent.
     <groupId>io.quarkus</groupId>
     <artifactId>quarkus-opentelemetry</artifactId>
 </dependency>
+```
+
+Also add the GitHub Packages repository to your `pom.xml`, since the library is not published to Maven Central:
+
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <name>GitHub RETIT Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/RETIT/opentelemetry-javaagent-extension</url>
+    </repository>
+</repositories>
+```
+
+### 1a. Authenticate with GitHub Packages
+
+GitHub Packages requires a Personal Access Token (PAT) with the `read:packages` scope, even for
+public packages. A ready-to-use [`settings.xml`](settings.xml) is provided in this directory —
+it reads credentials from environment variables so nothing secret is committed to version control.
+
+**Step 1 — create a PAT:**
+Go to **GitHub → Settings → Developer settings → Personal access tokens (classic)**,
+create a token with only the `read:packages` scope.
+
+**Step 2 — set environment variables:**
+
+```bash
+# Linux / macOS
+export GITHUB_ACTOR=your-github-username
+export GITHUB_TOKEN=your-pat-with-read-packages-scope
+
+# Windows PowerShell
+$env:GITHUB_ACTOR = "your-github-username"
+$env:GITHUB_TOKEN = "your-pat-with-read-packages-scope"
+```
+
+**Step 3 — pass the settings file to Maven:**
+
+```bash
+mvn package --settings settings.xml
 ```
 
 ### 2. Configure via environment variables (or system properties)
@@ -77,7 +117,7 @@ transaction spans are published as OpenTelemetry metrics for SCI/carbon calculat
 
 ```bash
 # Build the uber-jar and Docker image
-mvn package
+mvn package --settings settings.xml
 
 # Run locally (without container)
 java -jar target/quarkus-rest-service-library.jar

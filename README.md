@@ -68,9 +68,37 @@ If your application already runs inside a CDI container (e.g. Quarkus with `quar
 <dependency>
     <groupId>io.retit</groupId>
     <artifactId>opentelemetry-java-agent-extension-cdi-library</artifactId>
-    <version><!-- latest release tag --></version>
+    <version><!-- latest release tag, e.g. v0.0.20-alpha --></version>
 </dependency>
 ```
+
+Also add the GitHub Packages repository to your `pom.xml`, since it is not available on Maven Central:
+
+```xml
+<repositories>
+    <repository>
+        <id>github</id>
+        <name>GitHub RETIT Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/RETIT/opentelemetry-javaagent-extension</url>
+    </repository>
+</repositories>
+```
+
+> **Authentication required:** GitHub Packages requires a GitHub personal access token (PAT) with the `read:packages` scope, even for public packages. Add the following to your `~/.m2/settings.xml`:
+>
+> ```xml
+> <settings>
+>   <servers>
+>     <server>
+>       <id>github</id>
+>       <username>YOUR_GITHUB_USERNAME</username>
+>       <password>YOUR_GITHUB_PAT</password>
+>     </server>
+>   </servers>
+> </settings>
+> ```
+>
+> You can create a PAT at **GitHub → Settings → Developer settings → Personal access tokens** with the `read:packages` scope.
 
 For Quarkus, `quarkus-opentelemetry` must also be present (usually already in a Quarkus project):
 

@@ -53,6 +53,19 @@
         </dependencies>
     </dependencyManagement>
 
+    <!--
+        GitHub Packages repository for the RETIT CDI library.
+        Required when using this pom.xml outside of the RETIT multi-module build.
+        Authentication is needed even for public packages — see settings.xml in this directory.
+    -->
+    <repositories>
+        <repository>
+            <id>github</id>
+            <name>GitHub RETIT Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/RETIT/opentelemetry-javaagent-extension</url>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>io.retit</groupId>
@@ -84,6 +97,10 @@
             RETIT instrumentation library.  No Java-agent required – the library JAR is a plain
             compile-time dependency and exposes the RETITSpanProcessor that we register via CDI.
             JNA is pulled in transitively and collects OS-level resource metrics.
+
+            Note: ${project.version} resolves correctly inside the RETIT multi-module build.
+            When copying this pom.xml to your own project, replace ${project.version} with the
+            desired release tag, e.g. <version>v0.0.20-alpha</version>
         -->
         <!-- Apache 2.0 License -->
         <dependency>

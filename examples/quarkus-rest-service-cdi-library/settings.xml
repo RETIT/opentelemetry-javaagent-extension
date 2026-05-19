@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Maven settings file for resolving the RETIT CDI library from GitHub Packages.
+
+    GitHub Packages requires authentication even for public packages.
+    Set the following environment variables before running Maven:
+
+        GITHUB_ACTOR   – your GitHub username (or the shared bot account username)
+        GITHUB_TOKEN   – a GitHub Personal Access Token (PAT) with the "read:packages" scope
+
+    Then run Maven with:
+        mvn package - -settings settings.xml
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0
+                              https://maven.apache.org/xsd/settings-1.2.0.xsd">
+    <servers>
+        <server>
+            <id>github</id>
+            <username>${env.GITHUB_ACTOR}</username>
+            <password>${env.GITHUB_TOKEN}</password>
+        </server>
+    </servers>
+</settings>
+

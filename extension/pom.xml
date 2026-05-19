@@ -2,12 +2,22 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>extension</artifactId>
+    <description>
+        Shaded uber-JAR loaded by the OpenTelemetry Java agent via -Dotel.javaagent.extensions.
+        Distributed as a GitHub Release asset, not as a Maven dependency — deployment to GitHub
+        Packages is intentionally skipped.
+    </description>
 
     <parent>
         <groupId>io.retit</groupId>
         <artifactId>opentelemetry-javaagent-extension</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
+
+    <properties>
+        <!-- This module is a shaded agent JAR distributed via GitHub Releases, not a Maven library -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
         <dependency>
