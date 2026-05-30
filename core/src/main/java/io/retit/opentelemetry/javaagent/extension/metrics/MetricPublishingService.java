@@ -58,10 +58,10 @@ public class MetricPublishingService {
 
     private static MetricPublishingService instance = new MetricPublishingService();
 
-    private LongCounter storageDemandMetricPublisher;
-    private LongCounter memoryDemandMetricPublisher;
-    private LongCounter networkDemandMetricPublisher;
-    private LongCounter cpuDemandMetricPublisher;
+    private final LongCounter storageDemandMetricPublisher;
+    private final LongCounter memoryDemandMetricPublisher;
+    private final LongCounter networkDemandMetricPublisher;
+    private final LongCounter cpuDemandMetricPublisher;
 
     /**
      * Returns the singleton instance of MetricPublishingService, creating it if necessary.
@@ -139,14 +139,24 @@ public class MetricPublishingService {
         if (ManagementFactory.getOperatingSystemMXBean() instanceof OperatingSystemMXBean) {
             OperatingSystemMXBean sunOSBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
 
-            LOGGER.info("Publishing CPU time");
-            measurement.record(sunOSBean.getProcessCpuTime() / NANOSECOND_TO_MILLISECOND_CONVERSION, Attributes.of(AttributeKey.stringKey("io.retit.java.process.id"), String.valueOf(CommonResourceDemandDataCollector.getProcessID())));
+            LOGGER.fine("Publishing CPU time");
+
+            AttributesBuilder attributesBuilder = Attributes.builder();
+
+            attributesBuilder.put("io.retit.java.process.id", CommonResourceDemandDataCollector.getProcessID());
+
+            if (CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails() != null) {
+                attributesBuilder.put("io.retit.instance.vcpu.count", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceVCpuCount());
+                attributesBuilder.put("io.retit.platform.cpu.count", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getPlatformTotalVCpuCount());
+            }
+
+            measurement.record(sunOSBean.getProcessCpuTime() / NANOSECOND_TO_MILLISECOND_CONVERSION, attributesBuilder.build());
         }
     }
 
     private void publishDoubleMeasurement(final ObservableDoubleMeasurement measurement, final String type, final double value) {
         if (CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCloudProvider() != null) {
-            LOGGER.info("Publishing " + type + " with value " + value);
+            LOGGER.fine("Publishing " + type + " with value " + value);
             measurement.record(value, Attributes.of(AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCloudProvider().name(),
                     AttributeKey.stringKey(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY), CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceType()));
         }
