@@ -94,8 +94,15 @@
                                 </excludes>
                             </artifactSet>
                             <filters>
+                                <!-- JNA loads a number of its classes reflectively (e.g. the
+                                     platform specific mappers used by Native.loadLibrary on Windows).
+                                     minimizeJar cannot see those references, so all JNA classes are
+                                     explicitly included to keep them in the shaded artifact. -->
                                 <filter>
                                     <artifact>net.java.dev.jna:*</artifact>
+                                    <includes>
+                                        <include>**/*</include>
+                                    </includes>
                                     <excludes>
                                         <exclude>META-INF/*</exclude>
                                     </excludes>
