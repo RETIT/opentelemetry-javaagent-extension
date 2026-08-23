@@ -149,18 +149,35 @@ public class InstanceConfiguration {
         if (propertyName == null) {
             return defaultValue;
         }
-        if (System.getProperty(propertyName) != null) {
-            return converter.convert(System.getProperty(propertyName));
+        final String systemPropertyValue = System.getProperty(propertyName);
+        if (systemPropertyValue != null) {
+            return converter.convert(removeEmbeddingQuotes(systemPropertyValue));
         }
         final String envVariableName = propertyName.toUpperCase(Locale.ENGLISH).replace(".", "_");
-        if (System.getenv(envVariableName) != null) {
-            return converter.convert(System.getenv(envVariableName));
+        final String envVariableValue = System.getenv(envVariableName);
+        if (envVariableValue != null) {
+            return converter.convert(removeEmbeddingQuotes(envVariableValue));
         }
         if (LOGGER.isLoggable(Level.FINEST)) {
             LOGGER.log(Level.FINEST, "RETIT APM: Property {0} not configured defaulting to {1}",
                     new Object[]{propertyName, (defaultValue != null ? defaultValue : "null")});
         }
         return defaultValue;
+    }
+
+    /**
+     * Removes a pair of embedding double quotes from the given value.
+     * Some shells and container runtimes pass the quotes of a configuration
+     * value on to the JVM, in which case they would become part of the value.
+     *
+     * @param value - the raw configuration value.
+     * @return - the value without its embedding double quotes.
+     */
+    private static String removeEmbeddingQuotes(final String value) {
+        if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+            return value.substring(1, value.length() - 1);
+        }
+        return value;
     }
 
     /**
