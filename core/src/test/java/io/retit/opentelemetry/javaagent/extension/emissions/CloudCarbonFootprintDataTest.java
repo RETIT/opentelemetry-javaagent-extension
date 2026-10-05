@@ -52,8 +52,9 @@ public class CloudCarbonFootprintDataTest {
 
         Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
         Assertions.assertEquals(72, cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
-        Assertions.assertEquals(8.4, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
-        Assertions.assertEquals(28.4, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
+        // the AWS instance file contains 8.4 W / 28.4 W for the whole instance with 4 vCPUs
+        Assertions.assertEquals(8.4 / 4, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
+        Assertions.assertEquals(28.4 / 4, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
         Assertions.assertEquals(1477.54, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
         Assertions.assertEquals(CloudProvider.AWS, cloudCarbonFootprintInstanceData.getCloudProvider());
     }
@@ -117,6 +118,25 @@ public class CloudCarbonFootprintDataTest {
     }
 
     @Test
+    public void testCloudCarbonFootprintDataAzureWithConstrainedVCpus() {
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "Azure");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "West Europe");
+        System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE_CONFIGURATION_PROPERTY, "M16-8ms");
+        CloudCarbonFootprintData instance = CloudCarbonFootprintData.getConfigInstance();
+        instance.init();
+        CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
+        Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
+        // M16-8ms is a M16ms constrained to 8 vCPUs, the instance file contains the ratio 0.5 and the
+        // vCPU count of the M16ms (16) instead, the platform vCPU count is taken from the M16ms (128)
+        Assertions.assertEquals(8, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        Assertions.assertEquals(128, cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
+        Assertions.assertEquals(CloudCarbonFootprintCoefficients.AVERAGE_MIN_WATT_AZURE, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
+        Assertions.assertEquals(CloudCarbonFootprintCoefficients.AVERAGE_MAX_WATT_AZURE, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
+        Assertions.assertEquals(1735.74, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
+        Assertions.assertEquals(CloudProvider.AZURE, cloudCarbonFootprintInstanceData.getCloudProvider());
+    }
+
+    @Test
     public void testCloudCarbonFootprintDataAzureWithMicroarchitecture() {
         System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY, "Azure");
         System.setProperty(Constants.RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY, "West Europe");
@@ -128,7 +148,8 @@ public class CloudCarbonFootprintDataTest {
         Assertions.assertEquals(0.39, instance.getGridEmissionsFactor());
         CloudCarbonFootprintInstanceData cloudCarbonFootprintInstanceData = instance.getCloudInstanceDetails();
         Assertions.assertNotNull(cloudCarbonFootprintInstanceData);
-        Assertions.assertEquals(0.8, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
+        // HB120-96rs v3 is a HB120rs v3 constrained to 96 vCPUs, the instance file contains the ratio 0.8 instead
+        Assertions.assertEquals(96, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
         Assertions.assertEquals(120, cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
         Assertions.assertEquals(0.44538981119791665, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
         Assertions.assertEquals(2.0193277994791665, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());

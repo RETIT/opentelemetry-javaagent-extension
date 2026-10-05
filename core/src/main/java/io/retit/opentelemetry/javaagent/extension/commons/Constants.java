@@ -35,6 +35,7 @@ public class Constants {
     public static final String RETIT_DISK_DEMAND_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.disk.demand";
     public static final String RETIT_GC_EVENT_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.gc.event";
     public static final String RETIT_THREAD_NAME_LOGGING_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".log.thread.name";
+    public static final String RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".metrics.excluded.attributes";
 
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider";
     public static final String RETIT_EMISSIONS_CLOUD_PROVIDER_REGION_CONFIGURATION_PROPERTY = RETIT_NAMESPACE + ".emissions.cloud.provider.region";

@@ -163,6 +163,7 @@ Configuration options specific to this extension are listed below. All configura
  | IO_RETIT_LOG_DISK_DEMAND | true/false                                                         | false                                      | If set to true storage demand is captured for every span (Works only on Linux-based systems with a Kernel version higher than 3.14).                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | IO_RETIT_LOG_NETWORK_DEMAND | true/false                                                         | false                                      | If set to true network demand is captured for every span (Works only on Linux-based systems with a Kernel version higher than 3.14).                                                                                                                                                                                                                                                                                                                                                                                                                                      |
 | IO_RETIT_LOG_GC_EVENT | true/false                                                         | true                                       | If set to true a garbage event listener is registered to capture garbage collection events.                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| IO_RETIT_METRICS_EXCLUDED_ATTRIBUTES | comma separated list of attribute name prefixes | see [OpenTelemetry Metrics published by this extension](#opentelemetry-metrics-published-by-this-extension) | Span attributes starting with one of these prefixes are not published as attributes of the io.retit.resource.demand.* metrics. The configured list replaces the default list, so copy the default list and adjust it if you only want to add or remove single entries. Attributes starting with io.retit are always excluded. Every distinct attribute value creates a new time series, so attributes with a high cardinality (e.g., attributes containing IDs) should always be excluded. Example: "network,thread,user,client,instance,url.full,url.fragment,http.request.header,http.response.header,session,enduser,messaging.message.id,messaging.message.conversation_id,db.statement,db.query.text" (publishes url.query) |
 | IO_RETIT_EMISSIONS_CLOUD_PROVIDER | AWS/Azure/GCP/OnPremise                                            | -                                          | Specifies the cloud provider for this process. Use "OnPremise" for on-premise infrastructure. Please note that for on-premise instrastructure you need to specify the other configuration operations starting with IO_RETIT_EMISSIONS_ONPREMISE_* as well                                                                                                                                                                                                                                                                                                                 |
 | IO_RETIT_EMISSIONS_CLOUD_PROVIDER_REGION | regions of the corresponding cloud provider                        | -                                          | Specifies the cloud provider region for this process. Not required for on-premise.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | IO_RETIT_EMISSIONS_CLOUD_PROVIDER_INSTANCE_TYPE | virtual machine instance types of the corresponding cloud provider | -                                          | Specifies the cloud provider virtual machine instance type for this process. Not required for on-premise.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
@@ -180,22 +181,52 @@ Configuration options specific to this extension are listed below. All configura
 
 Furthermore, it publishes OpenTelemetry metrics including this data for all entry level transactions (e.g., API calls) of an application. These metrics are called as follows:
 
-    io.retit.resource.demand.storage.bytes
-    io.retit.resource.demand.memory.bytes
-    io.retit.resource.demand.network.bytes
-    io.retit.resource.demand.cpu.ms
+    io.retit.resource.demand.storage.bytes - storage demand of a transaction in bytes
+    io.retit.resource.demand.memory.bytes - memory demand of a transaction in bytes
+    io.retit.resource.demand.network.bytes - network demand of a transaction in bytes
+    io.retit.resource.demand.cpu.ms - CPU demand of a transaction in ms
+
+In addition, the total CPU time of the Java process (summed over all threads and cores) is published in ms:
+
+    io.retit.emissions.java.process.cpu.time - CPU time of the Java process in ms
+
+Please note that this counter has no unit set, so its Prometheus name has no unit suffix (`io_retit_emissions_java_process_cpu_time_total`), whereas the transaction CPU demand includes it (`io_retit_resource_demand_cpu_ms_milliseconds_total`). Both values are in ms.
+
+The resource demand metrics carry the attributes of the corresponding span (e.g., http.request.method, http.route, url.path) so that they can be grouped by transaction. Attributes that would create a new time series for (almost) every transaction or contain personal data are not published. By default, these are all attributes starting with one of the following prefixes:
+
+    network, thread, user (incl. user_agent), client, instance, url.query, url.full, url.fragment,
+    http.request.header, http.response.header, session, enduser, messaging.message.id,
+    messaging.message.conversation_id, db.statement, db.query.text
+
+This default list can be replaced using the IO_RETIT_METRICS_EXCLUDED_ATTRIBUTES configuration option. Attributes starting with io.retit (the raw resource demand measurements of the span) are always excluded. If your application distinguishes transactions only by query parameters (e.g., /controller?action=list), you can remove url.query from the list, but only if the query strings do not contain IDs or personal data. If the url.path of your application contains IDs (e.g., /customers/4711), you should exclude url.path and use http.route instead.
 
 If the cloud provider and its region is configured, also emission related metrics are being published:
 
-    io.retit.emissions.cpu.power.min -  minimum power consumption of the CPU in Idle
-    io.retit.emissions.cpu.power.max -  maximum power consumption of the CPU at 100% utilization
+    io.retit.emissions.cpu.power.min -  minimum power consumption of the CPU in Idle in Watts per vCPU
+    io.retit.emissions.cpu.power.max -  maximum power consumption of the CPU at 100% utilization in Watts per vCPU
+    io.retit.emissions.instance.vcpu.count - number of vCPUs of the instance
     io.retit.emissions.embodied.emissions.minute.mg - embodied emissions per minute in mg
     io.retit.emissions.memory.energy.gb.minute -  Memory energy consumption in kWh per GB per minute
     io.retit.emissions.storage.energy.gb.minute - Storage energy consumption in kWh per GB per minute
     io.retit.emissions.network.energy.gb.minute - Network energy consumption in kWh per GB per minute
     io.retit.emissions.pue - Power Usage Effectiveness (PUE) value of the datacenter
-    io.retit.emissions.gef - Grid Emissions Factor (GEF)
-    
+    io.retit.emissions.gef - Grid Emissions Factor (GEF) in kg CO2e per kWh
+
+The example Grafana dashboards in `examples/docker/grafana` calculate the SCI value per minute in gCO2eq for a group of transactions (e.g., all GET requests) as follows (all `rate()` values are per second):
+
+    vCPU      = io.retit.emissions.instance.vcpu.count
+    CPUutil   = rate(io.retit.emissions.java.process.cpu.time) / 1000 / vCPU
+    CPUutilT  = rate(io.retit.resource.demand.cpu.ms) / rate(io.retit.emissions.java.process.cpu.time)
+    Pcpu      = vCPU * (cpu.power.min + CPUutil * (cpu.power.max - cpu.power.min))      [W]
+    PTcpu     = Pcpu * PUE * CPUutilT                                                   [W]
+    Ecpu      = PTcpu / 60 / 1000                                                       [kWh per minute]
+    cCPU      = Ecpu * GEF * 1000                                                       [g per minute]
+    cMEM      = rate(io.retit.resource.demand.memory.bytes) * 60 * 10^-9 * memory.energy.gb.minute * PUE * GEF * 1000  [g per minute]
+    MT        = embodied.emissions.minute.mg / 1000 * CPUutilT                          [g per minute]
+    SCIT      = cCPU + cMEM + MT                                                        [g per minute]
+
+To get the SCI value per transaction, divide SCIT by the number of transactions per minute.
+
 This data can later be used to calculate the carbon intensity of the application or of each API call (e.g., using SCI as shown in our work presented at the [Symposium on Software Performance 2024](https://fb-swt.gi.de/fileadmin/FB/SWT/Softwaretechnik-Trends/Verzeichnis/Band_44_Heft_4/SSP24_16_camera-ready_5255.pdf)).
 
 # OpenTelemetry Tracing Span attributes added by this extension

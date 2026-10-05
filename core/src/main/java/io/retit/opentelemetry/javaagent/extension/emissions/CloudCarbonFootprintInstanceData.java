@@ -28,9 +28,9 @@ public class CloudCarbonFootprintInstanceData {
     private double instanceVCpuCount;
     // Number of Platform Total vCPU
     private double platformTotalVCpuCount;
-    // Instance Watt usage @ Idle
+    // Watt usage per vCPU @ Idle
     private double cpuPowerConsumptionIdle;
-    // Instance Watt usage @ 100%
+    // Watt usage per vCPU @ 100%
     private double cpuPowerConsumption100Percent;
     // the total embodied emissions of the server running this vminstance
     private double totalEmbodiedEmissions;
@@ -46,8 +46,8 @@ public class CloudCarbonFootprintInstanceData {
      *
      * @param instanceVCpuCount             - Number of Instance vCPUs
      * @param platformTotalVCpuCount        - Number of Platform total vCPUs
-     * @param cpuPowerConsumptionIdle       - Instance Watt usage @ Idle
-     * @param cpuPowerConsumption100Percent - Instance Watt usage @ 100% Utilization
+     * @param cpuPowerConsumptionIdle       - Watt usage per vCPU @ Idle
+     * @param cpuPowerConsumption100Percent - Watt usage per vCPU @ 100% Utilization
      * @param totalEmbodiedEmissions        - the total embodied emissions of the server running this vminstance
      */
     public CloudCarbonFootprintInstanceData(final double instanceVCpuCount,
