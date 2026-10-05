@@ -23,6 +23,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class MetricPublishingServiceTest {
 
@@ -64,6 +66,59 @@ public class MetricPublishingServiceTest {
                 .put("url.scheme", "https")
                 .put("server.address", "localhost")
                 .build(), filteredAttributes);
+    }
+
+    // one attribute per default excluded prefix, the names are spelled out on purpose
+    // so that a misspelled or removed prefix in the default list fails this test
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "io.retit.startcputime",
+            "network.peer.address",
+            "thread.name",
+            "user.id",
+            "user_agent.original",
+            "client.address",
+            "instance.id",
+            "url.query",
+            "url.full",
+            "url.fragment",
+            "http.request.header.cookie",
+            "http.response.header.set-cookie",
+            "session.id",
+            "enduser.id",
+            "messaging.message.id",
+            "messaging.message.conversation_id",
+            "db.statement",
+            "db.query.text"
+    })
+    public void testDefaultExcludedAttributeIsNotPublished(final String attributeName) {
+        Attributes spanAttributes = Attributes.builder()
+                .put("http.request.method", "GET")
+                .put(attributeName, "example-value")
+                .build();
+
+        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(spanAttributes);
+
+        Assertions.assertEquals(Attributes.of(AttributeKey.stringKey("http.request.method"), "GET"), filteredAttributes);
+    }
+
+    // attributes used to group transactions must not be caught by an overly broad default prefix
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "http.request.method",
+            "http.route",
+            "url.path",
+            "url.scheme",
+            "server.address",
+            "messaging.destination.name",
+            "db.system"
+    })
+    public void testTransactionAttributeIsPublished(final String attributeName) {
+        Attributes spanAttributes = Attributes.of(AttributeKey.stringKey(attributeName), "example-value");
+
+        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(spanAttributes);
+
+        Assertions.assertEquals(spanAttributes, filteredAttributes);
     }
 
     @Test
