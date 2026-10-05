@@ -1565,7 +1565,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$dmem * 60 * 0.000000001 * $Emem * $PUE * $GEF * 1000",
+          "expression": "$dmem * 60 * 0.000001 * $Emem * $PUE * $GEF * 1000",
           "hide": true,
           "refId": "cmem",
           "type": "math"
@@ -1965,7 +1965,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$dmem * 60 * 0.000000001 * $Emem * $PUE * $GEF * 1000",
+          "expression": "$dmem * 60 * 0.000001 * $Emem * $PUE * $GEF * 1000",
           "hide": true,
           "refId": "cmem",
           "type": "math"
@@ -2365,7 +2365,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$dmem * 60 * 0.000000001 * $Emem * $PUE * $GEF * 1000",
+          "expression": "$dmem * 60 * 0.000001 * $Emem * $PUE * $GEF * 1000",
           "hide": true,
           "refId": "cmem",
           "type": "math"
