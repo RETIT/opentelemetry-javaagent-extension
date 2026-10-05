@@ -212,8 +212,8 @@ final class CloudCarbonFootprintDataLoader {
             for (String[] lineFields : csvLines) {
                 String csvMicroarchitecture = lineFields[1].trim();
                 if (csvMicroarchitecture.equals(microarchitecture)) {
-                    cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[2].trim())); // Instance Watt usage @ Idle
-                    cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[3].trim())); // Instance Watt usage @ 100%
+                    cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[2].trim())); // Watt usage per vCPU @ Idle
+                    cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[3].trim())); // Watt usage per vCPU @ 100%
                 }
             }
         }
@@ -236,10 +236,15 @@ final class CloudCarbonFootprintDataLoader {
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[0];
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
-                cloudVMInstanceDetails.setInstanceVCpuCount(Double.parseDouble(lineFields[2])); // Instance vCPU
+                double instanceVCpuCount = Double.parseDouble(lineFields[2]);
+                cloudVMInstanceDetails.setInstanceVCpuCount(instanceVCpuCount); // Instance vCPU
                 cloudVMInstanceDetails.setPlatformTotalVCpuCount(Double.parseDouble(lineFields[3])); // Platform Total Number of vCPU
-                cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[27].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ Idle
-                cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[30].replace("\"", "").trim().replace(',', '.'))); // Instance Watt usage @ 100%
+                if (instanceVCpuCount > DOUBLE_ZERO) {
+                    // the AWS instance file contains the power consumption of the whole instance, while
+                    // all other sources provide it per vCPU, so we convert it to a per vCPU value here
+                    cloudVMInstanceDetails.setCpuPowerConsumptionIdle(Double.parseDouble(lineFields[27].replace("\"", "").trim().replace(',', '.')) / instanceVCpuCount); // Instance Watt usage @ Idle
+                    cloudVMInstanceDetails.setCpuPowerConsumption100Percent(Double.parseDouble(lineFields[30].replace("\"", "").trim().replace(',', '.')) / instanceVCpuCount); // Instance Watt usage @ 100%
+                }
             }
         }
 

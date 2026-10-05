@@ -52,8 +52,9 @@ public class CloudCarbonFootprintDataTest {
 
         Assertions.assertEquals(4, cloudCarbonFootprintInstanceData.getInstanceVCpuCount());
         Assertions.assertEquals(72, cloudCarbonFootprintInstanceData.getPlatformTotalVCpuCount());
-        Assertions.assertEquals(8.4, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
-        Assertions.assertEquals(28.4, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
+        // the AWS instance file contains 8.4 W / 28.4 W for the whole instance with 4 vCPUs
+        Assertions.assertEquals(8.4 / 4, cloudCarbonFootprintInstanceData.getCpuPowerConsumptionIdle());
+        Assertions.assertEquals(28.4 / 4, cloudCarbonFootprintInstanceData.getCpuPowerConsumption100Percent());
         Assertions.assertEquals(1477.54, cloudCarbonFootprintInstanceData.getTotalEmbodiedEmissions());
         Assertions.assertEquals(CloudProvider.AWS, cloudCarbonFootprintInstanceData.getCloudProvider());
     }
