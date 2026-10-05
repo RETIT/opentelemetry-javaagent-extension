@@ -32,6 +32,7 @@ import java.util.List;
 final class CloudCarbonFootprintDataLoader {
 
     private static final double DOUBLE_ZERO = 0.0;
+    private static final String AZURE_CONSTRAINED_VCPU_SERIES = "Constrained vCPUs capable";
 
     private CloudCarbonFootprintDataLoader() {
     }
@@ -201,8 +202,12 @@ final class CloudCarbonFootprintDataLoader {
         for (String[] lineFields : csvLines) {
             String csvInstanceType = lineFields[1].trim();
             if (csvInstanceType.equalsIgnoreCase(vmInstanceType.trim())) {
-                cloudVMInstanceDetails.setInstanceVCpuCount(Double.parseDouble(lineFields[3].trim())); // Number of Instance vCPU
-                cloudVMInstanceDetails.setPlatformTotalVCpuCount(Double.parseDouble(lineFields[5].trim())); // Number of Platform Total vCPU
+                if (AZURE_CONSTRAINED_VCPU_SERIES.equals(lineFields[0].trim())) {
+                    initializeConstrainedVCpuDetails(cloudVMInstanceDetails, csvLines, lineFields);
+                } else {
+                    cloudVMInstanceDetails.setInstanceVCpuCount(Double.parseDouble(lineFields[3].trim())); // Number of Instance vCPU
+                    cloudVMInstanceDetails.setPlatformTotalVCpuCount(Double.parseDouble(lineFields[5].trim())); // Number of Platform Total vCPU
+                }
                 break;
             }
         }
@@ -218,6 +223,31 @@ final class CloudCarbonFootprintDataLoader {
             }
         }
         return cloudVMInstanceDetails;
+    }
+
+    /**
+     * Initializes the vCPU counts of Azure VMs with constrained vCPUs (e.g., M16-8ms is a M16ms with 8 instead of 16 vCPUs).
+     * For these VMs the Azure instance file does not contain the vCPU counts but the ratio of active vCPUs
+     * compared to the parent VM in the "Instance vCPUs" column and the vCPU count of the parent VM in the
+     * "Platform vCPUs" column. The platform vCPU count is therefore taken from the parent VM.
+     *
+     * @param cloudVMInstanceDetails - the instance details to initialize.
+     * @param csvLines               - all lines of the Azure instance file.
+     * @param constrainedLineFields  - the line of the constrained VM.
+     */
+    private static void initializeConstrainedVCpuDetails(final CloudCarbonFootprintInstanceData cloudVMInstanceDetails, final List<String[]> csvLines, final String[] constrainedLineFields) {
+        double activeVCpuRatio = Double.parseDouble(constrainedLineFields[3].trim());
+        double parentVCpuCount = Double.parseDouble(constrainedLineFields[5].trim());
+        cloudVMInstanceDetails.setInstanceVCpuCount(Math.round(activeVCpuRatio * parentVCpuCount));
+        cloudVMInstanceDetails.setPlatformTotalVCpuCount(parentVCpuCount);
+
+        String parentInstanceType = constrainedLineFields[1].trim().replaceFirst("-\\d+", "");
+        for (String[] lineFields : csvLines) {
+            if (!AZURE_CONSTRAINED_VCPU_SERIES.equals(lineFields[0].trim()) && lineFields[1].trim().equalsIgnoreCase(parentInstanceType)) {
+                cloudVMInstanceDetails.setPlatformTotalVCpuCount(Double.parseDouble(lineFields[5].trim())); // Number of Platform Total vCPU
+                break;
+            }
+        }
     }
 
     /**
