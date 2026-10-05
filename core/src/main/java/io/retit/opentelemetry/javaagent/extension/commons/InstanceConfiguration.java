@@ -16,6 +16,8 @@
 
 package io.retit.opentelemetry.javaagent.extension.commons;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -112,6 +114,28 @@ public class InstanceConfiguration {
     public static double getHardwareLifespanInYears() {
         double configuredValue = getProperty(Constants.RETIT_EMISSIONS_HARDWARE_LIFESPAN_CONFIGURATION_PROPERTY, Double::valueOf, 4.0);
         return configuredValue > 0.0 ? configuredValue : 4.0;
+    }
+
+    /**
+     * Returns the attribute name prefixes that should not be published as metric attributes.
+     * The prefixes are configured as a comma separated list, which replaces the provided default list.
+     *
+     * @param defaultValue - the attribute name prefixes to return if the property is not set
+     * @return the configured attribute name prefixes or the provided defaultValue if the property is not set
+     */
+    public static List<String> getMetricsExcludedAttributes(final List<String> defaultValue) {
+        String configuredValue = getProperty(Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY, String::valueOf, null);
+        if (configuredValue == null) {
+            return defaultValue;
+        }
+        List<String> excludedAttributes = new ArrayList<>();
+        for (String excludedAttribute : configuredValue.split(",")) {
+            String trimmedAttribute = excludedAttribute.trim();
+            if (!trimmedAttribute.isEmpty()) {
+                excludedAttributes.add(trimmedAttribute);
+            }
+        }
+        return excludedAttributes;
     }
 
     /**

@@ -27,6 +27,7 @@ import io.opentelemetry.api.metrics.ObservableDoubleMeasurement;
 import io.opentelemetry.api.metrics.ObservableLongMeasurement;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
+import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
 import io.retit.opentelemetry.javaagent.extension.commons.TelemetryUtils;
 import io.retit.opentelemetry.javaagent.extension.emissions.CloudCarbonFootprintData;
 import io.retit.opentelemetry.javaagent.extension.emissions.embodied.EmbodiedEmissions;
@@ -36,6 +37,8 @@ import io.retit.opentelemetry.javaagent.extension.energy.StorageEnergyData;
 import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourceDemandDataCollector;
 
 import java.lang.management.ManagementFactory;
+import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -47,14 +50,28 @@ public class MetricPublishingService {
     private static final Logger LOGGER = Logger.getLogger(MetricPublishingService.class.getName());
 
     private static final long NANOSECOND_TO_MILLISECOND_CONVERSION = 1_000_000;
-    private static final String[] EXCLUDED_ATTRIBUTE_NAMESPACES = {
-            Constants.RETIT_NAMESPACE,
+    // span attributes starting with these prefixes are not published as metric attributes
+    // as they would create a new time series for (almost) every transaction. This default list
+    // can be replaced using Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY,
+    // attributes in Constants.RETIT_NAMESPACE are always excluded.
+    private static final List<String> DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES = Arrays.asList(
             Constants.NETWORK_NAMESPACE,
             Constants.THREAD_NAMESPACE,
             Constants.USER_NAMESPACE,
             Constants.CLIENT_NAMESPACE,
-            Constants.INSTANCE_NAMESPACE
-    };
+            Constants.INSTANCE_NAMESPACE,
+            "url.query",
+            "url.full",
+            "url.fragment",
+            "http.request.header",
+            "http.response.header",
+            "session",
+            "enduser",
+            "messaging.message.id",
+            "messaging.message.conversation_id",
+            "db.statement",
+            "db.query.text"
+    );
 
     private static MetricPublishingService instance = new MetricPublishingService();
 
@@ -182,7 +199,7 @@ public class MetricPublishingService {
             Long endThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
 
             if (startThread != null && startThread.equals(endThread)) {
-                Attributes filteredAttributes = getAttributesWithoutRETITThreadUserAndNetworkClientAttributes(readWriteSpan.getAttributes());
+                Attributes filteredAttributes = getAttributesWithoutExcludedAttributes(readWriteSpan.getAttributes());
                 // add resource demands to resource demand vector
                 publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes(), filteredAttributes);
                 publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes(), filteredAttributes);
@@ -254,19 +271,31 @@ public class MetricPublishingService {
         }
     }
 
-    private Attributes getAttributesWithoutRETITThreadUserAndNetworkClientAttributes(final Attributes spanAttributes) {
+    /**
+     * Removes all span attributes that should not be published as metric attributes.
+     * These are the attributes in Constants.RETIT_NAMESPACE as well as the attributes configured
+     * using Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY, which defaults to
+     * DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES.
+     *
+     * @param spanAttributes - the attributes of the span.
+     * @return the attributes to publish with the metrics.
+     */
+    static Attributes getAttributesWithoutExcludedAttributes(final Attributes spanAttributes) {
+        List<String> excludedAttributes = InstanceConfiguration.getMetricsExcludedAttributes(DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES);
+
         AttributesBuilder attributesBuilder = Attributes.builder();
 
         attributesBuilder.putAll(spanAttributes);
 
-        attributesBuilder.removeIf(key -> hasExcludedNamespacePrefix(key.getKey()));
+        attributesBuilder.removeIf(key -> key.getKey().startsWith(Constants.RETIT_NAMESPACE)
+                || hasExcludedPrefix(key.getKey(), excludedAttributes));
 
         return attributesBuilder.build();
     }
 
-    private static boolean hasExcludedNamespacePrefix(final String key) {
-        for (String namespace : EXCLUDED_ATTRIBUTE_NAMESPACES) {
-            if (key.startsWith(namespace)) {
+    private static boolean hasExcludedPrefix(final String key, final List<String> excludedPrefixes) {
+        for (String excludedPrefix : excludedPrefixes) {
+            if (key.startsWith(excludedPrefix)) {
                 return true;
             }
         }
