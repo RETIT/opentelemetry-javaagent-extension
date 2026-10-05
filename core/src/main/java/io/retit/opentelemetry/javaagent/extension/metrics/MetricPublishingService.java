@@ -95,6 +95,11 @@ public class MetricPublishingService {
                 .buildWithCallback(measurement ->
                         publishDoubleMeasurement(measurement, "Max CPU Power Consumption", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getCpuPowerConsumption100Percent()));
 
+        // number of vCPUs of the instance, required to scale the per vCPU power consumption values to the instance
+        meter.gaugeBuilder("io.retit.emissions.instance.vcpu.count")
+                .buildWithCallback(measurement ->
+                        publishDoubleMeasurement(measurement, "Instance vCPU Count", CloudCarbonFootprintData.getConfigInstance().getCloudInstanceDetails().getInstanceVCpuCount()));
+
         // embodied emissions per minute in mg
         meter.gaugeBuilder("io.retit.emissions.embodied.emissions.minute.mg")
                 .buildWithCallback(measurement ->

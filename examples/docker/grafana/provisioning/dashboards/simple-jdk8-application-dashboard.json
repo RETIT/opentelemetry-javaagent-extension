@@ -193,6 +193,23 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
+          "expr": "io_retit_emissions_instance_vcpu_count{job=\"simple-jdk8-application\"}",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "vcpu",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
           "exemplar": false,
           "expr": "rate(io_retit_emissions_java_process_cpu_time_total{job=\"simple-jdk8-application\"}[1m])",
           "fullMetaSearch": false,
@@ -210,7 +227,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$processcpudemand  / 60000",
+          "expression": "$processcpudemand / 1000 / $vcpu",
           "hide": true,
           "refId": "CPUutil",
           "type": "math"
@@ -232,7 +249,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Pcpumin + ($CPUutil * ($Pcpumax-$Pcpumin))",
+          "expression": "$vcpu * ($Pcpumin + ($CPUutil * ($Pcpumax - $Pcpumin)))",
           "hide": true,
           "refId": "Pcpu",
           "type": "math"
@@ -243,7 +260,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Pcpu * $CPUutilT",
+          "expression": "$Pcpu * $PUE * $CPUutilT",
           "hide": true,
           "refId": "Ptcpu",
           "type": "math"
@@ -254,7 +271,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "($Ptcpu * 60000) / 1000",
+          "expression": "$Ptcpu / 60 / 1000",
           "hide": true,
           "refId": "Ecpu",
           "type": "math"
@@ -265,7 +282,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Ecpu * $GEF",
+          "expression": "$Ecpu * $GEF * 1000",
           "hide": true,
           "refId": "ccpu",
           "type": "math"
@@ -344,7 +361,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$dmem*0.000000001*$Emem*$GEF",
+          "expression": "$dmem * 60 * 0.000000001 * $Emem * $PUE * $GEF * 1000",
           "hide": true,
           "refId": "cmem",
           "type": "math"
@@ -383,7 +400,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$M * $CPUutilT",
+          "expression": "$M / 1000 * $CPUutilT",
           "hide": true,
           "refId": "Mt",
           "type": "math"
@@ -576,6 +593,23 @@
           },
           "disableTextWrap": false,
           "editorMode": "builder",
+          "expr": "io_retit_emissions_instance_vcpu_count{job=\"simple-jdk8-application\"}",
+          "fullMetaSearch": false,
+          "hide": true,
+          "includeNullMetadata": true,
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "vcpu",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "api-metrics"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
           "exemplar": false,
           "expr": "rate(io_retit_emissions_java_process_cpu_time_total{job=\"simple-jdk8-application\"}[1m])",
           "fullMetaSearch": false,
@@ -593,7 +627,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$processcpudemand  / 60000",
+          "expression": "$processcpudemand / 1000 / $vcpu",
           "hide": true,
           "refId": "CPUutil",
           "type": "math"
@@ -615,7 +649,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Pcpumin + ($CPUutil * ($Pcpumax-$Pcpumin))",
+          "expression": "$vcpu * ($Pcpumin + ($CPUutil * ($Pcpumax - $Pcpumin)))",
           "hide": true,
           "refId": "Pcpu",
           "type": "math"
@@ -626,7 +660,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Pcpu * $CPUutilT",
+          "expression": "$Pcpu * $PUE * $CPUutilT",
           "hide": true,
           "refId": "Ptcpu",
           "type": "math"
@@ -637,7 +671,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "($Ptcpu * 60000) / 1000",
+          "expression": "$Ptcpu / 60 / 1000",
           "hide": true,
           "refId": "Ecpu",
           "type": "math"
@@ -648,7 +682,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$Ecpu * $GEF",
+          "expression": "$Ecpu * $GEF * 1000",
           "hide": true,
           "refId": "ccpu",
           "type": "math"
@@ -727,7 +761,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$dmem*0.000000001*$Emem*$GEF",
+          "expression": "$dmem * 60 * 0.000000001 * $Emem * $PUE * $GEF * 1000",
           "hide": true,
           "refId": "cmem",
           "type": "math"
@@ -766,7 +800,7 @@
             "type": "__expr__",
             "uid": "__expr__"
           },
-          "expression": "$M * $CPUutilT",
+          "expression": "$M / 1000 * $CPUutilT",
           "hide": true,
           "refId": "Mt",
           "type": "math"

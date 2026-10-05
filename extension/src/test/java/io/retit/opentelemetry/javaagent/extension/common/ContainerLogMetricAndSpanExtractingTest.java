@@ -15,7 +15,7 @@ import java.util.Map;
 
 public abstract class ContainerLogMetricAndSpanExtractingTest {
     // Metrics to be tested
-    protected static final String[] METRIC_NAMES = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "io.retit.emissions.cpu.power.min", "io.retit.emissions.cpu.power.max",
+    protected static final String[] METRIC_NAMES = {Constants.SPAN_ATTRIBUTE_PROCESS_CPU_TIME, "io.retit.emissions.cpu.power.min", "io.retit.emissions.cpu.power.max", "io.retit.emissions.instance.vcpu.count",
             "io.retit.emissions.embodied.emissions.minute.mg", "io.retit.emissions.memory.energy.gb.minute",
             "io.retit.emissions.storage.energy.gb.minute", "io.retit.emissions.network.energy.gb.minute",
             "io.retit.emissions.pue", "io.retit.emissions.gef", "io.retit.resource.demand.storage.bytes",
