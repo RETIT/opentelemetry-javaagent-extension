@@ -48,6 +48,11 @@ public class MetricPublishingServiceTest {
             .put("io.retit.endcputime", 23490117509L)
             .build();
 
+    // resolves the exclusion configuration like the MetricPublishingService does during its initialization
+    private static Attributes filter(final Attributes spanAttributes) {
+        return MetricPublishingService.getAttributesWithoutExcludedAttributes(spanAttributes, MetricPublishingService.resolveExcludedAttributes());
+    }
+
     @BeforeEach
     @AfterEach
     public void clearProperties() {
@@ -56,7 +61,7 @@ public class MetricPublishingServiceTest {
 
     @Test
     public void testHighCardinalityAttributesAreExcludedByDefault() {
-        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(SERVER_SPAN_ATTRIBUTES);
+        Attributes filteredAttributes = filter(SERVER_SPAN_ATTRIBUTES);
 
         Assertions.assertEquals(Attributes.builder()
                 .put("http.request.method", "GET")
@@ -97,7 +102,7 @@ public class MetricPublishingServiceTest {
                 .put(attributeName, "example-value")
                 .build();
 
-        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(spanAttributes);
+        Attributes filteredAttributes = filter(spanAttributes);
 
         Assertions.assertEquals(Attributes.of(AttributeKey.stringKey("http.request.method"), "GET"), filteredAttributes);
     }
@@ -116,7 +121,7 @@ public class MetricPublishingServiceTest {
     public void testTransactionAttributeIsPublished(final String attributeName) {
         Attributes spanAttributes = Attributes.of(AttributeKey.stringKey(attributeName), "example-value");
 
-        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(spanAttributes);
+        Attributes filteredAttributes = filter(spanAttributes);
 
         Assertions.assertEquals(spanAttributes, filteredAttributes);
     }
@@ -125,7 +130,7 @@ public class MetricPublishingServiceTest {
     public void testConfiguredAttributesReplaceDefaultList() {
         System.setProperty(Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY, " network, thread, user,client ,");
 
-        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(SERVER_SPAN_ATTRIBUTES);
+        Attributes filteredAttributes = filter(SERVER_SPAN_ATTRIBUTES);
 
         Assertions.assertEquals(Attributes.builder()
                 .put("http.request.method", "GET")
@@ -142,7 +147,7 @@ public class MetricPublishingServiceTest {
     public void testRETITAttributesAreAlwaysExcluded() {
         System.setProperty(Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY, "");
 
-        Attributes filteredAttributes = MetricPublishingService.getAttributesWithoutExcludedAttributes(SERVER_SPAN_ATTRIBUTES);
+        Attributes filteredAttributes = filter(SERVER_SPAN_ATTRIBUTES);
 
         Assertions.assertNull(filteredAttributes.get(AttributeKey.longKey("io.retit.startcputime")));
         Assertions.assertNull(filteredAttributes.get(AttributeKey.longKey("io.retit.endcputime")));

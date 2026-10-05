@@ -38,6 +38,7 @@ import io.retit.opentelemetry.javaagent.extension.resources.common.CommonResourc
 
 import java.lang.management.ManagementFactory;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -80,6 +81,9 @@ public class MetricPublishingService {
     private final LongCounter networkDemandMetricPublisher;
     private final LongCounter cpuDemandMetricPublisher;
 
+    // resolved once as the configuration does not change at runtime and the list is used for every transaction
+    private final List<String> excludedAttributes;
+
     /**
      * Returns the singleton instance of MetricPublishingService, creating it if necessary.
      *
@@ -94,6 +98,8 @@ public class MetricPublishingService {
      * Initializes the meters for storage, CPU, embedded components, and memory emissions.
      */
     private MetricPublishingService() {
+
+        excludedAttributes = resolveExcludedAttributes();
 
         Meter meter = GlobalOpenTelemetry.get().getMeter("opentelemetry-javaagent-extension");
 
@@ -199,7 +205,7 @@ public class MetricPublishingService {
             Long endThread = readWriteSpan.getAttributes().get(AttributeKey.longKey(Constants.SPAN_ATTRIBUTE_SPAN_END_THREAD));
 
             if (startThread != null && startThread.equals(endThread)) {
-                Attributes filteredAttributes = getAttributesWithoutExcludedAttributes(readWriteSpan.getAttributes());
+                Attributes filteredAttributes = getAttributesWithoutExcludedAttributes(readWriteSpan.getAttributes(), excludedAttributes);
                 // add resource demands to resource demand vector
                 publishCpuDemandMetricForTransaction(logCPUTime, readWriteSpan.getAttributes(), filteredAttributes);
                 publishMemoryDemandMetricForTransaction(logHeapConsumption, readWriteSpan.getAttributes(), filteredAttributes);
@@ -272,17 +278,24 @@ public class MetricPublishingService {
     }
 
     /**
-     * Removes all span attributes that should not be published as metric attributes.
-     * These are the attributes in Constants.RETIT_NAMESPACE as well as the attributes configured
-     * using Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY, which defaults to
-     * DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES.
+     * Returns the attribute name prefixes configured using Constants.RETIT_METRICS_EXCLUDED_ATTRIBUTES_CONFIGURATION_PROPERTY,
+     * which defaults to DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES.
      *
-     * @param spanAttributes - the attributes of the span.
+     * @return the attribute name prefixes that should not be published as metric attributes.
+     */
+    static List<String> resolveExcludedAttributes() {
+        return Collections.unmodifiableList(InstanceConfiguration.getMetricsExcludedAttributes(DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES));
+    }
+
+    /**
+     * Removes all span attributes that should not be published as metric attributes.
+     * These are the attributes in Constants.RETIT_NAMESPACE as well as the attributes starting with one of the given prefixes.
+     *
+     * @param spanAttributes     - the attributes of the span.
+     * @param excludedAttributes - the attribute name prefixes to exclude, see resolveExcludedAttributes().
      * @return the attributes to publish with the metrics.
      */
-    static Attributes getAttributesWithoutExcludedAttributes(final Attributes spanAttributes) {
-        List<String> excludedAttributes = InstanceConfiguration.getMetricsExcludedAttributes(DEFAULT_EXCLUDED_ATTRIBUTE_NAMESPACES);
-
+    static Attributes getAttributesWithoutExcludedAttributes(final Attributes spanAttributes, final List<String> excludedAttributes) {
         AttributesBuilder attributesBuilder = Attributes.builder();
 
         attributesBuilder.putAll(spanAttributes);
