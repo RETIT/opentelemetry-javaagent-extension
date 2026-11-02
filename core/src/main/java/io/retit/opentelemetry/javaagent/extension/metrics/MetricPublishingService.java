@@ -138,9 +138,9 @@ public class MetricPublishingService {
                 .buildWithCallback(measurement ->
                         publishDoubleMeasurement(measurement, "Storage energy consumption in kWh per GB per minute", StorageEnergyData.getInstance().getKwhPerGBMinute()));
 
-        // Network energy consumption in kWh per GB per minute
-        meter.gaugeBuilder("io.retit.emissions.network.energy.gb.minute")
-                .buildWithCallback(measurement -> publishDoubleMeasurement(measurement, "Network energy consumption in kWh per GB per minute", NetworkEnergyData.getInstance().getKwhPerGBMinute()));
+        // Network energy consumption in kWh per GB transferred
+        meter.gaugeBuilder("io.retit.emissions.network.energy.gb")
+                .buildWithCallback(measurement -> publishDoubleMeasurement(measurement, "Network energy consumption in kWh per GB transferred", NetworkEnergyData.getInstance().getKwhPerGB()));
 
         // Power Usage Effectiveness (PUE) value of the datacenter
         meter.gaugeBuilder("io.retit.emissions.pue")

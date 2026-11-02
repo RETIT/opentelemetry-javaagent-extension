@@ -39,11 +39,12 @@ public class StorageEnergyData {
      * Initializes the {@link CloudCarbonFootprintData} to load necessary configuration.
      */
     private StorageEnergyData() {
-        // convert to kWh and then to one minute
-        this.kwhPerGBMinute = (Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD
+        double whPerTBHour = Constants.RETIT_EMISSIONS_STORAGE_TYPE_CONFIGURATION_PROPERTY_VALUE_SSD
                 .equalsIgnoreCase(InstanceConfiguration.getStorageType())
-                ? CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR / 1_000
-                : CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_HDD_PER_TB_HOUR / 1_000) / 60.0;
+                ? CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_SSD_PER_TB_HOUR
+                : CloudCarbonFootprintCoefficients.STORAGE_ENERGY_CONSUMPTION_WH_HDD_PER_TB_HOUR;
+        // convert Wh to kWh, per TB to per GB and per hour to per minute
+        this.kwhPerGBMinute = whPerTBHour / 1_000 / 1_000 / 60.0;
 
         LOGGER.info("Initialized StorageEnergyData using following data: " + this);
     }

@@ -208,7 +208,7 @@ If the cloud provider and its region is configured, also emission related metric
     io.retit.emissions.embodied.emissions.minute.mg - embodied emissions per minute in mg
     io.retit.emissions.memory.energy.gb.minute -  Memory energy consumption in kWh per GB per minute
     io.retit.emissions.storage.energy.gb.minute - Storage energy consumption in kWh per GB per minute
-    io.retit.emissions.network.energy.gb.minute - Network energy consumption in kWh per GB per minute
+    io.retit.emissions.network.energy.gb - Network energy consumption in kWh per GB transferred (no time component, as defined by the CCF methodology)
     io.retit.emissions.pue - Power Usage Effectiveness (PUE) value of the datacenter
     io.retit.emissions.gef - Grid Emissions Factor (GEF) in kg CO2e per kWh
 

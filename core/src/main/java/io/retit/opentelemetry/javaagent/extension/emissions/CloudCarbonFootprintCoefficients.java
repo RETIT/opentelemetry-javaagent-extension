@@ -91,10 +91,11 @@ public class CloudCarbonFootprintCoefficients {
     public static final double MEMORY_KWH_PER_GB_HOUR = 0.000_392;
 
     /**
-     * Coefficient for calculating network emissions in kWh per GB-hour.
+     * Coefficient for calculating network emissions in kWh per GB transferred.
+     * In contrast to the memory and storage coefficients, this value has no time component.
      * Source: <a href="https://www.cloudcarbonfootprint.org/docs/methodology/#networking">...</a>
      */
-    public static final double NETWORK_KWH_PER_GB_HOUR =  0.001;
+    public static final double NETWORK_KWH_PER_GB = 0.001;
 
     /**
      * Coefficient for Power Usage Effectiveness (PUE) for AWS.
