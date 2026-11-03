@@ -30,16 +30,15 @@ public class NetworkEnergyData {
 
     private static final NetworkEnergyData INSTANCE = new NetworkEnergyData();
 
-    private final double kwhPerGBMinute;
+    private final double kwhPerGB;
 
     /**
      * Private constructor to prevent instantiation.
      * Initializes the {@link CloudCarbonFootprintData} to load necessary configuration.
      */
     private NetworkEnergyData() {
-        // convert to kWh and then to one minute
-
-        this.kwhPerGBMinute = CloudCarbonFootprintCoefficients.NETWORK_KWH_PER_GB_HOUR / 60;
+        // the CCF network coefficient is the energy per GB transferred, so it must not be converted to a time interval
+        this.kwhPerGB = CloudCarbonFootprintCoefficients.NETWORK_KWH_PER_GB;
 
         LOGGER.info("Initialized NetworkEnergyData using following data: " + this);
     }
@@ -53,14 +52,14 @@ public class NetworkEnergyData {
         return INSTANCE;
     }
 
-    public double getKwhPerGBMinute() {
-        return kwhPerGBMinute;
+    public double getKwhPerGB() {
+        return kwhPerGB;
     }
 
     @Override
     public String toString() {
         return "NetworkEnergyData{"
-                + "kwhPerGBMinute=" + kwhPerGBMinute
+                + "kwhPerGB=" + kwhPerGB
                 + '}';
     }
 }
