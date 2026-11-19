@@ -38,8 +38,6 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     private static final Logger LOGGER = Logger.getLogger(LinuxDataCollector.class.getName());
 
-    private static final ThreadLocal<Long> THREAD_LOCAL_PROC_FS_READ_OVERHEAD = ThreadLocal.withInitial(() -> 0L);
-
     /**
      * Uses the symbolic link /proc/thread-self to avoid native calls for process and thread ID.
      * This symbolic link requires a linux kernel version higher than 3.14.
@@ -52,7 +50,13 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      */
     private static final Path PROC_FS_THREAD_SELF_NET = FileSystems.getDefault().getPath("/proc/thread-self/net/dev");
 
-    private static final String READ_BYTES = "rchar";
+    /**
+     * read_bytes and write_bytes count the bytes the thread caused to be fetched from / sent to the storage layer,
+     * see proc_pid_io(5). In contrast to rchar and wchar, they do not include reads from or writes to sockets, pipes
+     * or terminals and reads served from the page cache. Note that write_bytes is counted when a page is dirtied,
+     * so it is attributed to the thread writing to the page cache and not to the thread flushing the page to disk.
+     */
+    private static final String READ_BYTES = "read_bytes";
     private static final String WRITE_BYTES = "write_bytes";
 
     @Override
@@ -62,45 +66,53 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
 
     @Override
     public long[] getDiskBytesReadAndWritten() {
-        /*
-         * rchar: 476726516 wchar: 450053132 syscr: 1145703 syscw: 461006
-         * read_bytes: 933888 write_bytes: 26984448 cancelled_write_bytes: 0
-         */
-        long[] result = null;
+        long[] result = {0, 0};
 
         if (Files.exists(PROC_FS_THREAD_SELF_IO)) {
             try {
                 byte[] filearray = Files.readAllBytes(PROC_FS_THREAD_SELF_IO);
-                String text = new String(filearray, "UTF-8");
-
-                int startIndex = text.indexOf(READ_BYTES);
-                if (startIndex == -1) {
-                    return new long[]{};
-                }
-                startIndex += READ_BYTES.length() + 2;
-                int endIndex = text.indexOf('\n', startIndex);
-                long readBytes = Long.parseLong(text.substring(startIndex, endIndex)) - THREAD_LOCAL_PROC_FS_READ_OVERHEAD.get();
-
-                startIndex = text.indexOf(WRITE_BYTES);
-                if (startIndex == -1) {
-                    return new long[]{};
-                }
-                startIndex += WRITE_BYTES.length() + 2;
-                endIndex = text.indexOf('\n', startIndex);
-                long writeBytes = Long.parseLong(text.substring(startIndex, endIndex));
-
-                result = new long[2];
-                result[0] = readBytes;
-                result[1] = writeBytes;
-
-                THREAD_LOCAL_PROC_FS_READ_OVERHEAD.set(THREAD_LOCAL_PROC_FS_READ_OVERHEAD.get() + text.length());
-            } catch (IOException e) {
+                result = parseDiskBytesReadAndWritten(new String(filearray, StandardCharsets.UTF_8));
+            } catch (IOException | NumberFormatException e) {
                 LOGGER.log(Level.SEVERE, "Could not read disk io from proc fs " + e.getMessage(), e);
             }
-        } else {
-            result = new long[]{0, 0};
         }
         return result;
+    }
+
+    /**
+     * Parses the content of /proc/thread-self/io, e.g.:
+     * <pre>
+     * rchar: 476726516
+     * wchar: 450053132
+     * syscr: 1145703
+     * syscw: 461006
+     * read_bytes: 933888
+     * write_bytes: 26984448
+     * cancelled_write_bytes: 0
+     * </pre>
+     *
+     * @param procFsIoContent - the content of /proc/thread-self/io.
+     * @return an array containing the read_bytes and write_bytes values. Both values are 0 if one of them is missing,
+     * e.g., on kernels without task I/O accounting.
+     */
+    static long[] parseDiskBytesReadAndWritten(final String procFsIoContent) {
+        Long readBytes = null;
+        Long writeBytes = null;
+        for (String line : procFsIoContent.split("\n")) {
+            int separatorIndex = line.indexOf(':');
+            if (separatorIndex > 0) {
+                String key = line.substring(0, separatorIndex).trim();
+                if (READ_BYTES.equals(key)) {
+                    readBytes = Long.parseLong(line.substring(separatorIndex + 1).trim());
+                } else if (WRITE_BYTES.equals(key)) {
+                    writeBytes = Long.parseLong(line.substring(separatorIndex + 1).trim());
+                }
+            }
+        }
+        if (readBytes == null || writeBytes == null) {
+            return new long[]{0, 0};
+        }
+        return new long[]{readBytes, writeBytes};
     }
 
     @Override
