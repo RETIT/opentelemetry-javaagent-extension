@@ -16,6 +16,7 @@
 
 package io.retit.opentelemetry.javaagent.extension.processor;
 
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.context.Context;
 import io.opentelemetry.sdk.common.CompletableResultCode;
 import io.opentelemetry.sdk.trace.ReadWriteSpan;
@@ -92,7 +93,7 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
                 logNetworkDemand,
                 readWriteSpan);
 
-        if (readWriteSpan.getParentSpanContext() != null && !readWriteSpan.getParentSpanContext().isValid()) {
+        if (isTopLevelSpan(readWriteSpan.getParentSpanContext())) {
             // publish resource demand vector for top level transactions as metric for SCI calculations in Grafana
             MetricPublishingService.getInstance().publishResourceDemandVectorOfTransaction(readWriteSpan, logCPUDemand, logHeapDemand, logDiskDemand, logNetworkDemand);
         }
@@ -101,5 +102,17 @@ public class RETITSpanProcessor implements ExtendedSpanProcessor {
     @Override
     public boolean isOnEndingRequired() {
         return true;
+    }
+
+    /**
+     * Returns whether a span is the top level transaction within this JVM. This is the case if the span has
+     * no parent, or if its parent was created in another process and propagated to this JVM, e.g., by a
+     * service mesh sidecar, an ingress or an upstream service sending a traceparent header.
+     *
+     * @param parentSpanContext - the span context of the parent span.
+     * @return true if the span is a top level transaction within this JVM.
+     */
+    static boolean isTopLevelSpan(final SpanContext parentSpanContext) {
+        return parentSpanContext != null && (!parentSpanContext.isValid() || parentSpanContext.isRemote());
     }
 }

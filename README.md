@@ -186,6 +186,8 @@ Furthermore, it publishes OpenTelemetry metrics including this data for all entr
     io.retit.resource.demand.network.bytes - network demand of a transaction in bytes
     io.retit.resource.demand.cpu.ms - CPU demand of a transaction in ms
 
+An entry level transaction is a span without a parent or with a parent from another process (e.g., propagated by a service mesh sidecar, an ingress or an upstream service using a traceparent header). Only spans that are sampled are processed by this extension. If incoming requests carry trace headers with the sampled flag not set (e.g., when the tracing of a service mesh samples only a small percentage of requests), the default parentbased_always_on sampler of the OpenTelemetry Java agent drops these spans and no metrics are published for them. In this case, set OTEL_TRACES_SAMPLER=always_on or OTEL_PROPAGATORS=none (if the trace context of the caller is not needed).
+
 In addition, the total CPU time of the Java process (summed over all threads and cores) is published in ms:
 
     io.retit.emissions.java.process.cpu.time - CPU time of the Java process in ms
