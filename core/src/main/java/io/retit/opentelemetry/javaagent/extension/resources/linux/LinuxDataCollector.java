@@ -56,8 +56,10 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      * or terminals and reads served from the page cache. Note that write_bytes is counted when a page is dirtied,
      * so it is attributed to the thread writing to the page cache and not to the thread flushing the page to disk.
      */
-    private static final String READ_BYTES = "read_bytes";
-    private static final String WRITE_BYTES = "write_bytes";
+    // the preceding line break ensures that write_bytes does not match cancelled_write_bytes,
+    // read_bytes and write_bytes are never the first line of the file
+    private static final String READ_BYTES_KEY = "\nread_bytes:";
+    private static final String WRITE_BYTES_KEY = "\nwrite_bytes:";
 
     @Override
     protected long getPlatformSpecificThreadCpuTime() {
@@ -72,7 +74,7 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
             try {
                 byte[] filearray = Files.readAllBytes(PROC_FS_THREAD_SELF_IO);
                 result = parseDiskBytesReadAndWritten(new String(filearray, StandardCharsets.UTF_8));
-            } catch (IOException | NumberFormatException e) {
+            } catch (IOException e) {
                 LOGGER.log(Level.SEVERE, "Could not read disk io from proc fs " + e.getMessage(), e);
             }
         }
@@ -96,23 +98,43 @@ public class LinuxDataCollector extends CommonResourceDemandDataCollector {
      * e.g., on kernels without task I/O accounting.
      */
     static long[] parseDiskBytesReadAndWritten(final String procFsIoContent) {
-        Long readBytes = null;
-        Long writeBytes = null;
-        for (String line : procFsIoContent.split("\n")) {
-            int separatorIndex = line.indexOf(':');
-            if (separatorIndex > 0) {
-                String key = line.substring(0, separatorIndex).trim();
-                if (READ_BYTES.equals(key)) {
-                    readBytes = Long.parseLong(line.substring(separatorIndex + 1).trim());
-                } else if (WRITE_BYTES.equals(key)) {
-                    writeBytes = Long.parseLong(line.substring(separatorIndex + 1).trim());
-                }
-            }
-        }
-        if (readBytes == null || writeBytes == null) {
+        long readBytes = parseValue(procFsIoContent, READ_BYTES_KEY);
+        long writeBytes = parseValue(procFsIoContent, WRITE_BYTES_KEY);
+        if (readBytes < 0 || writeBytes < 0) {
             return new long[]{0, 0};
         }
         return new long[]{readBytes, writeBytes};
+    }
+
+    /**
+     * Returns the value of the given key without creating intermediate strings, as this is called twice per span.
+     *
+     * @param procFsIoContent - the content of /proc/thread-self/io.
+     * @param key             - the key including the preceding line break and the trailing colon.
+     * @return the value or -1 if the key is not found.
+     */
+    private static long parseValue(final String procFsIoContent, final String key) {
+        int index = procFsIoContent.indexOf(key);
+        if (index < 0) {
+            return -1;
+        }
+        index += key.length();
+        int length = procFsIoContent.length();
+        while (index < length && procFsIoContent.charAt(index) == ' ') {
+            index++;
+        }
+        long value = 0;
+        boolean hasDigits = false;
+        while (index < length) {
+            char character = procFsIoContent.charAt(index);
+            if (character < '0' || character > '9') {
+                break;
+            }
+            value = value * 10 + character - '0';
+            hasDigits = true;
+            index++;
+        }
+        return hasDigits ? value : -1;
     }
 
     @Override

@@ -52,6 +52,13 @@ public class LinuxDataCollectorTest {
     }
 
     @Test
+    public void testCancelledWriteBytesAreNotUsedAsWriteBytes() {
+        String procFsIoContent = "rchar: 1\nwchar: 2\nsyscr: 3\nsyscw: 4\nread_bytes: 5\ncancelled_write_bytes: 7\nwrite_bytes: 6";
+
+        Assertions.assertArrayEquals(new long[]{5, 6}, LinuxDataCollector.parseDiskBytesReadAndWritten(procFsIoContent));
+    }
+
+    @Test
     public void testDiskBytesReadAndWrittenLinux() {
         if (Platform.isLinux()) {
             long[] diskBytes = new LinuxDataCollector().getDiskBytesReadAndWritten();
