@@ -31,6 +31,7 @@ import io.opentelemetry.sdk.trace.data.SpanData;
 import io.opentelemetry.sdk.trace.data.StatusData;
 import io.retit.opentelemetry.javaagent.extension.commons.Constants;
 import io.retit.opentelemetry.javaagent.extension.commons.InstanceConfiguration;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -41,6 +42,10 @@ public class RETITSpanProcessorTest {
 
     private static final SpanContext SAMPLED_SPAN_CONTEXT =
             SpanContext.create(TraceId.getInvalid(), SpanId.getInvalid(), TraceFlags.getSampled(), TraceState.getDefault());
+
+    private static final String VALID_TRACE_ID = "4bf92f3577b34da6a3ce929d0e0e4736";
+
+    private static final String VALID_SPAN_ID = "00f067aa0ba902b7";
 
     private ReadableSpan readableSpan;
 
@@ -79,6 +84,29 @@ public class RETITSpanProcessorTest {
 
         retitSpanProcessor.onEnd(readableSpan);
         verify(readableSpan, atMostOnce()).toSpanData();
+    }
+
+    @Test
+    public void testSpanWithoutParentIsTopLevelSpan() {
+        Assertions.assertTrue(RETITSpanProcessor.isTopLevelSpan(SpanContext.getInvalid()));
+    }
+
+    @Test
+    public void testSpanWithRemoteParentIsTopLevelSpan() {
+        // e.g. a server span whose parent was propagated by a service mesh sidecar using a traceparent header
+        SpanContext remoteParent = SpanContext.createFromRemoteParent(VALID_TRACE_ID, VALID_SPAN_ID, TraceFlags.getSampled(), TraceState.getDefault());
+        Assertions.assertTrue(RETITSpanProcessor.isTopLevelSpan(remoteParent));
+    }
+
+    @Test
+    public void testSpanWithLocalParentIsNoTopLevelSpan() {
+        SpanContext localParent = SpanContext.create(VALID_TRACE_ID, VALID_SPAN_ID, TraceFlags.getSampled(), TraceState.getDefault());
+        Assertions.assertFalse(RETITSpanProcessor.isTopLevelSpan(localParent));
+    }
+
+    @Test
+    public void testSpanWithoutParentSpanContextIsNoTopLevelSpan() {
+        Assertions.assertFalse(RETITSpanProcessor.isTopLevelSpan(null));
     }
 
     @Test
