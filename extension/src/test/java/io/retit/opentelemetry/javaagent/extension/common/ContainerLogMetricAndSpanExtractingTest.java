@@ -106,8 +106,10 @@ public abstract class ContainerLogMetricAndSpanExtractingTest {
                 } else {
                     Assertions.assertNotEquals(0, spanDemandEntry.totalHeapSize);
                 }
-                Assertions.assertNotEquals(0, spanDemandEntry.startDiskReadDemand);
-                Assertions.assertNotEquals(0, spanDemandEntry.endDiskReadDemand);
+                // read_bytes only counts reads that reach the storage layer, so it is 0 if all reads are served from the page cache
+                Assertions.assertNotNull(spanDemandEntry.startDiskReadDemand);
+                Assertions.assertNotNull(spanDemandEntry.endDiskReadDemand);
+                Assertions.assertTrue(spanDemandEntry.endDiskReadDemand >= spanDemandEntry.startDiskReadDemand);
                 if (!isGcSpanName(spanDemandEntryList.getKey())) {
                     if (spanDemandEntry.endDiskWriteDemand != 0) {
                         Assertions.assertNotEquals(0, spanDemandEntry.endDiskWriteDemand);

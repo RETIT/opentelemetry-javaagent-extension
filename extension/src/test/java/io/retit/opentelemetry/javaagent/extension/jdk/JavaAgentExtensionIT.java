@@ -367,8 +367,8 @@ abstract class JavaAgentExtensionIT extends ContainerLogMetricAndSpanExtractingT
             assertNotNull(sd.endDiskReadDemand);
             assertNotNull(sd.startDiskWriteDemand);
             assertNotNull(sd.endDiskWriteDemand);
-            assertNotEquals(0, sd.startDiskReadDemand);
-            assertNotEquals(0, sd.endDiskReadDemand);
+            // read_bytes only counts reads that reach the storage layer, so it is 0 if all reads are served from the page cache
+            assertTrue(sd.endDiskReadDemand >= sd.startDiskReadDemand);
             assertNotEquals(0, sd.startDiskWriteDemand);
             assertNotEquals(0, sd.endDiskWriteDemand);
             assertNull(sd.startNetworkReadDemand);
